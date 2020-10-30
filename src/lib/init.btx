@@ -1,0 +1,413 @@
+\@@let\let\@@let
+\let\def\@@def
+
+\def\@true{1}
+\def\@false{0}
+\def\@iftrue#1{\@@if{{#1}}\@true}
+\def\@settrue#1{\@@set{#1}\@true}
+\def\@setfalse#1{\@@set{#1}\@false}
+\def\@ifmmode{\@iftrue{g.math-mode}}
+
+\def\@defappend{\@@set{def-append}\@true}
+\def\@defprepend{\@@set{def-prepend}\@true}
+\def\@defexpand{\@@set{def-expand}\@true}
+\def\@defglobal{\@@set{def-global}\@true}
+\def\@deftext{\@@set{def-text}\@true}
+\def\@adef{\@defappend\@@def}
+\def\@pdef{\@defprepend\@@def}
+\def\@gdef{\@defglobal\@@def}
+\def\@edef{\@defexpand\@@def}
+\def\@tdef{\@deftext\@@def}
+\def\@patch{\@@set{def-patch}\@true\@@def}
+\let\adef\@adef
+\let\pdef\@pdef
+\let\gdef\@gdef
+\let\edef\@edef
+\let\tdef\@tdef
+\def\alet{\@defappend\@@let}
+\def\plet{\@defprepend\@@let}
+\def\glet{\@defglobal\@@let}
+\def\tlet{\@deftext\@@let}
+
+\def\@defbyname#1{\@@set{def-name}{#1}\@@def@}
+\def\@patchbyname#1{\@@set{def-name}{#1}\@@set{def-patch}\@true\@@def@}
+
+\def\@ladef{\@settrue{def-latex-style}\@@def}
+\def\@ladefcmd#1{\@settrue{def-latex-style}\@@set{def-name}{#1}\@@def@}
+\def\newcommand#1{\@@ifdef#1{\@@throw{COMMAND_ALREADY_DEFINED}}{\@ladef#1}}
+\def\renewcommand#1{\@@ifdef#1{\@ladef#1}{\@@throw{UNDEFINED_COMMAND}}}
+\pdef\newcommand*{\newcommand}
+\pdef\renewcommand*{\renewcommand}
+
+
+% ==========  GROUPS AND ENVIRONMENTS   ==========
+
+\def\@begingroup{\@@enter{group}}
+\def\@endgroup{\@@exit{group}}
+\let\begingroup\@begingroup
+\let\endgroup\@endgroup
+
+\def\@par{\@@event{par}}
+\let\par\@par
+\def
+
+{\@par}
+
+\def$#+1${\@@enter{math}#1\@@exit{math}}
+\def\({\@setfalse{math-display}\@@enter{math}}
+\def\){\@@exit{math}}
+\pdef$$#+1$${\@settrue{math-display}\@@enter{math}#1\@@exit{math}}
+\def\[{\@settrue{math-display}\@@enter{math}}
+\def\]{\@@exit{math}}
+
+\def\begin#1{%
+  \@iftrue{env-defined-#1}{%
+    \@begingroup%
+    \@@set{env-name}{#1}%
+    \@@cmd{env.#1.begin}%
+  }{%
+    \@ifmmode{%
+      \@begingroup%
+      \@@set{env-name}{#1}%
+      \@@text{\begin}{#1}%
+    }{%
+      \@@throw{UNDEFINED_ENVIRONMENT}%
+    }%
+  }%
+}
+
+\def\end#1{%
+  \@iftrue{env-defined-#1}{%
+    \@@cmd{env.#1.end}%
+    \@@if{{env-name}}{#1}{}{%
+      \@@throw{UNMATCHED_ENVIRONMENT}%
+    }%
+  }{\@@text{\end}{#1}}%
+  \@endgroup%
+}
+
+\def\@envdef#1#2#3#4{%
+  \@settrue{env-defined-#1}%
+  \@defbyname{env.#1.begin}#2{#3}%
+  \@defbyname{env.#1.end}{#4}%
+}
+\def\@envpdef#1#2#3#4{%
+  \@settrue{env-defined-#1}%
+  \@defprepend\@defbyname{env.#1.begin}#2{#3}%
+  \@defprepend\@defbyname{env.#1.end}{#4}%
+}
+\def\@envadef#1#2#3#4{%
+  \@settrue{env-defined-#1}%
+  \@defappend\@defbyname{env.#1.begin}#2{#3}%
+  \@defappend\@defbyname{env.#1.end}{#4}%
+}
+\let\envdef\@envdef
+\let\envpdef\@envpdef
+\let\envadef\@envadef
+
+\def\@newenvironment#1#2#3#4{%
+  \@iftrue{env-renew}{%
+    \@@set{env-renew}\@false%
+    \@iftrue{env-defined-#1}{}{\@@throw{UNDEFINED_ENVIRONMENT}}%
+  }{%
+    \@iftrue{env-defined-#1}{\@@throw{ENVIRONMENT_ALREADY_DEFINED}}{}%
+  }%
+  \@settrue{env-defined-#1}%
+  \@ladefcmd{env.#1.begin}#2{#3}%
+  \@defbyname{env.#1.end}{#4}%
+}
+
+\def\newenvironment#0{\@newenvironment{#0}{}}
+\pdef\newenvironment#0[#1]{\@newenvironment{#0}{[#1]}}
+\pdef\newenvironment#0[#1][#2]{\@newenvironment{#0}{[#1][#2]}}
+\pdef\newenvironment#0[#1][#2][#3]{\@newenvironment{#0}{[#1][#2][#3]}}
+\pdef\newenvironment#0[#1][#2][#3][#4]{\@newenvironment{#0}{[#1][#2][#3][#4]}}
+\pdef\newenvironment#0[#1][#2][#3][#4][#5]{\@newenvironment{#0}{[#1][#2][#3][#4][#5]}}
+\pdef\newenvironment#0[#1][#2][#3][#4][#5][#6]{\@newenvironment{#0}{[#1][#2][#3][#4][#5][#6]}}
+\pdef\newenvironment#0[#1][#2][#3][#4][#5][#6][#7]{\@newenvironment{#0}{[#1][#2][#3][#4][#5][#6][#7]}}
+\pdef\newenvironment#0[#1][#2][#3][#4][#5][#6][#7][#8]{\@newenvironment{#0}{[#1][#2][#3][#4][#5][#6][#7][#8]}}
+\pdef\newenvironment#0[#1][#2][#3][#4][#5][#6][#7][#8][#9]{\@newenvironment{#0}{[#1][#2][#3][#4][#5][#6][#7][#8][#9]}}
+\pdef\newenvironment#0[#1][#2][#3][#4][#5][#6][#7][#8][#9][#A]{\@newenvironment{#0}{[#1][#2][#3][#4][#5][#6][#7][#8][#9][#A]}}
+\def\renewenvironment{\@settrue{env-renew}\newenvironment}
+
+
+% ==========        TEXT FORMAT         ==========
+
+\def\@toggle#1{\@iftrue{#1}{\@setfalse}{\@settrue}{#1}}
+\def\@it{\@settrue{text-italic}}
+\def\@rm{\@setfalse{text-italic}}
+\def\@em{\@toggle{text-italic}}
+\def\@bf{\@settrue{text-bold}}
+\def\@md{\@setfalse{text-bold}}
+\def\@colour#1{\@@set{text-colour}{#1}}
+\def\@size#1{\@@set{text-size}{#1}}
+\def\@lang#1#2{{\@@set{text-lang}{#1}#2}}
+\tlet\it\@it
+\tlet\rm\@rm
+\tlet\em\@em
+\tlet\bf\@bf
+\tlet\md\@md
+\tlet\color\@colour
+\tlet\colour\@colour
+\tlet\size\@size
+\tlet\lang\@lang
+\tdef\textit#1{{\@it#1}}
+\tdef\textrm#1{{\@rm#1}}
+\tdef\emph#1{{\@em#1}}
+\tdef\textbf#1{{\@bf#1}}
+\tdef\textmd#1{{\@md#1}}
+\tdef\textcolour#1#2{{\@colour{#1}#2}}
+\tlet\textcolor\textcolour
+\tdef\textsize#1#2{{\@size{#1}#2}}
+
+\tdef\floatright#1{\@@set{div-type}{floatright}\@@enter{div}#1\@@exit{div}}
+
+\tdef\@header#1#2{\@@set{header-type}{#1}\@par\@@enter{header}#2\@@exit{header}\@par}
+\pdef\@header#1[#2]#3{\@@set{header-type}{#1}\@@set{header-hash}{#2}\@par\@@enter{header}#2\@@exit{header}\@par}
+\tdef\section{\@header{h2}}
+\tdef\subsection{\@header{h3}}
+\tdef\subsubsection{\@header{h4}}
+\pdef\section*{\section}
+\pdef\subsection*{\section}
+\pdef\subsubsection*{\section}
+
+
+% ==========     SPECIAL CHARACTERS     ==========
+
+\def\@u#1#2#3#4{\@@char{#1#2#3#4}}
+\def\@ensuremath{\@ifmmode{}{\@@throw{MATH_MODE_REQUIRED}}}
+
+\tdef--{\@u2013}
+\pdef---{\@u2014}
+\tdef`{\@u2018}
+\pdef``{\@u201c}
+\tdef'{\@u2019}
+\pdef''{\@u201d}
+\tdef\`#1{#1\@u0300}
+\tdef\'#1{#1\@u0301}
+\tdef\^#1{#1\@u0302}
+\tdef\~#1{#1\@u0303}
+\tdef\=#1{#1\@u0304}
+\tdef\u#1{#1\@u0306}
+\tdef\.#1{#1\@u0307}
+\tdef\"#1{#1\@u0308}
+\tdef\r#1{#1\@u030a}
+\tdef\H#1{#1\@u030b}
+\tdef\v#1{#1\@u030c}
+\tdef\c#1{#1\@u0327}
+\tdef\AA{\@u00c5}
+\tdef\AE{\@u00c6}
+\tdef\ae{\@u00e6}
+\tdef\i{\@u0131}
+\tdef\j{\@u0237}
+\tdef\L{\@u0141}
+\tdef\l{\@u0142}
+\tdef\O{\@u00d8}
+\tdef\o{\@u00f8}
+\tdef\OE{\@u0152}
+\tdef\oe{\@u0153}
+\tdef\S{\@u00a7}
+\tdef\SS{\@u1e9e}
+\tdef\ss{\@u00df}
+\tdef\{{\@u007b}
+\tdef\}{\@u007d}
+\tdef\#{\@u0023}
+\tdef\${\@u0024}
+\tdef\%{\@u0025}
+\tdef\&{\@u0026}
+\tdef\_{\@u005f}
+\tdef\backslash{\@u005c}
+\tdef\ {\@u0020}
+\tdef~{\@u00a0}
+\tdef\\{\@u000a}
+\tdef\quad{\@u3000}
+\tdef\qquad{\@u3000\@u3000}
+
+\tdef\dagger{\@u2020}
+\tdef\ddagger{\@u2021}
+\tdef\bullet{\@u2022}
+\tdef\circ{\@u2218}
+% ...
+
+
+% ==========          COUNTERS          ==========
+
+\def\@inc#1{\@@add{#1}{1}}
+\def\@newcounter#1{\@@set{g.ctr-#1}{0}\@defbyname{the#1}{\arabic{#1}}\@defbyname{@next#1}{}}
+\def\newcounter#1{\@newcounter{#1}}
+  \pdef\newcounter#1[#2]{\@newcounter{#1}\numberwithin{#1}{#2}}
+\def\stepcounter#1{\@inc{g.ctr-#1}\@@cmd{@next#1}}
+\def\refstepcounter#1{%
+  \@inc{g.ctr-#1}%
+  \@@cmd{@next#1}%
+  \@edef\@currentlabel{\@@cmd{the#1}}%
+  \@@bmk%
+}
+\def\addtocounter#1#2{\@@add{g.ctr-#1}{#2}\@@cmd{@next#1}}
+\def\setcounter#1#2{\@@set{g.ctr-#1}{#2}\@@cmd{@next#1}}
+\def\@addtoreset#1#2{\@patchbyname{@next#2}{\setcounter{#1}{0}}}
+\def\numberwithin#1#2{%
+  \@addtoreset{#1}{#2}%
+  \@defbyname{the#1}{%
+    \@@cmd{the#2}.\arabic{#1}%
+  }%
+}
+\def\arabic#1{\@@set{get-format}{0}\@@get{g.ctr-#1}}
+\def\alph#1{\@@set{get-format}{1}\@@get{g.ctr-#1}}
+\def\Alph#1{\@@set{get-format}{2}\@@get{g.ctr-#1}}
+\def\roman#1{\@@set{get-format}{3}\@@get{g.ctr-#1}}
+\def\Roman#1{\@@set{get-format}{4}\@@get{g.ctr-#1}}
+
+
+% ==========          THEOREMS          ==========
+
+\newcounter{theorem}
+\def\thmprefix{}
+\def\thetheorem{\thmprefix\arabic{theorem}}
+
+\envdef{@theorem}{#1}{%
+  \@par\@@set{div-type}{block}\@@enter{div}\@bf\@rm#1.\@md%
+}{\@@exit{div}}
+\envpdef{@theorem}{#1[#2]}{%
+  \@par\@@set{div-type}{block}\@@enter{div}\@bf\@rm#1\@md (#2)\@bf.\@md%
+}{\@@exit{div}}
+
+\def\theoremstyle#1{%
+  \@@if{#1}{plain}{%
+    \@changethmbegin{\@thmbegina}%
+  }{\@@if{#1}{definition}{%
+    \@changethmbegin{\@thmbeginb}%
+  }{\@@if{#1}{remark}{%
+    \@changethmbegin{\@thmbeginc}%
+  }{\@@throw{UNKNOWN_THEOREM_STYLE}}}}%
+}
+\def\@changethmbegin#1{%
+  \@@def\newtheorem##1##2{%
+    \@envdef{##1}{}{%
+      #1%
+      \begin{@theorem}{\refstepcounter{theorem}##2 \thetheorem}%
+    }{\end{@theorem}}%
+  }%
+  \@pdef\newtheorem*##1##2{%
+    \@envdef{##1}{}{%
+      #1%
+      \begin{@theorem}{##2}%
+    }{\end{@theorem}}%
+  }%
+}
+\def\@thmbegina{} % |
+\def\@thmbeginb{} % | TODO: write these styles
+\def\@thmbeginc{} % |
+
+\theoremstyle{plain}
+\newtheorem{theorem}{\theoremname}
+\newtheorem{corollary}{\corollaryname}
+\newtheorem{lemma}{\lemmaname}
+\newtheorem{proposition}{\propositionname}
+\theoremstyle{definition}
+\newtheorem{definition}{\definitionname}
+\theoremstyle{remark}
+\newtheorem{remark}{\remarkname}
+\theoremstyle{plain}
+
+\envdef{proof}{[#1]}{%
+  \@par%
+  \@gdef\@proofend{\qed}%
+  {\@bf\@rm#1.} %
+}{\@proofend\@par}
+\envadef{proof}{}{\begin{proof}[\proofname]}{\end{proof}}
+
+\tdef\qedsymbol{$\Box$}
+\def\qed{\floatright{\qedsymbol}}
+\def\qedhere{%
+  \@gdef\@proofend{}%
+  \@ifmmode{%
+    \reqno{ \qedsymbol}%
+  }{\qed}%
+}
+
+% ==========           LISTS            ==========
+
+\@@set{list-level}{0}
+\envdef{@list}{}{%
+  \@par\@@enter{list}%
+  \@inc{list-level}%
+}{\@@exit{list}}
+\def\@item{\@@event{+}\@itemlabel\@@event{.}}
+  \pdef\@item[#1]{\@@event{+}#1\@@event{.}}
+\tlet\item\@item
+\def\@itemlabel{}
+
+\envdef{@enum}{#1}{%
+  \begin{@list}%
+  \newcounter{enum-{list-level}}%
+  \def\@itemlabel{\refstepcounter{enum-{list-level}}#1}%
+}{\end{@list}}
+
+\envdef{enumerate}{}{\begin{@enum}{\rm\arabic*.}}{\end{@enum}}
+  \envpdef{enumerate}{[label=#+1]}{\begin{@enum}{#1}}{\end{@enum}}
+
+\envdef{itemize}{}{%
+  \begin{@list}%
+  \@@if{{list-level}}{1}{%
+    \def\@itemlabel{\rm\bullet}%
+  }{%
+    \def\@itemlabel{\rm\circ}%
+  }%
+}{\end{@list}}
+
+\pdef\arabic*{\arabic{enum-{list-level}}}
+\pdef\alph*{\alph{enum-{list-level}}}
+\pdef\Alph*{\Alph{enum-{list-level}}}
+\pdef\roman*{\roman{enum-{list-level}}}
+\pdef\Roman*{\Roman{enum-{list-level}}}
+
+
+% ==========         EQUATIONS          ==========
+
+\newcounter{equation}
+\def\eqno{\reqno}
+\def\leqno{\@@event{leqno}}
+\def\reqno{\@@event{reqno}}
+\def\xeqno{\@@event{xeqno}}
+\def\theequation{\thmprefix\arabic{equation}}
+
+\envdef{equation}{}{\[\refstepcounter{equation}\eqno(\theequation)\xeqno}{\]}
+\envdef{equation*}{}{\[}{\]}
+\envdef{align}{}{\[\begin{aligned}}{\end{aligned}\]}
+\envdef{align*}{}{\[\begin{aligned}}{\end{aligned}\]}
+
+
+% ==========         CROSS-REF          ==========
+
+\def\@currentlabel{}
+\let\label\@@label
+\tdef\@ref#1{\@@enter{ref}#1\@@exit{ref}}
+\tdef\ref#1{\@@set{ref-key}{#1}\@ref{}}
+\pdef\ref*#1{\@settrue{ref-no-link}\@@set{ref-key}{#1}\@ref{}}
+\pdef\ref[#1]#2{\@@set{ref-key}{#2}\@ref{#1}}
+\tdef\eqref#1{(\ref#1)}
+\pdef\eqref*#1{(\ref*#1)}
+
+\envdef{references}{}{%
+  \@@def\bibitem##1{\@@set{ref-prefix}{c}\@item\@@label{cite:##1}}
+  \begin{@enum}{\rm[\arabic*]}%
+}{\end{@enum}}
+\envdef{thebibliography}{}{%
+  \section{\refname}%
+  \begin{references}%
+}{\end{references}}
+\def\cite#1{{[\@ref{cite:#1}]}}
+\pdef\cite[#1]#2{{[\@ref{cite:#2}, #1]}}
+
+
+% ==========           NAMES            ==========
+
+\def\theoremname{定理}
+\def\corollaryname{推论}
+\def\lemmaname{引理}
+\def\propositionname{命题}
+\def\definitionname{定义}
+\def\remarkname{注}
+\def\proofname{证明}
+\def\refname{参考文献}

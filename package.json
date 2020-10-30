@@ -1,0 +1,20 @@
+{
+  "name": "btex",
+  "version": "1.0.0",
+  "description": "A typesetting language that is very similar to LaTeX",
+  "main": "src/main.ts",
+  "repository": "https://github.com/banana-space/btex",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/main.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jsdom": "^16.4.0",
+    "katex": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^16.2.4",
+    "@types/katex": "^0.11.0"
+  }
+}
