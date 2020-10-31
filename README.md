@@ -17,11 +17,13 @@ POST http://127.0.0.1:7200
 Content-Type: application/json
 
 {
-  "code": "要编译的代码",
-  // 以下为可选项，标出的值为默认值
-  "inverseSearch": false // 在结果中包含反向搜索信息
+  "code": "要编译的代码"
 }
 ```
+
+可选参数：
+
+* `"inverseSearch": boolean`，指定是否包含反向搜索信息，默认 `false`。
 
 响应格式如下：
 
@@ -31,10 +33,10 @@ Content-Type: application/json
 
 {
   "html": "<div class=\"btex-output\"> ... </div>",
-  "labels": {        // 页面包含的书签，为了实现跨页面引用
-    "foo": {         // 例如由 \label{foo} 产生
-      "id": "bar",   // 对应 HTML 书签 #bar
-      "html": "3.14" // 当输入 \ref{foo} 时显示的文字
+  "labels": {
+    "foo": {
+      "id": "bar",
+      "html": "3.14"
     }
   },
   "errors": [],
@@ -42,6 +44,10 @@ Content-Type: application/json
 }
 ```
 
+其中
+
+* `labels` 用于跨页面引用，以上示例表示用户输入 `\ref{foo}` 时，应显示文字 `3.14` 并链接至 `#bar` 书签。
+
 ## 测试
 
-在 `src/main.ts` 中去掉 `test();` 一行的注释，则将编译 `test/test.btx`，并输出到 `test/test.html`。
+在 `src/main.ts` 中去掉最后一行的注释，则将编译 `test/test.btx`，并输出到 `test/test.html`。
