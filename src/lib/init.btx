@@ -171,6 +171,11 @@
 \pdef\subsection*{\section}
 \pdef\subsubsection*{\section}
 
+\envdef{flushleft}{}{\@begingroup\@@set{par-align}{left}\@par}{\@endgroup\@par}
+\envdef{center}{}{\@begingroup\@@set{par-align}{center}\@par}{\@endgroup\@par}
+\envdef{centre}{}{\@begingroup\@@set{par-align}{center}\@par}{\@endgroup\@par}
+\envdef{flushright}{}{\@begingroup\@@set{par-align}{right}\@par}{\@endgroup\@par}
+
 
 % ==========     SPECIAL CHARACTERS     ==========
 

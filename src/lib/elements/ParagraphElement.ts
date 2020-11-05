@@ -8,12 +8,16 @@ export class ParagraphElement implements RenderElement {
   children: RenderElement[] = [];
 
   style: {
-    textAlign?: 'left' | 'center' | 'right' | 'justify';
+    textAlign?: string;
   } = {};
 
+  // Provide the argument `context` only if paragraph styles (text align etc.) are desired.
   constructor(context?: Context) {
     if (context) {
-      // TODO: set styles
+      let textAlign = context.get('par-align');
+      if (textAlign && /^(left|center|centre|right|justify)$/.test(textAlign)) {
+        this.style.textAlign = textAlign.replace('centre', 'center');
+      }
     }
   }
 
@@ -150,6 +154,9 @@ export class ParagraphElement implements RenderElement {
 
     let element = document.createElement(name);
     if (name !== 'p') element.classList.add('p');
+
+    if (this.style.textAlign) element.style.textAlign = this.style.textAlign;
+
     element.append(...this.renderInner(options));
 
     return [element];

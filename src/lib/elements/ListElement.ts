@@ -35,7 +35,7 @@ export class ListElement implements ContainerElement {
     switch (arg) {
       case '+':
         if (!this.contentMode) return false;
-        this.paragraph = new ParagraphElement(context);
+        this.paragraph = new ParagraphElement();
         this.children.push({ label: [this.paragraph], content: [] });
         this.contentMode = false;
         return true;
