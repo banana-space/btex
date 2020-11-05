@@ -1,6 +1,7 @@
 import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { SpanElement } from './SpanElement';
+import { TextNode } from './TextNode';
 
 export class ParagraphElement implements RenderElement {
   name: 'paragraph' = 'paragraph';
@@ -17,33 +18,94 @@ export class ParagraphElement implements RenderElement {
   }
 
   normalise() {
-    let lastText = ' ';
+    let prevType: 'space' | 'letter' | 'cjk' | 'punct' | 'cjk-punct' | 'other' = 'space';
+    let prevText: TextNode | undefined = undefined;
+
     for (let child of this.children) {
       if (child instanceof SpanElement && !child.style.preservesSpaces) {
         for (let text of child.children) {
-          if (/^\s*$/.test(text.text) && !/\n/.test(text.text)) {
-            text.text = lastText === ' ' ? '' : ' ';
-            lastText = ' ';
-          } else {
-            lastText = text.text;
+          let newText = text.text;
+
+          // Adjacent spaces are merged into one
+          if (prevType === 'space' || prevType === 'cjk-punct') newText = newText.trimStart();
+
+          // Spacing between letters and CJK characters
+          if (
+            (prevType === 'letter' || prevType === 'punct') &&
+            /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText)
+          )
+            newText = ' ' + newText;
+          if (
+            prevType === 'cjk' &&
+            prevText &&
+            /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{%'"‘“]/u.test(newText)
+          )
+            prevText.text += ' ';
+
+          if (newText) {
+            prevText = text;
+
+            if (/\s+$/.test(newText)) {
+              newText = newText.trimEnd() + ' ';
+              prevType = 'space';
+            } else if (/[\p{Ll}\p{Lu}\p{Nd}\p{Mn}]$/u.test(newText)) {
+              prevType = 'letter';
+            } else if (/[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
+              prevType = 'cjk';
+            } else if (/[\)\]\},.!%;:?'"’”]$/.test(newText)) {
+              prevType = 'punct';
+            } else if (/[\u3000-\u301f\uff00-\uff60]$/.test(newText)) {
+              prevType = 'cjk-punct';
+            } else {
+              prevType = 'other';
+            }
           }
+
+          text.text = newText;
         }
 
         child.children = child.children.filter((text) => {
           return text.text !== '';
         });
       } else {
-        // Child is a container; kill the space unless it is inline.
         child.normalise();
-        if (!child.isEmpty()) lastText = (child as ContainerElement).isInline ? '' : ' ';
+        if (!child.isEmpty()) {
+          if (child instanceof SpanElement) {
+            prevType = 'other';
+          } else if ((child as ContainerElement).isInline) {
+            if (prevType === 'cjk' && prevText) prevText.text += ' ';
+            prevType = 'letter';
+          } else {
+            if (prevText && prevType === 'space') prevText.text = prevText.text.trimRight();
+            prevType = 'space';
+          }
+          prevText = undefined;
+        }
       }
     }
 
-    // TODO: trim right
-    // TODO: merge adjacent spans when possible
-    // TODO: EC spacing
-    // TODO: NFC normalisation
+    // Remove trailing spaces of the paragraph
+    if (prevText && prevType === 'space') {
+      prevText.text = prevText.text.trimRight();
+    }
 
+    // Merge adjacent spans whenever possible
+    let mergeWith: SpanElement | undefined = undefined;
+    for (let span of this.children) {
+      if (!(span instanceof SpanElement)) {
+        mergeWith = undefined;
+        continue;
+      }
+
+      if (mergeWith && mergeWith.canMergeWith(span)) {
+        mergeWith.children.push(...span.children);
+        span.children = [];
+      } else {
+        mergeWith = span;
+      }
+    }
+
+    // Remove empty spans
     this.children = this.children.filter((child) => {
       if (child instanceof SpanElement) return !child.isEmpty();
       return true;

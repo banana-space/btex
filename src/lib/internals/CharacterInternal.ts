@@ -25,7 +25,7 @@ export class CharacterInternal implements Internal {
 
     if (!context.noOutput) {
       let char = String.fromCodePoint(charCode);
-      let isWhitespace = /\s/.test(char) && char !== '\n';
+      let isWhitespace = /\s/.test(char);
       if (isWhitespace) {
         context.flushSpan();
         context.span.style.preservesSpaces = true;

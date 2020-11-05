@@ -38,6 +38,17 @@ export class SpanElement implements RenderElement {
     this.style.lang = context.get('text-lang');
   }
 
+  canMergeWith(span: SpanElement): boolean {
+    return (
+      (this.style.italic ?? false) === (span.style.italic ?? false) &&
+      (this.style.bold ?? false) === (span.style.bold ?? false) &&
+      this.style.colour === span.style.colour &&
+      this.style.fontSize === span.style.fontSize &&
+      (this.style.preservesSpaces ?? false) === (span.style.preservesSpaces ?? false) &&
+      this.style.lang === span.style.lang
+    );
+  }
+
   append(text: string, source: Token) {
     if (this.spacyCommand) {
       if (/^[a-zA-Z]/.test(text)) this.children.push(new TextNode(' ', this.spacyCommand));
@@ -61,6 +72,7 @@ export class SpanElement implements RenderElement {
   render(options?: RenderOptions): Node[] {
     function toHTML(text: string): Node[] {
       let result: Node[] = [];
+      text = text.normalize('NFC');
       let lines = text.split('\n');
       for (let i = 0; i < lines.length; i++) {
         if (i > 0) result.push(document.createElement('br'));
