@@ -9,8 +9,18 @@ import { LabelDictionary, WorkerData, WorkerResult } from './WorkerPool';
 const window = new JSDOM().window;
 global['document'] = window.document;
 
-parentPort?.on('message', (value) => {
-  parentPort?.postMessage(work(value));
+parentPort?.on('message', (value: WorkerData) => {
+  try {
+    parentPort?.postMessage(work(value));
+  } catch {
+    parentPort?.postMessage({
+      taskId: value.taskId ?? 0,
+      html: '',
+      labels: {},
+      errors: ['UNKNOWN'],
+      warnings: [],
+    });
+  }
 });
 
 function work(data: WorkerData): WorkerResult {
