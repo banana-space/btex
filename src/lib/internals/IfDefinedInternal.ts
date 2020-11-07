@@ -2,7 +2,7 @@ import { Code } from '../Code';
 import { Context } from '../Context';
 import { Internal } from '../Internal';
 
-export class IfDefinedInternal implements Internal {
+export const IfDefinedInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     let start = code.pointer;
     let initiator = code.token;
@@ -35,5 +35,5 @@ export class IfDefinedInternal implements Internal {
     code.spliceFrom(start, ...replace.tokens);
 
     return true;
-  }
-}
+  },
+};

@@ -4,7 +4,7 @@ import { Context } from '../Context';
 import { Internal } from '../Internal';
 import { Token, TokenType } from '../Token';
 
-export class CommandInternal implements Internal {
+export const CommandInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     let start = code.pointer;
     let initiator = code.token;
@@ -15,5 +15,5 @@ export class CommandInternal implements Internal {
 
     code.spliceFrom(start, Token.fromParent('\\' + name, TokenType.Command, initiator));
     return true;
-  }
-}
+  },
+};

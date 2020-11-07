@@ -5,7 +5,7 @@ import { LabelElement } from '../elements/LabelElement';
 import { Internal } from '../Internal';
 import { Token, TokenType } from '../Token';
 
-export class LabelInternal implements Internal {
+export const LabelInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     let initiator = code.token;
     code.step();
@@ -31,5 +31,5 @@ export class LabelInternal implements Internal {
     context.exitContainer();
 
     return true;
-  }
-}
+  },
+};

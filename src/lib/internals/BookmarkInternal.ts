@@ -3,7 +3,7 @@ import { Context } from '../Context';
 import { BookmarkElement } from '../elements/BookmarkElement';
 import { Internal } from '../Internal';
 
-export class BookmarkInternal implements Internal {
+export const BookmarkInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     code.step();
 
@@ -20,5 +20,5 @@ export class BookmarkInternal implements Internal {
     context.set('ref-id', bookmark.id.toString());
 
     return true;
-  }
-}
+  },
+};

@@ -4,7 +4,7 @@ import { CompilerErrorType } from '../CompilerError';
 import { Context } from '../Context';
 import { Internal } from '../Internal';
 
-export class ThrowInternal implements Internal {
+export const ThrowInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     let initiator = code.token;
     code.step();
@@ -16,5 +16,5 @@ export class ThrowInternal implements Internal {
     context.throw(text as CompilerErrorType, initiator);
 
     return false;
-  }
-}
+  },
+};

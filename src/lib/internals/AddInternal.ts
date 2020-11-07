@@ -3,7 +3,7 @@ import { Compiler } from '../Compiler';
 import { Context } from '../Context';
 import { Internal } from '../Internal';
 
-export class AddInternal implements Internal {
+export const AddInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     let start = code.pointer;
     let initiator = code.token;
@@ -37,5 +37,5 @@ export class AddInternal implements Internal {
 
     code.spliceFrom(start);
     return true;
-  }
-}
+  },
+};

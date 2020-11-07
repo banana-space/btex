@@ -4,7 +4,7 @@ import { Context } from '../Context';
 import { Containers } from '../Element';
 import { Internal } from '../Internal';
 
-export class EnterInternal implements Internal {
+export const EnterInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     let start = code.pointer;
     let initiator = code.token;
@@ -29,5 +29,5 @@ export class EnterInternal implements Internal {
 
     code.spliceFrom(start);
     return true;
-  }
-}
+  },
+};

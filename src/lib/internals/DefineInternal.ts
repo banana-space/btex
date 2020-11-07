@@ -5,7 +5,7 @@ import { Context } from '../Context';
 import { Internals, Internal } from '../Internal';
 import { Token, TokenType } from '../Token';
 
-export class DefineInternal implements Internal {
+export const DefineInternal: Internal = {
   execute(code: Code, context: Context): boolean {
     let start = code.pointer;
     let initiator = code.token;
@@ -174,5 +174,5 @@ export class DefineInternal implements Internal {
 
     code.spliceFrom(start);
     return true;
-  }
-}
+  },
+};
