@@ -35,6 +35,7 @@ span.display-math {
 
 p:last-child,
 .p:last-child,
+table.list:last-child,
 p > span.display-math:last-child,
 .p > span.display-math:last-child {
   margin-bottom: 0;
