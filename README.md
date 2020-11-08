@@ -7,7 +7,7 @@
 进行以下步骤：
 
 * 运行 `yarn` 初始化项目文件夹。
-* 运行 `yarn build` 或 `tsc` 编译项目。需要 TypeScript 版本 ≥ 4.0。
+* 运行 `yarn build` 编译项目。
 * 运行 `yarn start` 或 `node ./dist/main.js` 启动本地服务器。
 
 bTeX 将运行于本地端口 `7200`。向该端口发送 `POST` 请求以运行编译器，格式如下：
