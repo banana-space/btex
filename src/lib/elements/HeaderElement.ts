@@ -27,7 +27,7 @@ export class HeaderElement implements ContainerElement {
     hash = hash.trim().replace(/\s/g, '_');
 
     // Find an available hash of the form hash_1, hash_2, ...
-    let i = /^[a-z]?\d+$/i.test(hash) ? 1 : 0;
+    let i = /^([a-z]?\d+)?$/i.test(hash) ? 1 : 0;
     let name = hash;
     for (; ; i++) {
       if (i > 0) name = hash + '_' + i;
