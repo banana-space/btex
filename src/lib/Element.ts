@@ -25,6 +25,10 @@ export interface RenderElement {
 export interface ContainerElement extends RenderElement {
   paragraph: ParagraphElement;
   isInline?: boolean;
+  spacingType?: {
+    first: string;
+    last: string;
+  };
 
   enter?(context: Context): void;
 

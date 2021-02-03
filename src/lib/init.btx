@@ -714,6 +714,17 @@
 \tdef\eqref#1{(\ref#1)}
 \pdef\eqref*#1{(\ref*#1)}
 
+\tdef[[#1]]{{\@wlink#1|}}
+
+\tdef\@wlink#+1|{\@link{#1}{#1}}
+\pdef\@wlink#+1|#+2|{\@link{#1}{#2}}
+\pdef\@wlink#+1|#+2|#+3|{\@wlink#1|#2|}
+
+\tdef\@link#1#2{%
+    \@@set{ref-page}{#1}%
+    \@ref{#2}%
+}
+
 \envdef{references}{}{%
     \@@def\bibitem##1{%
         \@@set{ref-prefix}{c}%

@@ -1,5 +1,7 @@
 import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
+import { Token, TokenType } from '../Token';
+import { ReferenceElement } from './ReferenceElement';
 import { SpanElement } from './SpanElement';
 import { TextNode } from './TextNode';
 
@@ -21,9 +23,28 @@ export class ParagraphElement implements RenderElement {
     }
   }
 
-  normalise() {
+  normalise(): {
+    first: string;
+    last: string;
+  } {
+    // Insert auxiliary span between non-span elements
+    for (let i = 0; i < this.children.length - 1; i++) {
+      if (this.children[i] instanceof SpanElement || this.children[i + 1] instanceof SpanElement)
+        continue;
+      let span = new SpanElement();
+      span.append(
+        '',
+        Token.fromCode('', TokenType.Whitespace, { line: 0, col: 0 }, { line: 0, col: 0 })
+      );
+      this.children.splice(i + 1, 0, span);
+      i++;
+    }
+
+    // Insert spaces between CJK and letters, etc.
     let prevType: 'space' | 'letter' | 'cjk' | 'punct' | 'cjk-punct' | 'other' = 'space';
     let prevText: TextNode | undefined = undefined;
+    let first = '',
+      last = '';
 
     for (let child of this.children) {
       if (child instanceof SpanElement && !child.style.preservesSpaces) {
@@ -39,16 +60,14 @@ export class ParagraphElement implements RenderElement {
             /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText)
           )
             newText = ' ' + newText;
-          if (
-            prevType === 'cjk' &&
-            prevText &&
-            /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{%'"‘“]/u.test(newText)
-          )
-            prevText.text += ' ';
+          if (prevType === 'cjk' && /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{%'"‘“]/u.test(newText)) {
+            if (prevText) prevText.text += ' ';
+            else newText = ' ' + newText;
+          }
+
+          prevText = text;
 
           if (newText) {
-            prevText = text;
-
             if (/\s+$/.test(newText)) {
               newText = newText.trimEnd() + ' ';
               prevType = 'space';
@@ -63,22 +82,35 @@ export class ParagraphElement implements RenderElement {
             } else {
               prevType = 'other';
             }
+
+            if (prevType !== 'space') {
+              if (!first) first = prevType;
+              last = prevType;
+            }
           }
 
           text.text = newText;
         }
-
-        child.children = child.children.filter((text) => {
-          return text.text !== '';
-        });
       } else {
         child.normalise();
         if (!child.isEmpty()) {
           if (child instanceof SpanElement) {
             prevType = 'other';
           } else if ((child as ContainerElement).isInline) {
-            if (prevType === 'cjk' && prevText) prevText.text += ' ';
-            prevType = 'letter';
+            let childType = (child as ContainerElement).spacingType;
+            if (childType) {
+              if (
+                prevText &&
+                ((prevType === 'letter' && childType.first === 'cjk') ||
+                  (prevType === 'cjk' && childType.first === 'letter'))
+              )
+                prevText.text += ' ';
+
+              prevType = childType.last as typeof prevType;
+            } else {
+              if (prevType === 'cjk' && prevText) prevText.text += ' ';
+              prevType = 'letter';
+            }
           } else {
             if (prevText && prevType === 'space') prevText.text = prevText.text.trimRight();
             prevType = 'space';
@@ -111,9 +143,16 @@ export class ParagraphElement implements RenderElement {
 
     // Remove empty spans
     this.children = this.children.filter((child) => {
-      if (child instanceof SpanElement) return !child.isEmpty();
+      if (child instanceof SpanElement) {
+        child.children = child.children.filter((text) => {
+          return text.text !== '';
+        });
+        return !child.isEmpty();
+      }
       return true;
     });
+
+    return { first: first || 'other', last: last || 'other' };
   }
 
   isEmpty(): boolean {

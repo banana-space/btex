@@ -10,13 +10,17 @@ export class ReferenceElement implements ContainerElement {
   noLink: boolean = false;
   isInline: boolean = true;
   paragraph: ParagraphElement = new ParagraphElement();
+  spacingType?: {
+    first: string;
+    last: string;
+  };
 
   isEmpty(): boolean {
     return false;
   }
 
   normalise() {
-    this.paragraph.normalise();
+    this.spacingType = this.paragraph.normalise();
   }
 
   enter(context: Context) {
