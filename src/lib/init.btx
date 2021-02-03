@@ -260,10 +260,14 @@
 \pdef\section*{\section}
 
 \tdef\subsection{\@header{h3}}
-\pdef\subsection*{\section}
+\pdef\subsection*{\subsection}
 
 \tdef\subsubsection{\@header{h4}}
-\pdef\subsubsection*{\section}
+\pdef\subsubsection*{\subsubsection}
+
+\pdef\@par==#+1=={\section{#1}}
+\pdef\@par===#+1==={\subsection{#1}}
+\pdef\@par====#+1===={\subsubsection{#1}}
 
 \envdef{flushleft}{}{%
     \@begingroup%

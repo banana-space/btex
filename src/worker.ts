@@ -4,6 +4,7 @@ import { Command } from './lib/Command';
 import { Compiler } from './lib/Compiler';
 import { Context } from './lib/Context';
 import { Parser } from './lib/Parser';
+import { Token, TokenType } from './lib/Token';
 import { LabelDictionary, WorkerData, WorkerResult } from './WorkerPool';
 
 const window = new JSDOM().window;
@@ -45,6 +46,14 @@ function work(data: WorkerData): WorkerResult {
 
   // Parse and compile
   let code = Parser.parse(data.code, '0');
+  // prepend 2 line-breaks to start the first paragraph
+  let lineBreak = Token.fromCode(
+    '\n',
+    TokenType.Whitespace,
+    { line: 0, col: 0 },
+    { line: 0, col: 0 }
+  );
+  code.tokens.splice(0, 0, lineBreak, lineBreak);
   Compiler.compile(code, context);
 
   // Render to HTML
