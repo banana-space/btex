@@ -29,6 +29,10 @@ function runWorker(
   });
 }
 
+function getTimestamp() {
+  return new Date().toISOString().replace('T', ' ').substring(0, 19);
+}
+
 function serve() {
   let requests = 0;
   let server = createServer((request, response) => {
@@ -42,7 +46,7 @@ function serve() {
       request.on('end', function () {
         let start = new Date();
         let id = ++requests;
-        console.log(`btex: Request #${id} received.`);
+        console.log(`[${getTimestamp()}] #${id} Accepted.`);
 
         let post = JSON.parse(body);
         let code = post['code'] ?? '';
@@ -53,7 +57,7 @@ function serve() {
 
         runWorker(code, undefined, renderOptions).then((result) => {
           let ms = new Date().getTime() - start.getTime();
-          console.log(`btex: Request #${id} resolved (${ms} ms).`);
+          console.log(`[${getTimestamp()}] #${id} Resolved (${ms} ms).`);
 
           response.statusCode = 200;
           response.setHeader('Content-Type', 'application/json');
@@ -64,7 +68,7 @@ function serve() {
   });
 
   server.listen(7200, '127.0.0.1', () => {
-    console.log('btex: Server running at http://127.0.0.1:7200');
+    console.log(`[${getTimestamp()}] bTeX running at http://127.0.0.1:7200`);
   });
 }
 
