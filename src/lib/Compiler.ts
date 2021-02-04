@@ -49,6 +49,10 @@ export abstract class Compiler {
       return context.getBoolean('g.math-mode', false);
     }
 
+    function isTextArg(): boolean {
+      return context.getBoolean('c-text-arg', false);
+    }
+
     let parent = context;
     let options = context.options;
     if (!isGlobal) context = context.passToSubgroup();
@@ -126,9 +130,11 @@ export abstract class Compiler {
 
         case TokenType.Text:
         case TokenType.Whitespace:
-          command = context.findCommand(t.text);
-          if (command && !(isMathMode() && command.isTextCommand)) {
-            if (code.expandMacro(command, false)) break;
+          if (!isTextArg()) {
+            command = context.findCommand(t.text);
+            if (command && !(isMathMode() && command.isTextCommand)) {
+              if (code.expandMacro(command, false)) break;
+            }
           }
 
           if (!context.noOutput) {
@@ -174,7 +180,9 @@ export abstract class Compiler {
 
     let noOutput = context.noOutput;
     context.noOutput = true;
+    context.set('c-text-arg', '1');
     this.compileGroup(group, context, code.tokenAtOffset(-1));
+    context.set('c-text-arg', '');
     context.noOutput = noOutput;
 
     let text = '';
@@ -195,6 +203,7 @@ export abstract class Compiler {
 
         case TokenType.Text:
         case TokenType.Whitespace:
+        case TokenType.Argument:
           text += t.text;
           group.step();
           break;
