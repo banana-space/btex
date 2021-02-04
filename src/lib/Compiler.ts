@@ -70,6 +70,7 @@ export abstract class Compiler {
 
       let i = code.pointer;
       let t = code.tokens[i];
+      let mathMode = isMathMode();
 
       switch (t.type) {
         case TokenType.BeginGroup:
@@ -78,6 +79,15 @@ export abstract class Compiler {
             if (context.throw('UNMATCHED_LEFT_BRACKET', t) > options.maxErrors) return false;
             code.step();
             break;
+          }
+
+          // Replace {{...}} by \@@fun{...}
+          let isDoubleBrace =
+            !mathMode &&
+            group.tokens[0]?.type === TokenType.BeginGroup &&
+            group.matchGroup(0) === group.tokens.length - 1;
+          if (isDoubleBrace) {
+            group.tokens.splice(0, 0, Token.fromParent('\\@@fun', TokenType.Command, t));
           }
 
           let preserveBrackets = !context.noOutput && isMathMode();
@@ -109,7 +119,6 @@ export abstract class Compiler {
           }
 
           let command = context.findCommand(name);
-          let mathMode = isMathMode();
           if (!command || (mathMode && command.isTextCommand)) {
             if (mathMode) {
               context.span.append(name, t);

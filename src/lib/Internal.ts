@@ -8,6 +8,7 @@ import { DefineInternal } from './internals/DefineInternal';
 import { EnterInternal } from './internals/EnterInternal';
 import { EventInternal } from './internals/EventInternal';
 import { ExitInternal } from './internals/ExitInternal';
+import { FunctionInternal } from './internals/FunctionInternal';
 import { GetInternal } from './internals/GetInternal';
 import { IfDefinedInternal } from './internals/IfDefinedInternal';
 import { IfInternal } from './internals/IfInternal';
@@ -30,6 +31,7 @@ export const Internals: { [key: string]: Internal } = {
   '\\@@enter': EnterInternal,
   '\\@@event': EventInternal,
   '\\@@exit': ExitInternal,
+  '\\@@fun': FunctionInternal,
   '\\@@get': GetInternal,
   '\\@@if': IfInternal,
   '\\@@ifdef': IfDefinedInternal,

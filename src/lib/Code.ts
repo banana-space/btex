@@ -48,7 +48,7 @@ export class Code {
     return -1;
   }
 
-  private matchGroup(start?: number): number {
+  matchGroup(start?: number): number {
     start ??= this.pointer;
     let nest = 0;
     for (var i = start; i < this.tokens.length; i++) {

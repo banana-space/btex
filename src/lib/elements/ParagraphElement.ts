@@ -184,7 +184,8 @@ export class ParagraphElement implements RenderElement {
         child.name !== 'span' &&
         child.name !== 'math' &&
         child.name !== 'bookmark' &&
-        child.name !== 'ref'
+        child.name !== 'ref' &&
+        !(child as ContainerElement)?.isInline
       ) {
         name = 'div';
         break;
