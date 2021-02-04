@@ -38,7 +38,7 @@ export class WorkerPool {
   }[];
 
   onMessage(workerId: number, value: WorkerResult) {
-    if (!value?.taskId) return;
+    if (!value.taskId) return;
 
     let id = value.taskId;
     delete value.taskId;
@@ -105,7 +105,7 @@ export class WorkerPool {
         delete resolvers[id];
 
         worker.worker = new Worker(__dirname + '/worker.js');
-        worker.worker.on('message', this.onMessage);
+        worker.worker.on('message', (value) => this.onMessage(worker.id, value));
         if (worker.queue.length > 0) this.setWorkerTimeout(workerId);
         for (let data of worker.queue) worker.worker.postMessage(data);
         console.log(`[${getTimestamp()}] #${id} Timeout.`);
