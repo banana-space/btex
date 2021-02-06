@@ -35,8 +35,6 @@ export interface ContainerElement extends RenderElement {
   exit?(context: Context): void;
 
   event(name: string, context: Context, initiator: Token): boolean;
-
-  render(options?: RenderOptions): HTMLElement[];
 }
 
 interface ContainerConstructor {

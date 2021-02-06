@@ -41,6 +41,7 @@ export class HeaderElement implements ContainerElement {
     }
 
     this.hash = name;
+    context.set('ref-id', name);
     context.headers.push(this);
   }
 

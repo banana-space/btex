@@ -23,7 +23,7 @@ export const LabelInternal: Internal = {
     // TODO: detect conflicting labels
 
     let label = new Code([Token.fromParent('\\@currentlabel', TokenType.Command, initiator)]);
-    let element = new LabelElement(text, context.getInteger('ref-id', -1).toString());
+    let element = new LabelElement(text, context.get('ref-id') ?? '');
     context.labels.push(element);
 
     context.enterContainer(element, initiator);

@@ -90,7 +90,7 @@
 \pdef\renewcommand*{\renewcommand}
 
 
-% ==========    GROUPS AND ENVIRONMENTS     ==========
+% ==========  GROUPS AND ENVIRONMENTS   ==========
 
 \def\@begingroup{\@@enter{group}}
 \let\begingroup\@begingroup
@@ -187,7 +187,7 @@
 \def\renewenvironment{\@settrue{env-renew}\newenvironment}
 
 
-% ==========                TEXT FORMAT                 ==========
+% ==========        TEXT FORMAT         ==========
 
 \def\@toggle#1{\@iftrue{#1}{\@setfalse}{\@settrue}{#1}}
 
@@ -244,6 +244,7 @@
     \@@enter{header}%
         #2%
     \@@exit{header}%
+    \@@def\@currentlabel{#2}%
     \@par%
 }
 \pdef\@header#1[#2]#3{%
@@ -251,8 +252,9 @@
     \@@set{header-hash}{#2}%
     \@par%
     \@@enter{header}%
-        #2%
+        #3%
     \@@exit{header}%
+    \@@def\@currentlabel{#3}%
     \@par%
 }
 
@@ -306,7 +308,7 @@
 }
 
 
-% ==========         SPECIAL CHARACTERS         ==========
+% ==========     SPECIAL CHARACTERS     ==========
 
 \def\@u#1#2#3#4{\@@char{#1#2#3#4}}
 
@@ -402,9 +404,9 @@
 
 \tdef\\{\@u000a}
 
-\tdef\quad{\@u3000}
+\tdef\quad{\@u2001}
 
-\tdef\qquad{\@u3000\@u3000}
+\tdef\qquad{\@u2001\@u2001}
 
 \tdef\dagger{\@u2020}
 
@@ -417,7 +419,7 @@
 % ...
 
 
-% ==========                    COUNTERS                    ==========
+% ==========          COUNTERS          ==========
 
 \def\@inc#1{\@@add{#1}{1}}
 
@@ -496,7 +498,7 @@
 }
 
 
-% ==========                    THEOREMS                    ==========
+% ==========          THEOREMS          ==========
 
 \newcounter{theorem}
 
@@ -598,7 +600,7 @@
     }{\qed}%
 }
 
-% ==========                     LISTS                        ==========
+% ==========          LISTS             ==========
 
 \@@set{list-level}{0}
 
@@ -664,7 +666,7 @@
 \pdef\Roman*{\Roman{enum-{list-level}}}
 
 
-% ==========                 EQUATIONS                    ==========
+% ==========        EQUATIONS           ==========
 
 \newcounter{equation}
 
@@ -693,7 +695,7 @@
 \envdef{align*}{}{\[\begin{aligned}}{\end{aligned}\]}
 
 
-% ==========                 CROSS-REF                    ==========
+% ==========        CROSS-REF           ==========
 
 \def\@currentlabel{}
 
@@ -751,20 +753,52 @@
 \pdef\cite[#1]#2{{[\@ref{cite:#2}, #1]}}
 
 
-% ==========                     NAMES                        ==========
+% ==========         SUBPAGES           ==========
+
+\envdef{structure}{}{%
+    \@@def\subpage{\@@set{subpage-level}{1}\@subpage}%
+    \@@def\subsubpage{\@@set{subpage-level}{2}\@@set{list-indent}{1}\@subpage}%
+    \@@def\subsubsubpage{\@@set{subpage-level}{3}\@@set{list-indent}{2}\@subpage}%
+    \section{\tocname}%
+    \@@set{g.list-classes}{subpage-list}%
+    \begin{@list}%
+}{%
+    \end{@list}%
+}
+
+\pdef\@subpage#1#2{\@subpageitem{#1}{#1}{#2}{#2}}
+\pdef\@subpage#1[#2]#3{\@subpageitem{#1}{#1}{#2}{#3}}
+\pdef\@subpage[#1]#2#3{\@subpageitem{#1}{#2}{#3}{#3}}
+\pdef\@subpage[#1]#2[#3]#4{\@subpageitem{#1}{#2}{#3}{#4}}
+
+\def\@subpageitem#1#2#3#4{%
+    \@@set{subpage-number}{#2}%
+    \@@subpage{#4}%
+    \@item%
+    \@link{\@@get{subpage-title}}{#1\@u2001#3}%
+}
+
+
+% ==========          NAMES             ==========
 
 \def\theoremname{定理}
-
 \def\corollaryname{推论}
-
 \def\lemmaname{引理}
-
 \def\propositionname{命题}
-
 \def\definitionname{定义}
-
 \def\remarkname{注}
-
 \def\proofname{证明}
-
 \def\refname{参考文献}
+\def\tocname{目录}
+
+\def\english{%
+    \@@def\theoremname{Theorem}%
+    \@@def\corollaryname{Corollary}%
+    \@@def\lemmaname{Lemma}%
+    \@@def\propositionname{Proposition}%
+    \@@def\definitionname{Definition}%
+    \@@def\remarkname{Remark}%
+    \@@def\proofname{Proof}%
+    \@@def\refname{References}%
+    \@@def\tocname{Contents}%
+}

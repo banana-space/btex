@@ -5,7 +5,7 @@ import { Compiler } from './lib/Compiler';
 import { Context } from './lib/Context';
 import { Parser } from './lib/Parser';
 import { Token, TokenType } from './lib/Token';
-import { LabelDictionary, WorkerData, WorkerResult } from './WorkerPool';
+import { WorkerData, WorkerResult } from './WorkerPool';
 
 const window = new JSDOM().window;
 global['document'] = window.document;
@@ -17,7 +17,6 @@ parentPort?.on('message', (value: WorkerData) => {
     parentPort?.postMessage({
       taskId: value.taskId ?? 0,
       html: '',
-      labels: {},
       errors: ['UNKNOWN'],
       warnings: [],
     });
@@ -29,7 +28,6 @@ function work(data: WorkerData): WorkerResult {
     return {
       taskId: data.taskId ?? 0,
       html: '',
-      labels: {},
       errors: ['SERVER_IS_BUSY'],
       warnings: [],
     };
@@ -60,14 +58,9 @@ function work(data: WorkerData): WorkerResult {
   let root = context.root;
   let html = root.render(data.renderOptions)[0]?.outerHTML ?? '';
 
-  let labels: LabelDictionary = {};
-  for (let label of context.labels)
-    labels[label.key] = { id: label.bookmarkId, html: label.getHTML() };
-
   return {
     taskId: data.taskId ?? 0,
     html,
-    labels,
     errors: context.errors.map((e) => e.getMessage()),
     warnings: context.warnings.map((e) => e.getMessage()),
   };

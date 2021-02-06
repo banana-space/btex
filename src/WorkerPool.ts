@@ -18,16 +18,8 @@ export interface WorkerData {
 export interface WorkerResult {
   taskId?: number;
   html: string;
-  labels: LabelDictionary;
   errors: string[];
   warnings: string[];
-}
-
-export interface LabelDictionary {
-  [key: string]: {
-    id: string;
-    html: string;
-  };
 }
 
 export class WorkerPool {
@@ -98,7 +90,6 @@ export class WorkerPool {
         worker.worker.terminate();
         resolvers[id]({
           html: '',
-          labels: {},
           errors: ['TIMEOUT'],
           warnings: [],
         });

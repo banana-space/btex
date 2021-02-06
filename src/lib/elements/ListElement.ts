@@ -4,9 +4,11 @@ import { ParagraphElement } from './ParagraphElement';
 
 export class ListElement implements ContainerElement {
   name: 'list' = 'list';
+  classes?: string;
   children: {
     label: RenderElement[];
     content: RenderElement[];
+    indent?: number;
   }[] = [];
 
   // This first paragraph element will not be rendered; rendering starts after the first \item.
@@ -30,13 +32,19 @@ export class ListElement implements ContainerElement {
     return this.children.length === 0;
   }
 
+  enter(context: Context) {
+    this.classes = context.get('g.list-classes', true);
+  }
+
   event(arg: string, context: Context): boolean {
     // TODO: errors when returning false
     switch (arg) {
       case '+':
         if (!this.contentMode) return false;
         this.paragraph = new ParagraphElement();
-        this.children.push({ label: [this.paragraph], content: [] });
+        let indent: number | undefined = context.getInteger('list-indent', 0, true);
+        if (!(indent >= 1 && indent <= 3)) indent = undefined;
+        this.children.push({ label: [this.paragraph], content: [], indent });
         this.contentMode = false;
         return true;
       case '.':
@@ -61,9 +69,12 @@ export class ListElement implements ContainerElement {
 
     let table = document.createElement('table');
     table.classList.add('list');
+    if (this.classes) table.classList.add(...this.classes.split(' '));
+
     for (let child of this.children) {
       let tr = document.createElement('tr');
       tr.classList.add('list-item');
+      if (child.indent) tr.classList.add(`list-item-indent-${child.indent}`);
       table.append(tr);
 
       let td = document.createElement('td');

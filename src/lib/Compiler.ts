@@ -31,7 +31,7 @@ export abstract class Compiler {
       return false;
     }
 
-    context.finish();
+    context.finalise();
     return true;
   }
 

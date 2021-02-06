@@ -5,8 +5,10 @@ import { ContainerElement } from './Element';
 import { BookmarkElement } from './elements/BookmarkElement';
 import { HeaderElement } from './elements/HeaderElement';
 import { LabelElement } from './elements/LabelElement';
+import { ReferenceElement } from './elements/ReferenceElement';
 import { RootElement } from './elements/RootElement';
 import { SpanElement } from './elements/SpanElement';
+import { SubpageDeclaration } from './internals/SubpageInternal';
 import { Token } from './Token';
 
 export class Context {
@@ -36,7 +38,12 @@ export class Context {
   // Bookmarks
   bookmarks: BookmarkElement[] = [];
   labels: LabelElement[] = [];
+  references: ReferenceElement[] = [];
   headers: HeaderElement[] = [];
+
+  // Subpages declared with \subpage
+  subpages: SubpageDeclaration[] = [];
+  subpageOfLevel: string[] = [];
 
   _expansions: number = 0;
   _nesting: number = 0;
@@ -56,6 +63,7 @@ export class Context {
       this.bookmarks = basedOn.bookmarks;
       this.labels = basedOn.labels;
       this.headers = basedOn.headers;
+      this.subpages = basedOn.subpages;
     } else {
       this.global = this;
       this.root = new RootElement();
@@ -159,6 +167,10 @@ export class Context {
     return this.errors.push(new CompilerError(type, initiator, ...args));
   }
 
+  warn(type: CompilerErrorType, initiator: Token, ...args: string[]): number {
+    return this.warnings.push(new CompilerError(type, initiator, ...args));
+  }
+
   passToSubgroup(): Context {
     let sub = new Context(this);
     sub._nesting = this._nesting + 1;
@@ -213,47 +225,29 @@ export class Context {
     }
   }
 
-  finish() {
+  /**
+   * Do things after compiling everything and before rendering.
+   * This is pretty much equivalent to a second LaTeX run
+   * in order to get the links and TOC right.
+   */
+  finalise() {
     while (this.stack.length > 1) {
       this.exitContainer();
     }
 
-    let usedBookmarks: { [prefix: string]: number[] } = {};
-    let inverseMap: { [id: number]: { prefix: string; newId: number } } = {};
-    for (let label of this.labels) {
-      let id = parseInt(label.bookmarkId);
-      if (id >= 0 && id < this.bookmarks.length && !(id in inverseMap)) {
-        let prefix = this.bookmarks[id].prefix ?? '';
-        inverseMap[id] = { prefix, newId: -1 }; // newId to be assigned later
-        (usedBookmarks[prefix] ??= []).push(id);
-      } else label.bookmarkId = '';
-    }
-
-    for (let prefix in usedBookmarks) usedBookmarks[prefix].sort((a, b) => a - b);
-
-    let newBookmarks: BookmarkElement[] = [];
-    for (let bookmark of this.bookmarks) bookmark.isUnused = true;
-    for (let prefix in usedBookmarks) {
-      for (let i = 0; i < usedBookmarks[prefix].length; i++) {
-        inverseMap[usedBookmarks[prefix][i]] = { prefix, newId: i };
-
-        let bookmark = this.bookmarks[usedBookmarks[prefix][i]];
-        bookmark.isUnused = false;
-        bookmark.id = i;
-        newBookmarks.push(bookmark);
-      }
-    }
-
-    this.bookmarks = newBookmarks;
-    for (let label of this.labels) {
-      label.normalise();
-      if (label.bookmarkId) {
-        let { prefix, newId } = inverseMap[parseInt(label.bookmarkId)];
-        label.bookmarkId = prefix + (newId + 1);
-      }
-    }
-
+    this.removeInaccessibleBookmarks();
+    this.handleReferences();
+    this.addTableOfContents();
     this.root.normalise();
+
+    let labels: any = {};
+    for (let label of this.labels)
+      labels[label.key] = { id: label.bookmarkId, html: label.getHTML() };
+    this.root.compilerData.labels = labels;
+
+    if (this.subpages.length > 0) {
+      this.root.compilerData.subpages = this.subpages;
+    }
   }
 
   changeTo(context: Context) {
@@ -278,5 +272,65 @@ export class Context {
 
     this.changeTo(parent);
     this._nesting--;
+  }
+
+  private removeInaccessibleBookmarks() {
+    // Remove bookmarks that are not assigned with a label
+    let usedBookmarks: { [prefix: string]: number[] } = {};
+    let inverseMap: { [id: number]: { prefix: string; newId: number } } = {};
+    for (let label of this.labels) {
+      let id = parseInt(label.bookmarkId);
+      if (id >= 0 && id < this.bookmarks.length && !(id in inverseMap)) {
+        let prefix = this.bookmarks[id].prefix ?? '';
+        inverseMap[id] = { prefix, newId: -1 }; // newId to be assigned later
+        (usedBookmarks[prefix] ??= []).push(id);
+      }
+    }
+
+    for (let prefix in usedBookmarks) usedBookmarks[prefix].sort((a, b) => a - b);
+
+    let newBookmarks: BookmarkElement[] = [];
+    for (let bookmark of this.bookmarks) bookmark.isUnused = true;
+    for (let prefix in usedBookmarks) {
+      for (let i = 0; i < usedBookmarks[prefix].length; i++) {
+        inverseMap[usedBookmarks[prefix][i]] = { prefix, newId: i };
+
+        let bookmark = this.bookmarks[usedBookmarks[prefix][i]];
+        bookmark.isUnused = false;
+        bookmark.id = i;
+        newBookmarks.push(bookmark);
+      }
+    }
+    this.bookmarks = newBookmarks;
+    for (let label of this.labels) {
+      label.normalise();
+      if (label.bookmarkId) {
+        let map = inverseMap[parseInt(label.bookmarkId)];
+        // label.bookmarkId may also be a section header
+        if (map) label.bookmarkId = map.prefix + (map.newId + 1);
+      }
+    }
+  }
+
+  private handleReferences() {
+    let labelDict: { [key: string]: LabelElement } = {};
+    for (let label of this.labels) {
+      labelDict[label.key] = label;
+    }
+
+    for (let ref of this.references) {
+      if (ref.page || !ref.key) continue;
+      let label = labelDict[ref.key];
+      if (!label) continue;
+      ref.target = label;
+    }
+  }
+
+  private addTableOfContents() {
+    // TODO: ...
+  }
+
+  private addSubpageData() {
+    this;
   }
 }

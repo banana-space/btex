@@ -15,6 +15,7 @@ import { IfInternal } from './internals/IfInternal';
 import { LabelInternal } from './internals/LabelInternal';
 import { LetInternal } from './internals/LetInternal';
 import { SetInternal } from './internals/SetInternal';
+import { SubpageInternal } from './internals/SubpageInternal';
 import { TextInternal } from './internals/TextInternal';
 import { ThrowInternal } from './internals/ThrowInternal';
 
@@ -38,6 +39,7 @@ export const Internals: { [key: string]: Internal } = {
   '\\@@label': LabelInternal,
   '\\@@let': LetInternal,
   '\\@@set': SetInternal,
+  '\\@@subpage': SubpageInternal,
   '\\@@text': TextInternal,
   '\\@@throw': ThrowInternal,
 };

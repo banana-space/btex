@@ -11,6 +11,7 @@ const errorMessages: { [type: string]: { [lang: string]: string } } = {
 export type CompilerErrorType =
   | 'ARGUMENT_EXPECTED'
   | 'COMMAND_EXPECTED'
+  | 'DUPLICATE_SUBPAGE'
   | 'INVALID_COMMAND_NAME'
   | 'INVALID_CONTAINER_NAME'
   | 'MAX_EXPANSIONS_EXCEEDED'
