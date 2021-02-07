@@ -55,8 +55,7 @@ function work(data: WorkerData): WorkerResult {
   Compiler.compile(code, context);
 
   // Render to HTML
-  let root = context.root;
-  let html = root.render(data.renderOptions)[0]?.outerHTML ?? '';
+  let html = context.render(data.renderOptions);
 
   return {
     taskId: data.taskId ?? 0,

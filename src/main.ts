@@ -14,7 +14,7 @@ global['document'] = window.document;
 const globalContext = new Context();
 Compiler.compile(Parser.parse(readFileSync('./src/lib/init.btx').toString()), globalContext);
 
-const pool = new WorkerPool(16);
+const pool = new WorkerPool(1);
 
 function runWorker(
   code: string,

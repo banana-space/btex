@@ -502,7 +502,7 @@
 
 \newcounter{theorem}
 
-\def\thmprefix{}
+\def\thmprefix{\@u edaf\@u0022\@u edaf}
 
 \def\thetheorem{\thmprefix\arabic{theorem}}
 

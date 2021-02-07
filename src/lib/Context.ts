@@ -1,7 +1,7 @@
 import { Command } from './Command';
 import { CompilerOptions, defaultCompilerOptions } from './Compiler';
 import { CompilerError, CompilerErrorType } from './CompilerError';
-import { ContainerElement } from './Element';
+import { ContainerElement, RenderOptions } from './Element';
 import { BookmarkElement } from './elements/BookmarkElement';
 import { HeaderElement } from './elements/HeaderElement';
 import { LabelElement } from './elements/LabelElement';
@@ -241,13 +241,24 @@ export class Context {
     this.root.normalise();
 
     let labels: any = {};
-    for (let label of this.labels)
-      labels[label.key] = { id: label.bookmarkId, html: label.getHTML() };
+    for (let label of this.labels) {
+      let html = label.getHTML().replace(/\uedaf"\uedaf/g, '~~');
+      labels[label.key] = { id: label.bookmarkId, html };
+    }
     this.root.compilerData.labels = labels;
 
     if (this.subpages.length > 0) {
       this.root.compilerData.subpages = this.subpages;
     }
+  }
+
+  /**
+   * Render everything to HTML.
+   */
+  render(options?: RenderOptions): string {
+    let html = this.root.render(options)[0]?.outerHTML ?? '';
+    html = html.replace(/\uedaf"\uedaf/g, '<btex-ref data-key="--prefix--"></btex-ref>');
+    return html;
   }
 
   changeTo(context: Context) {
