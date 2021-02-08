@@ -33,12 +33,7 @@ Content-Type: application/json
 
 {
   "html": "<div class=\"btex-output\"> ... </div>",
-  "labels": {
-    "foo": {
-      "id": "bar",
-      "html": "3.14"
-    }
-  },
+  "data": {},
   "errors": [],
   "warnings": []
 }
@@ -46,7 +41,7 @@ Content-Type: application/json
 
 其中
 
-* `labels` 用于跨页面引用，以上示例表示用户输入 `\ref{foo}` 时，应显示文字 `3.14` 并链接至 `#bar` 书签。
+* `data` 包含跨页面引用、子页面等数据。
 
 ## 测试
 

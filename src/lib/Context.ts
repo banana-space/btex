@@ -45,6 +45,9 @@ export class Context {
   subpages: SubpageDeclaration[] = [];
   subpageOfLevel: string[] = [];
 
+  // Compiler data to be sent in output
+  compilerData: any = {};
+
   _expansions: number = 0;
   _nesting: number = 0;
 
@@ -245,10 +248,10 @@ export class Context {
       let html = label.getHTML().replace(/\uedaf"\uedaf/g, '~~');
       labels[label.key] = { id: label.bookmarkId, html };
     }
-    this.root.compilerData.labels = labels;
+    this.compilerData.labels = labels;
 
     if (this.subpages.length > 0) {
-      this.root.compilerData.subpages = this.subpages;
+      this.compilerData.subpages = this.subpages;
     }
   }
 

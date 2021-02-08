@@ -8,7 +8,6 @@ export class RootElement implements ContainerElement {
   paragraph: ParagraphElement = new ParagraphElement();
   children: RenderElement[] = [this.paragraph];
   isInline: boolean = false;
-  compilerData: any = {};
 
   normalise() {
     for (let child of this.children) {
@@ -41,14 +40,6 @@ export class RootElement implements ContainerElement {
     div.classList.add('btex-output');
     for (let child of this.children) {
       div.append(...child.render(options));
-    }
-
-    let dataString = JSON.stringify(this.compilerData);
-    if (dataString && dataString !== '{}') {
-      let dataElement = document.createElement('div');
-      dataElement.classList.add('compiler-data');
-      dataElement.setAttribute('data-json', dataString);
-      div.append(dataElement);
     }
 
     return [div];

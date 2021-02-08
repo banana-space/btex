@@ -756,9 +756,32 @@
 % ==========         SUBPAGES           ==========
 
 \envdef{structure}{}{%
-    \@@def\subpage{\@@set{subpage-level}{1}\@subpage}%
-    \@@def\subsubpage{\@@set{subpage-level}{2}\@@set{list-indent}{1}\@subpage}%
-    \@@def\subsubsubpage{\@@set{subpage-level}{3}\@@set{list-indent}{2}\@subpage}%
+    \newcounter{subpage}%
+    \newcounter{ssubpage}[subpage]%
+    \newcounter{sssubpage}[ssubpage]%
+    \@@def\subpage{%
+        \stepcounter{subpage}%
+        \@@set{subpage-level}{1}%
+        \@@set{subpage-number}{\thesubpage}%
+        \@@def\@subpagenumber{\thesubpage}%
+        \@subpage%
+    }%
+    \@@def\subsubpage{%
+        \stepcounter{ssubpage}%
+        \@@set{subpage-level}{2}%
+        \@@set{subpage-number}{\thessubpage}%
+        \@@def\@subpagenumber{\thessubpage}%
+        \@@set{list-indent}{1}%
+        \@subpage%
+    }%
+    \@@def\subsubsubpage{%
+        \stepcounter{sssubpage}%
+        \@@set{subpage-level}{3}%
+        \@@set{subpage-number}{\thesssubpage}%
+        \@@def\@subpagenumber{\thesssubpage}%
+        \@@set{list-indent}{2}%
+        \@subpage%
+    }%
     \section{\tocname}%
     \@@set{g.list-classes}{subpage-list}%
     \begin{@list}%
@@ -766,16 +789,31 @@
     \end{@list}%
 }
 
-\pdef\@subpage#1#2{\@subpageitem{#1}{#1}{#2}{#2}}
-\pdef\@subpage#1[#2]#3{\@subpageitem{#1}{#1}{#2}{#3}}
-\pdef\@subpage[#1]#2#3{\@subpageitem{#1}{#2}{#3}{#3}}
-\pdef\@subpage[#1]#2[#3]#4{\@subpageitem{#1}{#2}{#3}{#4}}
+\def\@subpage#1{%
+    \@subpageitem{#1}{#1}%
+}
+\pdef\@subpage#1[#2]{%
+    \@subpageitem{#1}{#2}%
+}
+\pdef\@subpage[#1]{%
+    \@@set{subpage-number}{#1}%
+    \@subpage%
+}
+\pdef\@subpage[#1][#2]{%
+    \@@set{subpage-number}{#1}%
+    \@@def\@subpagenumber{#2}%
+    \@subpage%
+}
 
-\def\@subpageitem#1#2#3#4{%
-    \@@set{subpage-number}{#2}%
-    \@@subpage{#4}%
+\def\@subpageitem#1#2{%
+    \@@def\@subdisplaytitle{#2}%
+    \@@subpage{#1}%
     \@item%
-    \@link{\@@get{subpage-title}}{#1\@u2001#3}%
+    \@link{%
+        \@@get{subpage-title}%
+    }{%
+        {\@subpagenumber}\@u2001#2%
+    }%
 }
 
 

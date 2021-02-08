@@ -18,6 +18,7 @@ export interface WorkerData {
 export interface WorkerResult {
   taskId?: number;
   html: string;
+  data: string;
   errors: string[];
   warnings: string[];
 }
@@ -92,6 +93,7 @@ export class WorkerPool {
         worker.worker.terminate();
         resolvers[id]({
           html: '',
+          data: '',
           errors: ['TIMEOUT'],
           warnings: [],
         });

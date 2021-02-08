@@ -132,7 +132,7 @@ export abstract class Compiler {
 
           result = code.expandMacro(command);
           if (!result) {
-            if (context.throw('NO_MATCHING_DEFINITIONS', t) > options.maxErrors) return false;
+            if (context.throw('NO_MATCHING_DEFINITIONS', t, name) > options.maxErrors) return false;
           }
 
           break;
@@ -155,7 +155,7 @@ export abstract class Compiler {
 
         case TokenType.Argument:
           if (!context.noOutput) {
-            if (context.throw('UNEXPECTED_TOKEN', t) > options.maxErrors) return false;
+            context.span.append(t.text, t);
           }
           code.step();
           break;

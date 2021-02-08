@@ -17,6 +17,7 @@ parentPort?.on('message', (value: WorkerData) => {
     parentPort?.postMessage({
       taskId: value.taskId ?? 0,
       html: '',
+      data: '',
       errors: ['UNKNOWN'],
       warnings: [],
     });
@@ -28,6 +29,7 @@ function work(data: WorkerData): WorkerResult {
     return {
       taskId: data.taskId ?? 0,
       html: '',
+      data: '',
       errors: ['SERVER_IS_BUSY'],
       warnings: [],
     };
@@ -60,6 +62,7 @@ function work(data: WorkerData): WorkerResult {
   return {
     taskId: data.taskId ?? 0,
     html,
+    data: JSON.stringify(context.compilerData),
     errors: context.errors.map((e) => e.getMessage()),
     warnings: context.warnings.map((e) => e.getMessage()),
   };
