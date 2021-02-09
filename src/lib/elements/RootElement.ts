@@ -9,6 +9,8 @@ export class RootElement implements ContainerElement {
   children: RenderElement[] = [this.paragraph];
   isInline: boolean = false;
 
+  tocRendered?: HTMLElement;
+
   normalise() {
     for (let child of this.children) {
       child.normalise();
@@ -40,6 +42,11 @@ export class RootElement implements ContainerElement {
     div.classList.add('btex-output');
     for (let child of this.children) {
       div.append(...child.render(options));
+    }
+
+    if (this.tocRendered) {
+      let position = div.querySelector('h2');
+      position?.parentNode?.insertBefore(this.tocRendered, position);
     }
 
     return [div];

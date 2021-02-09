@@ -46,7 +46,7 @@ export class ReferenceElement implements ContainerElement {
       if (this.noLink) return nodes;
 
       let link = document.createElement('a');
-      link.setAttribute('href', '#' + this.target.bookmarkId);
+      link.setAttribute('href', '#' + encodeURIComponent(this.target.bookmarkId));
       link.append(...nodes);
       return [link];
     }

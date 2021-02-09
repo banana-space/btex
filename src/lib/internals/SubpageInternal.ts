@@ -1,9 +1,7 @@
 import { Code } from '../Code';
 import { Compiler } from '../Compiler';
 import { Context } from '../Context';
-import { VirtualElement } from '../elements/VirtualElement';
 import { Internal } from '../Internal';
-import { Token, TokenType } from '../Token';
 
 export const SubpageInternal: Internal = {
   execute(code: Code, context: Context): boolean {
@@ -30,20 +28,14 @@ export const SubpageInternal: Internal = {
     for (let subpage of context.subpages) if (subpage.title === fullTitle) isDuplicate = true;
 
     // Get display title of subpage
-    let sdt = new Code([Token.fromParent('\\@subdisplaytitle', TokenType.Command, initiator)]);
-    let element = new VirtualElement();
-
-    context.enterContainer(element, initiator);
-    if (!Compiler.compileGroup(sdt, context, initiator)) return false;
-    context.exitContainer();
-    element.normalise();
+    let displayTitle = context.commandToHTML('\\@subdisplaytitle', initiator) ?? '??';
 
     if (isDuplicate) {
       context.warn('DUPLICATE_SUBPAGE', initiator, fullTitle);
     } else {
       context.subpages.push({
         title: fullTitle,
-        displayTitle: element.getHTML(),
+        displayTitle,
         level,
         number: context.get('subpage-number') ?? '', // No resetting; subpage-number is used after this.
       });

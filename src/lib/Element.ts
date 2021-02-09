@@ -30,7 +30,7 @@ export interface ContainerElement extends RenderElement {
     last: string;
   };
 
-  enter?(context: Context): void;
+  enter?(context: Context, initiator: Token): void;
 
   exit?(context: Context): void;
 

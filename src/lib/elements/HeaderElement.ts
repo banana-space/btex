@@ -7,6 +7,8 @@ export class HeaderElement implements ContainerElement {
   name: 'header' = 'header';
   type?: string;
   hash?: string;
+  numberHTML?: string;
+  noToc?: boolean;
   paragraph: ParagraphElement = new ParagraphElement();
   isInline: boolean = true;
 
@@ -18,8 +20,13 @@ export class HeaderElement implements ContainerElement {
     this.paragraph.normalise();
   }
 
-  enter(context: Context) {
+  enter(context: Context, initiator: Token) {
     this.type = context.get('header-type', true);
+    this.noToc = context.getBoolean('header-no-toc', false, true);
+
+    if (context.getBoolean('header-numbered', false)) {
+      this.numberHTML = context.commandToHTML('\\@headernumber', initiator) ?? undefined;
+    }
   }
 
   exit(context: Context) {
@@ -55,6 +62,13 @@ export class HeaderElement implements ContainerElement {
 
     let element = document.createElement(this.type);
     if (this.hash) element.setAttribute('id', this.hash);
+
+    if (this.numberHTML) {
+      let span = document.createElement('span');
+      span.classList.add('header-number');
+      span.append(this.numberHTML);
+      element.append(span);
+    }
 
     element.append(...this.paragraph.renderInner(options));
     return [element];

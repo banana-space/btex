@@ -1,5 +1,6 @@
+import { Code } from './Code';
 import { Command } from './Command';
-import { CompilerOptions, defaultCompilerOptions } from './Compiler';
+import { Compiler, CompilerOptions, defaultCompilerOptions } from './Compiler';
 import { CompilerError, CompilerErrorType } from './CompilerError';
 import { ContainerElement, RenderOptions } from './Element';
 import { BookmarkElement } from './elements/BookmarkElement';
@@ -8,8 +9,9 @@ import { LabelElement } from './elements/LabelElement';
 import { ReferenceElement } from './elements/ReferenceElement';
 import { RootElement } from './elements/RootElement';
 import { SpanElement } from './elements/SpanElement';
+import { VirtualElement } from './elements/VirtualElement';
 import { SubpageDeclaration } from './internals/SubpageInternal';
-import { Token } from './Token';
+import { Token, TokenType } from './Token';
 
 export class Context {
   options: CompilerOptions;
@@ -205,7 +207,7 @@ export class Context {
     let parentIsInline = this.container.isInline;
 
     this.flushSpan();
-    if (element.enter) element.enter(this);
+    if (element.enter) element.enter(this, initiator);
     this.stack.push(element);
 
     if (parentIsInline && !element.isInline) {
@@ -243,12 +245,15 @@ export class Context {
     this.addTableOfContents();
     this.root.normalise();
 
+    // Generate compiler data
     let labels: any = {};
+    let hasLabels = false;
     for (let label of this.labels) {
       let html = label.getHTML().replace(/\uedaf"\uedaf/g, '~~');
       labels[label.key] = { id: label.bookmarkId, html };
+      hasLabels = true;
     }
-    this.compilerData.labels = labels;
+    if (hasLabels) this.compilerData.labels = labels;
 
     if (this.subpages.length > 0) {
       this.compilerData.subpages = this.subpages;
@@ -286,6 +291,18 @@ export class Context {
 
     this.changeTo(parent);
     this._nesting--;
+  }
+
+  commandToHTML(command: string, initiator: Token): string | null {
+    let code = new Code([Token.fromParent(command, TokenType.Command, initiator)]);
+    let element = new VirtualElement();
+
+    this.enterContainer(element, initiator);
+    if (!Compiler.compileGroup(code, this, initiator)) return null;
+    this.exitContainer();
+    element.normalise();
+
+    return element.getHTML();
   }
 
   private removeInaccessibleBookmarks() {
@@ -341,10 +358,48 @@ export class Context {
   }
 
   private addTableOfContents() {
-    // TODO: ...
-  }
+    let headers = this.headers.filter((header) => !header.noToc);
 
-  private addSubpageData() {
-    this;
+    if (headers.length > 0) {
+      let toc = document.createElement('div');
+      toc.classList.add('toc');
+      this.root.tocRendered = toc;
+
+      let tocTitle = document.createElement('div');
+      tocTitle.classList.add('toctitle');
+      tocTitle.innerHTML =
+        this.commandToHTML(
+          '\\tocname',
+          Token.fromCode('\\tocname', TokenType.Command, { line: 0, col: 0 }, { line: 0, col: 0 })
+        ) ?? '??';
+      toc.append(tocTitle);
+
+      let ul = document.createElement('ul');
+      toc.append(ul);
+
+      for (let header of headers) {
+        let level = header.type === 'h4' ? 3 : header.type === 'h3' ? 2 : 1;
+
+        let li = document.createElement('li');
+        li.classList.add('toclevel-' + level);
+        ul.append(li);
+
+        let a = document.createElement('a');
+        a.setAttribute('href', '#' + encodeURIComponent(header.hash ?? ''));
+        li.append(a);
+
+        if (header.numberHTML) {
+          let tocNumber = document.createElement('span');
+          tocNumber.classList.add('tocnumber');
+          tocNumber.innerHTML = header.numberHTML;
+          a.append(tocNumber);
+        }
+
+        let tocText = document.createElement('span');
+        tocText.classList.add('toctext');
+        header.paragraph.renderInner().map((node) => tocText.append(node));
+        a.append(tocText);
+      }
+    }
   }
 }

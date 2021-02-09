@@ -187,6 +187,85 @@
 \def\renewenvironment{\@settrue{env-renew}\newenvironment}
 
 
+% ==========          COUNTERS          ==========
+
+\def\@inc#1{\@@add{#1}{1}}
+
+\def\@newcounter#1{%
+    \@@set{g.ctr-#1}{0}%
+    \@defbyname{the#1}{\arabic{#1}}%
+    \@defbyname{@next#1}{}%
+}
+
+\def\newcounter#1{%
+    \@newcounter{#1}%
+}
+\pdef\newcounter#1[#2]{%
+    \@newcounter{#1}%
+    \numberwithin{#1}{#2}%
+}
+
+\def\stepcounter#1{%
+    \@inc{g.ctr-#1}%
+    \@@cmd{@next#1}%
+}
+
+\def\refstepcounter#1{%
+    \@inc{g.ctr-#1}%
+    \@@cmd{@next#1}%
+    \@edef\@currentlabel{\@@cmd{the#1}}%
+    \@@bmk%
+}
+
+\def\addtocounter#1#2{%
+    \@@add{g.ctr-#1}{#2}%
+    \@@cmd{@next#1}%
+}
+
+\def\setcounter#1#2{%
+    \@@set{g.ctr-#1}{#2}%
+    \@@cmd{@next#1}%
+}
+
+\def\@addtoreset#1#2{%
+    \@patchbyname{@next#2}{%
+        \setcounter{#1}{0}%
+    }%
+}
+
+\def\numberwithin#1#2{%
+    \@addtoreset{#1}{#2}%
+    \@defbyname{the#1}{%
+        \@@cmd{the#2}.\arabic{#1}%
+    }%
+}
+
+\def\arabic#1{%
+    \@@set{get-format}{0}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\alph#1{%
+    \@@set{get-format}{1}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\Alph#1{%
+    \@@set{get-format}{2}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\roman#1{%
+    \@@set{get-format}{3}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\Roman#1{%
+    \@@set{get-format}{4}%
+    \@@get{g.ctr-#1}%
+}
+
+
 % ==========        TEXT FORMAT         ==========
 
 \def\@toggle#1{\@iftrue{#1}{\@setfalse}{\@settrue}{#1}}
@@ -244,7 +323,11 @@
     \@@enter{header}%
         #2%
     \@@exit{header}%
-    \@@def\@currentlabel{#2}%
+    \@iftrue{header-numbered}{%
+        \@setfalse{header-numbered}%
+    }{%
+        \@@def\@currentlabel{#2}%
+    }%
     \@par%
 }
 \pdef\@header#1[#2]#3{%
@@ -254,22 +337,96 @@
     \@@enter{header}%
         #3%
     \@@exit{header}%
-    \@@def\@currentlabel{#3}%
+    \@iftrue{header-numbered}{%
+        \@setfalse{header-numbered}%
+    }{%
+        \@@def\@currentlabel{#3}%
+    }%
     \@par%
 }
 
-\tdef\section{\@header{h2}}
-\pdef\section*{\section}
+\newcounter{section}
+\newcounter{subsection}[section]
+\newcounter{subsubsection}[subsection]
 
-\tdef\subsection{\@header{h3}}
-\pdef\subsection*{\subsection}
+\def\thmprefix{\@u edaf\@u0022\@u edaf}
+\def\thesection{\thmprefix\arabic{section}}
 
-\tdef\subsubsection{\@header{h4}}
-\pdef\subsubsection*{\subsubsection}
+\newcounter{theorem}
+
+\tdef\@section{%
+    \refstepcounter{section}%
+    \@@def\@headernumber{\thesection}%
+    \@settrue{header-numbered}%
+    \@header{h2}%
+}
+\pdef\@section*{\@header{h2}}
+\pdef\@section**{%
+    \@settrue{header-no-toc}%
+    \@header{h2}%
+}
+\pdef\@section***{\@section**}
+
+\tdef\@subsection{%
+    \refstepcounter{subsection}%
+    \@@def\@headernumber{\thesubsection}%
+    \@settrue{header-numbered}%
+    \@header{h3}%
+}
+\pdef\@subsection*{\@header{h3}}
+\pdef\@subsection**{%
+    \@settrue{header-no-toc}%
+    \@header{h3}%
+}
+\pdef\@subsection***{\@subsection**}
+
+\tdef\@subsubsection{%
+    \refstepcounter{subsubsection}%
+    \@@def\@headernumber{\thesubsubsection}%
+    \@settrue{header-numbered}%
+    \@header{h4}%
+}
+\pdef\@subsubsection*{\@header{h4}}
+\pdef\@subsubsection**{%
+    \@settrue{header-no-toc}%
+    \@header{h4}%
+}
+\pdef\@subsubsection***{\@subsubsection**}
 
 \pdef\@par==#+1=={\section{#1}}
 \pdef\@par===#+1==={\subsection{#1}}
 \pdef\@par====#+1===={\subsubsection{#1}}
+\pdef\@par====={\@par{}=====}
+
+\def\unnumbersections{%
+    \@tdef\section{\@section*}%
+    \@tdef\subsection{\@subsection*}%
+    \@tdef\subsubsection{\@subsubsection*}%
+    \def\thetheorem{\thmprefix\arabic{theorem}}%
+}
+
+\def\numbersections{%
+    \@tdef\section{\@section}%
+    \@tdef\subsection{\@subsection*}%
+    \@tdef\subsubsection{\@subsubsection*}%
+    \numberwithin{theorem}{section}%
+}
+
+\def\numbersubsections{%
+    \@tdef\section{\@section}%
+    \@tdef\subsection{\@subsection}%
+    \@tdef\subsubsection{\@subsubsection*}%
+    \numberwithin{theorem}{subsection}%
+}
+
+\def\numbersubsubsections{%
+    \@tdef\section{\@section}%
+    \@tdef\subsection{\@subsection}%
+    \@tdef\subsubsection{\@subsubsection}%
+    \numberwithin{theorem}{subsubsection}%
+}
+
+\numbersections
 
 \envdef{flushleft}{}{%
     \@begingroup%
@@ -419,92 +576,7 @@
 % ...
 
 
-% ==========          COUNTERS          ==========
-
-\def\@inc#1{\@@add{#1}{1}}
-
-\def\@newcounter#1{%
-    \@@set{g.ctr-#1}{0}%
-    \@defbyname{the#1}{\arabic{#1}}%
-    \@defbyname{@next#1}{}%
-}
-
-\def\newcounter#1{%
-    \@newcounter{#1}%
-}
-\pdef\newcounter#1[#2]{%
-    \@newcounter{#1}%
-    \numberwithin{#1}{#2}%
-}
-
-\def\stepcounter#1{%
-    \@inc{g.ctr-#1}%
-    \@@cmd{@next#1}%
-}
-
-\def\refstepcounter#1{%
-    \@inc{g.ctr-#1}%
-    \@@cmd{@next#1}%
-    \@edef\@currentlabel{\@@cmd{the#1}}%
-    \@@bmk%
-}
-
-\def\addtocounter#1#2{%
-    \@@add{g.ctr-#1}{#2}%
-    \@@cmd{@next#1}%
-}
-
-\def\setcounter#1#2{%
-    \@@set{g.ctr-#1}{#2}%
-    \@@cmd{@next#1}%
-}
-
-\def\@addtoreset#1#2{%
-    \@patchbyname{@next#2}{%
-        \setcounter{#1}{0}%
-    }%
-}
-
-\def\numberwithin#1#2{%
-    \@addtoreset{#1}{#2}%
-    \@defbyname{the#1}{%
-        \@@cmd{the#2}.\arabic{#1}%
-    }%
-}
-
-\def\arabic#1{%
-    \@@set{get-format}{0}%
-    \@@get{g.ctr-#1}%
-}
-
-\def\alph#1{%
-    \@@set{get-format}{1}%
-    \@@get{g.ctr-#1}%
-}
-
-\def\Alph#1{%
-    \@@set{get-format}{2}%
-    \@@get{g.ctr-#1}%
-}
-
-\def\roman#1{%
-    \@@set{get-format}{3}%
-    \@@get{g.ctr-#1}%
-}
-
-\def\Roman#1{%
-    \@@set{get-format}{4}%
-    \@@get{g.ctr-#1}%
-}
-
-
 % ==========          THEOREMS          ==========
-
-\newcounter{theorem}
-
-\def\thmprefix{\@u edaf\@u0022\@u edaf}
-
-\def\thetheorem{\thmprefix\arabic{theorem}}
 
 \envdef{@theorem}{#1}{%
     \@par%
@@ -743,7 +815,7 @@
 }
 
 \envdef{thebibliography}{}{%
-    \section{\refname}%
+    \@section**{\refname}%
     \begin{references}%
 }{%
     \end{references}%
@@ -782,7 +854,7 @@
         \@@set{list-indent}{2}%
         \@subpage%
     }%
-    \section{\tocname}%
+    \@section*{\tocname}%
     \@@set{g.list-classes}{subpage-list}%
     \begin{@list}%
 }{%
