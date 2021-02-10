@@ -9,6 +9,7 @@ let resolvers: { [id: number]: (value: WorkerResult) => void } = { 0: () => {} }
 export interface WorkerData {
   code: string;
   globalContext: Context;
+  preamble?: string;
   options?: CompilerOptions;
   renderOptions?: RenderOptions;
   taskId?: number;

@@ -23,7 +23,10 @@ Content-Type: application/json
 
 可选参数：
 
+* `"preamble": string`，导言部分。
 * `"inverseSearch": boolean`，指定是否包含反向搜索信息，默认 `false`。
+* `"inline": boolean`，指定是否为行内模式 (不允许分段)，默认 `false`。
+* `"equationMode": boolean`，指定是否为公式模式 (`code` 只包含一个数学公式)，默认 `false`。
 
 响应格式如下：
 

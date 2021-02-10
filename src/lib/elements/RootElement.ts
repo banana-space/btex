@@ -27,28 +27,41 @@ export class RootElement implements ContainerElement {
   event(name: string, context: Context, initiator: Token): boolean {
     switch (name) {
       case 'par':
-        this.paragraph = new ParagraphElement(context);
-        this.children.push(this.paragraph);
+        if (this.isInline) {
+          context.throw('NO_PARAGRAPHS_IN_INLINE_MODE', initiator);
+        } else {
+          this.paragraph = new ParagraphElement(context);
+          this.children.push(this.paragraph);
+        }
         return true;
     }
     context.throw('UNKNOWN_EVENT', initiator, name);
     return false;
   }
 
-  render(options?: RenderOptions): HTMLDivElement[] {
+  render(options?: RenderOptions): HTMLElement[] {
     if (this.isEmpty()) return [];
 
-    let div = document.createElement('div');
-    div.classList.add('btex-output');
-    for (let child of this.children) {
-      div.append(...child.render(options));
-    }
+    if (this.isInline) {
+      let span = document.createElement('span');
+      span.classList.add('btex-output');
+      span.append(...this.paragraph.renderInner(options));
 
-    if (this.tocRendered) {
-      let position = div.querySelector('h2');
-      position?.parentNode?.insertBefore(this.tocRendered, position);
-    }
+      return [span];
+    } else {
+      let div = document.createElement('div');
+      div.classList.add('btex-output');
 
-    return [div];
+      for (let child of this.children) {
+        div.append(...child.render(options));
+      }
+
+      if (this.tocRendered) {
+        let position = div.querySelector('h2');
+        position?.parentNode?.insertBefore(this.tocRendered, position);
+      }
+
+      return [div];
+    }
   }
 }

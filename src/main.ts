@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { createServer } from 'http';
 import { JSDOM } from 'jsdom';
-import { Compiler, CompilerOptions } from './lib/Compiler';
+import { Compiler, CompilerOptions, defaultCompilerOptions } from './lib/Compiler';
 import { Context } from './lib/Context';
 import { RenderOptions } from './lib/Element';
 import { Parser } from './lib/Parser';
@@ -55,7 +55,11 @@ function serve() {
           inverseSearch: post['inverseSearch'] === true,
         };
 
-        runWorker(code, undefined, renderOptions).then((result) => {
+        let options: CompilerOptions = defaultCompilerOptions;
+        options.inline = post['inline'] === true;
+        options.equationMode = post['equationMode'] === true;
+
+        runWorker(code, options, renderOptions).then((result) => {
           let ms = new Date().getTime() - start.getTime();
           console.log(`[${getTimestamp()}] #${id} Resolved (${ms} ms).`);
 

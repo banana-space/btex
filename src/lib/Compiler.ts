@@ -5,11 +5,41 @@ import { Internals } from './Internal';
 import { Token, TokenType } from './Token';
 
 export interface CompilerOptions {
+  /**
+   * Max number of errors before giving up.
+   * @default 100
+   */
   maxErrors: number;
+
+  /**
+   * Max number of macro expansions before giving up.
+   * @default 50000
+   */
   maxMacroExpansions: number;
+
+  /**
+   * Max number of tokens allowed during macro expansion.
+   * @default 1000000
+   */
   maxBuffer: number;
+
+  /**
+   * Max number of nesting groups and environments.
+   * @default 1000
+   */
   maxNesting: number;
+
+  /**
+   * Whether to compile in inline mode (disallow paragraph breaks).
+   * @default false
+   */
   inline: boolean;
+
+  /**
+   * Whether to regard the source as the part between $...$ in an equation.
+   * @default false
+   */
+  equationMode: boolean;
 }
 
 export const defaultCompilerOptions: CompilerOptions = {
@@ -18,6 +48,7 @@ export const defaultCompilerOptions: CompilerOptions = {
   maxBuffer: 1000000,
   maxNesting: 1000,
   inline: false,
+  equationMode: false,
 };
 
 export abstract class Compiler {
