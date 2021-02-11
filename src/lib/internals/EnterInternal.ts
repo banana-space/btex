@@ -20,7 +20,7 @@ export const EnterInternal: Internal = {
     } else {
       let SomeElement = Containers[name];
       if (!SomeElement) {
-        context.throw('INVALID_CONTAINER_NAME', initiator);
+        context.throw('INVALID_CONTAINER_NAME', initiator, name);
         return false;
       }
 

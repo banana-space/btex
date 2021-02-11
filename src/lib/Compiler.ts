@@ -88,14 +88,14 @@ export abstract class Compiler {
     let options = context.options;
     if (!isGlobal) context = context.passToSubgroup();
     if (context._nesting > options.maxNesting) {
-      context.throw('MAX_NESTING_EXCEEDED', nextToken);
+      context.throw('MAX_NESTING_EXCEEDED', nextToken, options.maxNesting.toString());
       return false;
     }
 
     code.pointer = 0;
     while (code.pointer < code.tokens.length) {
       if (code.tokens.length > options.maxBuffer) {
-        context.throw('MAX_TOKENS_EXCEEDED', nextToken);
+        context.throw('MAX_TOKENS_EXCEEDED', nextToken, options.maxBuffer.toString());
         return false;
       }
 
@@ -136,7 +136,7 @@ export abstract class Compiler {
 
         case TokenType.Command:
           if (context.recordExpansion() > options.maxMacroExpansions) {
-            context.throw('MAX_EXPANSIONS_EXCEEDED', t);
+            context.throw('MAX_EXPANSIONS_EXCEEDED', t, options.maxMacroExpansions.toString());
             return false;
           }
 

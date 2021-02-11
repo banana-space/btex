@@ -24,7 +24,7 @@ export const LetInternal: Internal = {
         t.type !== TokenType.Whitespace) ||
       Internals[name]
     ) {
-      context.throw('INVALID_COMMAND_NAME', t);
+      context.throw('INVALID_COMMAND_NAME', t, t.text);
       return false;
     }
 

@@ -22,7 +22,7 @@ export const DefineInternal: Internal = {
     if (name === '@') {
       let defName = context.get('def-name', true);
       if (defName === undefined) {
-        context.throw('INVALID_COMMAND_NAME', t);
+        context.throw('INVALID_COMMAND_NAME', t, '\\');
         return false;
       }
       name = '\\' + defName;
@@ -33,7 +33,7 @@ export const DefineInternal: Internal = {
           t.type !== TokenType.Whitespace) ||
         Internals[name]
       ) {
-        context.throw('INVALID_COMMAND_NAME', t);
+        context.throw('INVALID_COMMAND_NAME', t, t.text);
         return false;
       }
     }

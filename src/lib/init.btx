@@ -127,6 +127,7 @@
             \@@set{env-name}{#1}%
             \@@text{\begin}{#1}%
         }{%
+            \@@set{throw-arg-1}{#1}%
             \@@throw{UNDEFINED_ENVIRONMENT}%
         }%
     }%
@@ -167,6 +168,7 @@
     \@iftrue{env-renew}{%
         \@@set{env-renew}\@false%
         \@iftrue{env-defined-#1}{}{%
+            \@@set{throw-arg-1}{#1}%
             \@@throw{UNDEFINED_ENVIRONMENT}%
         }%
     }{%
@@ -398,7 +400,7 @@
 \pdef\@par====#+1===={\subsubsection{#1}}
 \pdef\@par====={\@par{}=====}
 
-\def\unnumbersections{%
+\def\nosectionnumbers{%
     \@tdef\section{\@section*}%
     \@tdef\subsection{\@subsection*}%
     \@tdef\subsubsection{\@subsubsection*}%
@@ -873,7 +875,7 @@
         \@@set{list-indent}{2}%
         \@subpage%
     }%
-    \@section*{\tocname}%
+    \@section**{\tocname}%
     \@@set{g.list-classes}{subpage-list}%
     \begin{@list}%
 }{%

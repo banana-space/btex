@@ -46,7 +46,8 @@ export class FunctionElement implements ContainerElement {
     let i = 1;
     for (let child of this.children) {
       let arg = document.createElement('btex-arg');
-      arg.append(...child.renderInner(options));
+      // No options provided -- we need plain HTML for functions to work
+      arg.append(...child.renderInner());
       // '=' in tags may mess up wikitext template format
       if (!/^[^<]*=/.test(arg.innerHTML)) {
         arg.innerHTML = i + '=' + arg.innerHTML;

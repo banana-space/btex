@@ -64,7 +64,7 @@ function work(data: WorkerData): WorkerResult {
     );
   }
 
-  let code = Parser.parse(data.code, '0');
+  let code = Parser.parse(data.code, 'code');
 
   if (!data.options?.inline) {
     // prepend 2 line-breaks to start the first paragraph
@@ -90,7 +90,7 @@ function work(data: WorkerData): WorkerResult {
     taskId: data.taskId ?? 0,
     html,
     data: JSON.stringify(context.compilerData),
-    errors: context.errors.map((e) => e.getMessage()),
-    warnings: context.warnings.map((e) => e.getMessage()),
+    errors: context.errors.map((e) => e.getMessage('zh')),
+    warnings: context.warnings.map((e) => e.getMessage('zh')),
   };
 }
