@@ -833,6 +833,17 @@
 \pdef\cite[#1]#2{{[\@ref{cite:#2}, #1]}}
 
 
+% ==========           CODE             ==========
+
+\def\@code{\@@set{code-lang}{btex}\@@code}
+\pdef\@code*{\@@code}
+\pdef\@code[#1]{\@@set{code-lang}{#1}\@@code}
+
+\def\code{\@code}
+
+\def\codeblock{\@settrue{code-display}\@code}
+
+
 % ==========         SUBPAGES           ==========
 
 \envdef{structure}{}{%
