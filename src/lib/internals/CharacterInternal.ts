@@ -26,7 +26,9 @@ export const CharacterInternal: Internal = {
 
     let char = String.fromCodePoint(charCode);
     code.spliceFrom(start);
-    code.tokens.splice(start, 0, Token.fromParent(char, TokenType.Text, initiator));
+    let token = Token.fromParent(char, TokenType.Text, initiator);
+    token.noExpand = true;
+    code.tokens.splice(start, 0, token);
 
     return true;
   },

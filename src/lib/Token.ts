@@ -20,6 +20,7 @@ export class Token {
   start?: TextPosition;
   end?: TextPosition;
   source: Token;
+  noExpand?: boolean;
 
   private constructor(text: string, type: TokenType, start?: TextPosition, end?: TextPosition) {
     this.text = text;

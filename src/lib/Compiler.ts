@@ -172,7 +172,7 @@ export abstract class Compiler {
         case TokenType.Whitespace:
           if (!isTextArg()) {
             command = context.findCommand(t.text);
-            if (command && !(isMathMode() && command.isTextCommand)) {
+            if (command && !(isMathMode() && command.isTextCommand) && !t.noExpand) {
               if (code.expandMacro(command, false)) break;
             }
           }
