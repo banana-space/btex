@@ -8,6 +8,7 @@ export class ReferenceElement implements ContainerElement {
   name: 'ref' = 'ref';
   page?: string;
   key?: string;
+  url?: string;
   noLink: boolean = false;
   isInline: boolean = true;
   paragraph: ParagraphElement = new ParagraphElement();
@@ -28,7 +29,14 @@ export class ReferenceElement implements ContainerElement {
   enter(context: Context) {
     this.page = context.get('ref-page', true);
     this.key = context.get('ref-key', true);
+    this.url = context.get('ref-url', true);
     this.noLink = context.getBoolean('ref-no-link', false, true);
+
+    if (this.url && /^https?:\/\/\w/.test(this.url)) {
+      context.externalLinks.push(this.url);
+    } else {
+      delete this.url;
+    }
   }
 
   exit(context: Context) {
@@ -49,6 +57,14 @@ export class ReferenceElement implements ContainerElement {
       link.setAttribute('href', '#' + encodeURIComponent(this.target.bookmarkId));
       link.append(...nodes);
       return [link];
+    }
+
+    if (this.url) {
+      let a = document.createElement('a');
+      a.classList.add('external');
+      a.setAttribute('href', this.url);
+      a.append(...this.paragraph.renderInner(options));
+      return [a];
     }
 
     let ref = document.createElement('btex-ref');

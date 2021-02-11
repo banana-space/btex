@@ -178,8 +178,16 @@ export abstract class Compiler {
           }
 
           if (!context.noOutput) {
-            let text = t.type === TokenType.Whitespace ? ' ' : t.text;
-            context.span.append(text, t);
+            // Whitespaces with TokenType.Text should be preserved
+            if (t.type === TokenType.Text && /^\s$/.test(t.text)) {
+              context.flushSpan();
+              context.span.style.preservesSpaces = true;
+              context.span.append(t.text, t);
+              context.flushSpan();
+            } else {
+              let text = t.type === TokenType.Whitespace ? ' ' : t.text;
+              context.span.append(text, t);
+            }
           }
           code.step();
           break;

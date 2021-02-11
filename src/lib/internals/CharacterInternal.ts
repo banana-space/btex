@@ -2,6 +2,7 @@ import { Code } from '../Code';
 import { Compiler } from '../Compiler';
 import { Context } from '../Context';
 import { Internal } from '../Internal';
+import { Token, TokenType } from '../Token';
 
 export const CharacterInternal: Internal = {
   execute(code: Code, context: Context): boolean {
@@ -23,19 +24,10 @@ export const CharacterInternal: Internal = {
       return false;
     }
 
-    if (!context.noOutput) {
-      let char = String.fromCodePoint(charCode);
-      let isWhitespace = /\s/.test(char);
-      if (isWhitespace) {
-        context.flushSpan();
-        context.span.style.preservesSpaces = true;
-        context.span.append(char, initiator);
-        context.flushSpan();
-      } else {
-        context.span.append(char, initiator);
-      }
-      code.spliceFrom(start);
-    }
+    let char = String.fromCodePoint(charCode);
+    code.spliceFrom(start);
+    code.tokens.splice(start, 0, Token.fromParent(char, TokenType.Text, initiator));
+
     return true;
   },
 };

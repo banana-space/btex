@@ -47,6 +47,9 @@ export class Context {
   subpages: SubpageDeclaration[] = [];
   subpageOfLevel: string[] = [];
 
+  // External links
+  externalLinks: string[] = [];
+
   // Compiler data to be sent in output
   compilerData: any = {};
 
@@ -69,6 +72,7 @@ export class Context {
       this.labels = basedOn.labels;
       this.headers = basedOn.headers;
       this.subpages = basedOn.subpages;
+      this.externalLinks = basedOn.externalLinks;
     } else {
       this.global = this;
       this.root = new RootElement();
@@ -257,6 +261,10 @@ export class Context {
 
     if (this.subpages.length > 0) {
       this.compilerData.subpages = this.subpages;
+    }
+
+    if (this.externalLinks.length > 0) {
+      this.compilerData.externalLinks = this.externalLinks;
     }
   }
 
