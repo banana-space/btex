@@ -45,14 +45,18 @@ function work(data: WorkerData): WorkerResult {
   globalContext.newVariables = contextData.newVariables;
   for (let key in contextData.newCommands)
     globalContext.newCommands[key] = Command.reconstructFrom(contextData.newCommands[key]);
-  let context = new Context(globalContext);
   globalContext.set('__code__', data.code);
+  let context = new Context(globalContext);
 
-  // Parse and compile
+  // Compile preamble
   if (data.preamble) {
-    // TODO: ...
+    let preamble = Parser.parse(data.preamble, 'preamble');
+    context.noOutput = true;
+    Compiler.compile(preamble, context);
+    context.noOutput = false;
   }
 
+  // Parse and compile
   if (data.options?.equationMode) {
     context.enterContainer(
       new MathElement(),

@@ -18,11 +18,13 @@ const pool = new WorkerPool(1);
 
 function runWorker(
   code: string,
+  preamble?: string,
   options?: CompilerOptions,
   renderOptions?: RenderOptions
 ): Promise<WorkerResult> {
   return pool.work({
     code,
+    preamble,
     options,
     renderOptions,
     globalContext,
@@ -59,7 +61,7 @@ function serve() {
         options.inline = post['inline'] === true;
         options.equationMode = post['equationMode'] === true;
 
-        runWorker(code, options, renderOptions).then((result) => {
+        runWorker(code, post['preamble'], options, renderOptions).then((result) => {
           let ms = new Date().getTime() - start.getTime();
           console.log(`[${getTimestamp()}] #${id} Resolved (${ms} ms).`);
 
