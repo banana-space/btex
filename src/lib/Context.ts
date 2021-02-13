@@ -13,28 +13,60 @@ import { VirtualElement } from './elements/VirtualElement';
 import { SubpageDeclaration } from './internals/SubpageInternal';
 import { Token, TokenType } from './Token';
 
+/**
+ * The object that stores all the data during compilation.
+ * A `Context` object is created for every scope in the code.
+ */
 export class Context {
   options: CompilerOptions;
 
-  // Variables and commands defined **exactly** in this scope
-  // Use put() and find() to look up the correct values
+  /**
+   * Variables defined **exactly** in this scope.
+   */
   newVariables: { [name: string]: string } = {};
+
+  /**
+   * Commands defined **exactly** in this scope.
+   */
   newCommands: { [name: string]: Command } = {};
 
+  /**
+   * The parent scope.
+   */
   base?: Context;
+
+  /**
+   * The global scope.
+   */
   global: Context;
 
-  // When compiling, compiled elements enter the root element
+  /**
+   * Stores the output.
+   * This object is shared by all scopes.
+   */
   root: RootElement;
 
-  // The elements currently being written to; the array is shared by all contexts.
+  /**
+   * The container stack.
+   * This is shared by all scopes.
+   */
   stack: ContainerElement[];
 
-  // All contexts share the same errors array
+  /**
+   * Compiler errors.
+   * This is shared by all scopes.
+   */
   errors: CompilerError[] = [];
+
+  /**
+   * Compiler warnings.
+   * This is shared by all scopes.
+   */
   warnings: CompilerError[] = [];
 
-  // Ancestor semi-simple groups
+  /**
+   * Semi-simple groups that are parents of the current scope.
+   */
   semisimple: Context[] = [];
 
   // Bookmarks
@@ -85,6 +117,9 @@ export class Context {
 
   private _span?: SpanElement;
 
+  /**
+   * The span element that is currently written to.
+   */
   get span(): SpanElement {
     return this.global._span as SpanElement;
   }
@@ -93,9 +128,11 @@ export class Context {
     this.global._span = value;
   }
 
-  // No-output mode for internal use
   private _noOutput?: boolean;
 
+  /**
+   * Whether in no-output mode.
+   */
   get noOutput(): boolean {
     return this.global._noOutput ?? false;
   }
@@ -104,6 +141,9 @@ export class Context {
     this.global._noOutput = value;
   }
 
+  /**
+   * The current container being written to.
+   */
   get container(): ContainerElement {
     return this.stack[this.stack.length - 1];
   }
@@ -112,6 +152,11 @@ export class Context {
     return ++this.global._expansions;
   }
 
+  /**
+   * Sets the value of a variable.
+   * @param key The name of the variable.
+   * @param value The value of the variable.
+   */
   set(key: string, value: string | undefined) {
     const scope = key.startsWith('g.') ? this.global : this;
     if (value === undefined) {
@@ -121,15 +166,23 @@ export class Context {
     }
   }
 
+  /**
+   * Adds a command definition to the current scope.
+   * @param command The command definition.
+   */
   defineCommand(command: Command) {
     delete this.newCommands[command.name];
     const scope = command.isGlobal ? this.global : this;
     scope.newCommands[command.name] = command;
   }
 
-  // When `reset` is false, reads the value of a variable.
-  // When `reset` is true and variable is not global,
-  // only reads from the current scope, and resets the value.
+  /**
+   * Gets the value of a variable.
+   * @param key The name of the variable.
+   * @param reset Whether to delete the variable after the operation.
+   * When set to `true`, variables in parent scopes will not be read or deleted.
+   * Only those in the current scope will be read.
+   */
   get(key: string, reset: boolean = false): string | undefined {
     let context: Context | undefined = key.startsWith('g.') ? this.global : this;
     do {
@@ -142,6 +195,10 @@ export class Context {
     } while (!reset && context);
   }
 
+  /**
+   * Gets the definition of a command.
+   * @param name The name of the command.
+   */
   findCommand(name: string): Command | undefined {
     let context: Context | undefined = this;
     do {
@@ -180,12 +237,18 @@ export class Context {
     return this.warnings.push(new CompilerError(type, initiator, ...args));
   }
 
+  /**
+   * Generates a `Context` object as a sub-scope of the current scope.
+   */
   passToSubgroup(): Context {
     let sub = new Context(this);
     sub._nesting = this._nesting + 1;
     return sub;
   }
 
+  /**
+   * Collects data from a sub-scope after the sub-scope is finished.
+   */
   collectFromSubgroup(subgroup: Context, initiator: Token): boolean {
     if (subgroup.semisimple.length > 0) {
       this.throw('UNMATCHED_SEMISIMPLE', initiator);
@@ -198,6 +261,9 @@ export class Context {
     return true;
   }
 
+  /**
+   * Starts a new span element (for styles to apply, etc.).
+   */
   flushSpan() {
     if (!this.span.isEmpty()) {
       this.container.paragraph.append(this.span);
@@ -207,6 +273,12 @@ export class Context {
     this.span.initialise(this);
   }
 
+  /**
+   * Enters a container element.
+   * @param element The container to enter.
+   * @param initiator The token that initiates the operation.
+   * @returns `false` if an error occurs, `true` otherwise.
+   */
   enterContainer(element: ContainerElement, initiator: Token): boolean {
     let parentIsInline = this.container.isInline;
 
@@ -221,6 +293,9 @@ export class Context {
     return true;
   }
 
+  /**
+   * Exits a container element.
+   */
   exitContainer() {
     if (this.stack.length <= 1) return;
 
@@ -235,7 +310,7 @@ export class Context {
   }
 
   /**
-   * Do things after compiling everything and before rendering.
+   * Does things after compiling everything and before rendering.
    * This is pretty much equivalent to a second LaTeX run
    * in order to get the links and TOC right.
    */
@@ -269,7 +344,7 @@ export class Context {
   }
 
   /**
-   * Render everything to HTML.
+   * Renders everything to HTML.
    */
   render(options?: RenderOptions): string {
     let html = this.root.render(options)[0]?.outerHTML ?? '';
@@ -277,12 +352,19 @@ export class Context {
     return html;
   }
 
+  /**
+   * Impersonates another scope.
+   * @param context The scope to impersonate.
+   */
   changeTo(context: Context) {
     this.base = context.base;
     this.newCommands = context.newCommands;
     this.newVariables = context.newVariables;
   }
 
+  /**
+   * Enters a semi-simple group.
+   */
   enterSemisimple() {
     let parent = new Context(this);
     parent.changeTo(this);
@@ -293,6 +375,9 @@ export class Context {
     this._nesting++;
   }
 
+  /**
+   * Exits a semi-simple group.
+   */
   exitSemisimple() {
     let parent = this.semisimple.pop();
     if (!parent) return;
@@ -301,8 +386,13 @@ export class Context {
     this._nesting--;
   }
 
-  commandToHTML(command: string, initiator: Token): string | null {
-    let code = new Code([Token.fromParent(command, TokenType.Command, initiator)]);
+  /**
+   * Compiles a code fragment to HTML, using a virtual container.
+   * This does not write to the output.
+   * @param code The code to compile.
+   * @param initiator The token that initiates the operation.
+   */
+  codeToHTML(code: Code, initiator: Token): string | null {
     let element = new VirtualElement();
 
     this.enterContainer(element, initiator);
@@ -311,6 +401,17 @@ export class Context {
     element.normalise();
 
     return element.getHTML();
+  }
+
+  /**
+   * Compiles a command to HTML, using a virtual container.
+   * This does not write to the output.
+   * @param command The command to compile, e.g. `'\foo'`.
+   * @param initiator The token that initiates the operation.
+   */
+  commandToHTML(command: string, initiator: Token): string | null {
+    let code = new Code([Token.fromParent(command, TokenType.Command, initiator)]);
+    return this.codeToHTML(code, initiator);
   }
 
   private removeInaccessibleBookmarks() {

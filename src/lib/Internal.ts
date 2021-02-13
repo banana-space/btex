@@ -5,6 +5,7 @@ import { BookmarkInternal } from './internals/BookmarkInternal';
 import { CharacterInternal } from './internals/CharacterInternal';
 import { CodeInternal } from './internals/CodeInternal';
 import { CommandInternal } from './internals/CommandInternal';
+import { DataInternal } from './internals/DataInternal';
 import { DefineInternal } from './internals/DefineInternal';
 import { EnterInternal } from './internals/EnterInternal';
 import { EventInternal } from './internals/EventInternal';
@@ -30,6 +31,7 @@ export const Internals: { [key: string]: Internal } = {
   '\\@@char': CharacterInternal,
   '\\@@code': CodeInternal,
   '\\@@cmd': CommandInternal,
+  '\\@@data': DataInternal,
   '\\@@def': DefineInternal,
   '\\@@enter': EnterInternal,
   '\\@@event': EventInternal,

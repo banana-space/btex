@@ -846,7 +846,16 @@
 \def\codeblock{\@settrue{code-display}\@code}
 
 
-% ==========         SUBPAGES           ==========
+% ==========       PAGE OPTIONS         ==========
+
+\def\@data#1#2{%
+    \@@set{data-key}{#1}%
+    \@@data{#2}%
+}
+
+\def\setdisplaytitle{\@data{displayTitle}}
+
+\def\sethtmltitle{\@data{htmlTitle}}
 
 \envdef{structure}{}{%
     \newcounter{subpage}%
