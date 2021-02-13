@@ -23,6 +23,7 @@ const errorMessages: { [lang: string]: { [type: string]: string } } = {
     UNEXPECTED_TOKEN_1: "'$1' 不该出现在这里。",
     UNKNOWN_EVENT: '事件没有定义。',
     UNMATCHED_ENVIRONMENT: '环境没有配对',
+    UNMATCHED_ENVIRONMENT_1: "环境 '$1' 没有配对",
     UNMATCHED_EXIT_CONTAINER: '容器没有配对。',
     UNMATCHED_LEFT_BRACKET: "括号 '{' 没有配对。",
     UNMATCHED_RIGHT_BRACKET: "括号 '}' 没有配对。",

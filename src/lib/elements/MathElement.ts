@@ -4,6 +4,7 @@ import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
 import { ParagraphElement } from './ParagraphElement';
 import { SpanElement } from './SpanElement';
+import { TikzElement } from './TikzElement';
 
 export class MathElement implements ContainerElement {
   name: 'math' = 'math';
@@ -18,7 +19,10 @@ export class MathElement implements ContainerElement {
   tagRight?: ParagraphElement;
 
   isEmpty(): boolean {
-    return !this.getText();
+    return (
+      !this.getText() &&
+      this.mainParagraph.children.filter((e) => e instanceof TikzElement).length === 0
+    );
   }
 
   normalise() {
@@ -75,11 +79,23 @@ export class MathElement implements ContainerElement {
     let span = document.createElement('span');
     span.classList.add(this.isInline ? 'inline-math' : 'display-math');
 
+    // Check if is tikz.
+    // If there is a tikz element, other elements will be ignored.
+    let tikz: TikzElement | undefined = undefined;
+    for (let child of this.mainParagraph.children) {
+      if (child instanceof TikzElement) {
+        tikz = child;
+        break;
+      }
+    }
+
     // Compile the equation
     if (options?.noKatex) {
       let code = document.createElement('code');
       code.append(document.createTextNode(this.getText()));
       span.append(code);
+    } else if (tikz) {
+      span.append(...tikz.render(options));
     } else {
       render(this.getText(), span, {
         displayMode: !this.isInline,

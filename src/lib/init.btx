@@ -137,6 +137,7 @@
     \@iftrue{env-defined-#1}{%
         \@@cmd{env.#1.end}%
         \@@if{{env-name}}{#1}{}{%
+            \@@set{throw-arg-1}{#1}%
             \@@throw{UNMATCHED_ENVIRONMENT}%
         }%
     }{\@@text{\end}{#1}}%
@@ -767,6 +768,44 @@
 \envdef{align}{}{\[\begin{aligned}}{\end{aligned}\]}
 
 \envdef{align*}{}{\[\begin{aligned}}{\end{aligned}\]}
+
+
+% ==========           TIKZ             ==========
+
+\envdef{tikzpicture}{}{%
+    \@@set{tikz-variant}{tikzpicture}%
+    \begin{@tikz}%
+}{%
+    \end{@tikz}%
+}
+
+\envdef{tikzcd}{}{%
+    \@@set{tikz-variant}{tikzcd}%
+    \begin{@tikz}%
+}{%
+    \end{@tikz}%
+}
+
+\@@set{tikz-nest}{0}
+
+\envdef{@tikz}{}{%
+    \@ifmmode{}{%
+        \@settrue{tikz-outside-math}%
+        \@settrue{math-display}%
+        \@@enter{math}%
+    }%
+    \@inc{tikz-nest}%
+    \@@enter{tikz}%
+}{%
+    \@@exit{tikz}%
+    \@iftrue{tikz-outside-math}{%
+        \@@if{{tikz-nest}}{1}{%
+            \@@exit{math}%
+        }{}%
+    }{}%
+}
+
+\def\tikz#1{\begin{tikzpicture}#1\end{tikzpicture}}
 
 
 % ==========        CROSS-REF           ==========

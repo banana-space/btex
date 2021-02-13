@@ -11,7 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "jsdom": "^16.4.0",
-    "katex": "^0.12.0"
+    "katex": "^0.12.0",
+    "sync-request": "^6.1.0"
   },
   "devDependencies": {
     "@types/jsdom": "^16.2.4",
