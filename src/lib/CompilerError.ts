@@ -28,6 +28,7 @@ const errorMessages: { [lang: string]: { [type: string]: string } } = {
     UNMATCHED_LEFT_BRACKET: "括号 '{' 没有配对。",
     UNMATCHED_RIGHT_BRACKET: "括号 '}' 没有配对。",
     UNMATCHED_SEMISIMPLE: '半单括号没有配对。',
+    UNKNOWN_THEOREM_STYLE: '不支持的定理风格。',
     UNKNOWN: '发生编译器内部错误。',
   },
 };
@@ -55,6 +56,7 @@ export type CompilerErrorType =
   | 'UNMATCHED_LEFT_BRACKET'
   | 'UNMATCHED_RIGHT_BRACKET'
   | 'UNMATCHED_SEMISIMPLE'
+  | 'UNKNOWN_THEOREM_STYLE'
   | 'UNKNOWN';
 
 export class CompilerError {

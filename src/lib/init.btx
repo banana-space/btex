@@ -314,7 +314,7 @@
 \tdef\textsize#1#2{{\@size{#1}#2}}
 
 \tdef\floatright#1{%
-    \@@set{div-type}{floatright}%
+    \@@set{g.div-type}{floatright}%
     \@@enter{div}%
         #1%
     \@@exit{div}%
@@ -583,17 +583,21 @@
 
 \envdef{@theorem}{#1}{%
     \@par%
-    \@@set{div-type}{block}%
+    \@@set{g.div-type}{block}%
     \@@enter{div}%
+    \@settrue{text-class-header}%
     \@bf\@rm#1.\@md%
+    \@setfalse{text-class-header}%
 }{%
     \@@exit{div}%
 }
 \envpdef{@theorem}{#1[#2]}{%
     \@par%
-    \@@set{div-type}{block}%
+    \@@set{g.div-type}{block}%
     \@@enter{div}%
-    \@bf\@rm#1\@md (#2)\@bf.\@md%
+    \@settrue{text-class-header}%
+    \@bf\@rm#1\@md{} (#2)\@bf.\@md%
+    \@setfalse{text-class-header}%
 }{%
     \@@exit{div}%
 }
@@ -626,9 +630,9 @@
     }%
 }
 
-\def\@thmbegina{} % |
-\def\@thmbeginb{} % | TODO: write these styles
-\def\@thmbeginc{} % |
+\def\@thmbegina{\@@set{g.div-class}{style-a}}
+\def\@thmbeginb{\@@set{g.div-class}{style-b}}
+\def\@thmbeginc{\@@set{g.div-class}{style-c}}
 
 \theoremstyle{plain}
 
@@ -896,6 +900,8 @@
 
 \def\sethtmltitle{\@data{htmlTitle}}
 
+\def\setlanguage{\@data{lang}}
+
 \envdef{structure}{}{%
     \newcounter{subpage}%
     \newcounter{ssubpage}[subpage]%
@@ -970,7 +976,7 @@
 \def\refname{参考文献}
 \def\tocname{目录}
 
-\def\english{%
+\def\@english{%
     \@@def\theoremname{Theorem}%
     \@@def\corollaryname{Corollary}%
     \@@def\lemmaname{Lemma}%
@@ -981,3 +987,7 @@
     \@@def\refname{References}%
     \@@def\tocname{Contents}%
 }
+
+\def\english{\setlanguage{en}\@english}
+\pdef\english[GB]{\setlanguage{en-gb}\@english}
+\pdef\english[US]{\setlanguage{en-us}\@english}

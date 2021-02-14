@@ -13,6 +13,7 @@ export class SpanElement implements RenderElement {
     fontSize?: number;
     preservesSpaces?: boolean;
     lang?: string;
+    classes?: string;
   } = {};
 
   // Used for determining whether to add a space after a command, e.g. $\a b$ vs. $\a($
@@ -36,6 +37,11 @@ export class SpanElement implements RenderElement {
     this.style.colour = context.get('text-colour');
     this.style.fontSize = context.getFloat('text-size', 0) || undefined;
     this.style.lang = context.get('text-lang');
+
+    this.style.classes = '';
+    if (context.getBoolean('text-class-error', false)) this.style.classes += ' error';
+    if (context.getBoolean('text-class-header', false)) this.style.classes += ' item-header';
+    this.style.classes = this.style.classes.trim();
   }
 
   canMergeWith(span: SpanElement): boolean {
@@ -45,7 +51,8 @@ export class SpanElement implements RenderElement {
       this.style.colour === span.style.colour &&
       this.style.fontSize === span.style.fontSize &&
       (this.style.preservesSpaces ?? false) === (span.style.preservesSpaces ?? false) &&
-      this.style.lang === span.style.lang
+      this.style.lang === span.style.lang &&
+      (this.style.classes ?? '') === (span.style.classes ?? '')
     );
   }
 
@@ -118,8 +125,9 @@ export class SpanElement implements RenderElement {
       for (let i = 0; i < text.length; i++) {
         if (text[i]) {
           let span = document.createElement('span');
-          if (this.style.lang) span.setAttribute('lang', this.style.lang);
+          if (this.style.classes) span.setAttribute('class', this.style.classes);
           if (styles.length > 0) span.setAttribute('style', styles.join(';'));
+          if (this.style.lang) span.setAttribute('lang', this.style.lang);
           let line = lines[i];
           if (line !== undefined) span.setAttribute('data-pos', (line + 1).toString());
           span.append(...toHTML(text[i]));
@@ -129,16 +137,18 @@ export class SpanElement implements RenderElement {
       return spans;
     }
 
-    if (!this.style.lang && styles.length === 0) {
-      // Create text nodes directly
-      return toHTML(fullText);
-    } else if (!this.style.lang && styles.length === 1) {
-      // Create a <b> or <i> tag
-      let name = this.style.bold ? 'b' : this.style.italic ? 'i' : '';
-      if (name) {
-        let element = document.createElement(name);
-        element.append(...toHTML(fullText));
-        return [element];
+    if (!this.style.lang && !this.style.classes) {
+      if (styles.length === 0) {
+        // Create text nodes directly
+        return toHTML(fullText);
+      } else if (styles.length === 1) {
+        // Create a <b> or <i> tag
+        let name = this.style.bold ? 'b' : this.style.italic ? 'i' : '';
+        if (name) {
+          let element = document.createElement(name);
+          element.append(...toHTML(fullText));
+          return [element];
+        }
       }
     }
 
@@ -146,6 +156,7 @@ export class SpanElement implements RenderElement {
     let span = document.createElement('span');
     if (this.style.lang) span.setAttribute('lang', this.style.lang);
     if (styles.length > 0) span.setAttribute('style', styles.join(';'));
+    if (this.style.classes) span.setAttribute('class', this.style.classes);
     span.append(...toHTML(fullText));
     return [span];
   }

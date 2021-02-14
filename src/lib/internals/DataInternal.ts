@@ -35,5 +35,5 @@ export const DataInternal: Internal = {
   },
 };
 
-const allowedKeys: string[] = ['displayTitle', 'htmlTitle'];
+const allowedKeys: string[] = ['displayTitle', 'htmlTitle', 'lang'];
 const richKeys: string[] = ['displayTitle'];

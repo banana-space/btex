@@ -6,6 +6,7 @@ import { ParagraphElement } from './ParagraphElement';
 export class DivElement implements ContainerElement {
   name: 'div' = 'div';
   type: string = 'block';
+  classList: string[] = [];
   paragraph: ParagraphElement = new ParagraphElement();
   children: RenderElement[] = [];
 
@@ -23,7 +24,9 @@ export class DivElement implements ContainerElement {
   enter(context: Context) {
     this.paragraph = new ParagraphElement(context);
     this.children.push(this.paragraph);
-    this.type = context.get('div-type', true) ?? 'block';
+    this.type = context.get('g.div-type', true) ?? 'block';
+    let classes = (context.get('g.div-class', true) ?? '').split(' ').filter((x) => x);
+    for (let cl of classes) this.classList.push(cl);
   }
 
   event(arg: string, context: Context, initiator: Token): boolean {
@@ -42,6 +45,7 @@ export class DivElement implements ContainerElement {
 
     let div = document.createElement('div');
     if (/^block|floatright$/.test(this.type)) div.classList.add(this.type);
+    div.classList.add(...this.classList);
     for (let child of this.children) {
       div.append(...child.render(options));
     }

@@ -156,6 +156,14 @@ export abstract class Compiler {
               if (/[a-zA-Z]$/.test(name)) context.span.spacyCommand = t;
             } else {
               if (context.throw('UNDEFINED_COMMAND', t, name) > options.maxErrors) return false;
+
+              if (!context.noOutput) {
+                context.set('text-class-error', '1');
+                context.flushSpan();
+                context.span.append(name, t);
+                context.set('text-class-error', undefined);
+                context.flushSpan();
+              }
             }
             code.step();
             break;
