@@ -862,6 +862,12 @@
         \@item%
         \@@label{cite:##1}%
     }%
+    \@pdef\bibitem[##1]##2{%
+        \@@set{ref-prefix}{c}%
+        \@item[{[##1]}]%
+        \@@def\@currentlabel{##1}%
+        \@@label{cite:##2}%
+    }%
     \begin{@enum}{\rm[\arabic*]}%
 }{%
     \end{@enum}%
@@ -874,8 +880,8 @@
     \end{references}%
 }
 
-\def\cite#1{{[\@ref{cite:#1}]}}
-\pdef\cite[#1]#2{{[\@ref{cite:#2}, #1]}}
+\def\cite#1{{[\ref{cite:#1}]}}
+\pdef\cite[#1]#2{{[\ref{cite:#2}, #1]}}
 
 
 % ==========           CODE             ==========

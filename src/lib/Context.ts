@@ -104,6 +104,7 @@ export class Context {
       this.labels = basedOn.labels;
       this.headers = basedOn.headers;
       this.subpages = basedOn.subpages;
+      this.references = basedOn.references;
       this.externalLinks = basedOn.externalLinks;
     } else {
       this.global = this;
