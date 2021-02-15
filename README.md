@@ -9,7 +9,7 @@
 * 运行 `yarn` 初始化项目文件夹。
 * 运行 `yarn build` 编译项目。
 * 运行 `yarn start` 或 `node ./dist/main.js` 启动本地服务器。
-* 若要使用 TikZ，于端口 `9292` 运行 [tex2svg](https://github.com/distler/tex2svg)。
+* 若要使用 TikZ，于端口 `9292` 运行 [tikz2svg](https://github.com/banana-space/tikz2svg)。
 
 bTeX 将运行于本地端口 `7200`。向该端口发送 `POST` 请求以运行编译器，格式如下：
 

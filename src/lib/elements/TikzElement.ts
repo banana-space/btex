@@ -48,6 +48,9 @@ export class TikzElement implements ContainerElement {
     }
     if (typeof body === 'string') {
       // rescale 1pt -> 0.1em for better display
+      // and resolve <glyph id=""> clash
+      let rand = '';
+      for (let i = 0; i < 16; i++) rand += Math.floor(Math.random() * 16).toString(16);
       svg = body
         .replace(/\n\s*/g, '')
         .replace(/^<\?xml[^>]*\?>/, '')
@@ -56,7 +59,8 @@ export class TikzElement implements ContainerElement {
         })
         .replace(/height="([\d\.]+)(pt)?"/, function (_, height) {
           return 'height="' + height * 0.1 + 'em"';
-        });
+        })
+        .replace(/(id="|href="#)/g, '$1' + rand);
     }
 
     if (svg) {

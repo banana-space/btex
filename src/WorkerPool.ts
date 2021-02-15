@@ -58,7 +58,7 @@ export class WorkerPool {
   }
 
   work(data: WorkerData): Promise<WorkerResult> {
-    data.expiresAt ??= new Date().getTime() + 10000;
+    data.expiresAt ??= new Date().getTime() + 20000;
     data.taskId = ++taskId;
 
     // Assign the task to the worker with minimum queue length
@@ -106,7 +106,7 @@ export class WorkerPool {
         for (let data of worker.queue) worker.worker.postMessage(data);
         console.log(`[${getTimestamp()}] #${id} Timeout.`);
       }
-    }, 10000);
+    }, 20000);
 
     function getTimestamp() {
       return new Date().toISOString().replace('T', ' ').substring(0, 19);
