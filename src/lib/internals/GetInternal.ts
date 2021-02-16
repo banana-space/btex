@@ -18,11 +18,7 @@ export const GetInternal: Internal = {
     let key = Compiler.readText(code, context, initiator);
     if (key === undefined) return false;
 
-    let value = context.get(key);
-    if (value === undefined) {
-      // TODO: warning
-      value = '';
-    }
+    let value = context.get(key) ?? '';
 
     let format = context.getInteger('get-format', 0, true);
     if (!(format >= 0 && format <= 4)) format = 0;

@@ -5,6 +5,7 @@ import { ListElement } from './elements/ListElement';
 import { MathElement } from './elements/MathElement';
 import { ParagraphElement } from './elements/ParagraphElement';
 import { ReferenceElement } from './elements/ReferenceElement';
+import { TableElement } from './elements/TableElement';
 import { TikzElement } from './elements/TikzElement';
 import { Token } from './Token';
 
@@ -47,6 +48,7 @@ export const Containers: { [name: string]: ContainerConstructor } = {
   header: HeaderElement,
   list: ListElement,
   math: MathElement,
+  table: TableElement,
   ref: ReferenceElement,
   tikz: TikzElement,
 };

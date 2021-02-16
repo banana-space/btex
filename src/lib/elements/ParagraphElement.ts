@@ -4,6 +4,7 @@ import { Token, TokenType } from '../Token';
 import { ReferenceElement } from './ReferenceElement';
 import { SpanElement } from './SpanElement';
 import { TextNode } from './TextNode';
+import { TikzElement } from './TikzElement';
 
 export class ParagraphElement implements RenderElement {
   name: 'paragraph' = 'paragraph';
@@ -205,6 +206,9 @@ export class ParagraphElement implements RenderElement {
   renderInner(options?: RenderOptions): Node[] {
     let result: Node[] = [];
     for (let child of this.children) {
+      // Skip tikz elements
+      if (child instanceof TikzElement) continue;
+
       result.push(...child.render(options));
     }
     return result;

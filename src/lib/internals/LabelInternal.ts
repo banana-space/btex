@@ -20,14 +20,24 @@ export const LabelInternal: Internal = {
 
     if (context.noOutput || context.container.isInline) return true;
 
-    // TODO: detect conflicting labels
+    let isDuplicate = false;
+    for (let label of context.labels)
+      if (label.key === text) {
+        isDuplicate = true;
+        break;
+      }
+    if (isDuplicate) {
+      context.warn('DUPLICATE_LABEL', initiator, text);
+    }
 
-    let label = new Code([Token.fromParent('\\@currentlabel', TokenType.Command, initiator)]);
+    let currentLabel = new Code([
+      Token.fromParent('\\@currentlabel', TokenType.Command, initiator),
+    ]);
     let element = new LabelElement(text, context.get('ref-id') ?? '');
     context.labels.push(element);
 
     context.enterContainer(element, initiator);
-    if (!Compiler.compileGroup(label, context, initiator)) return false;
+    if (!Compiler.compileGroup(currentLabel, context, initiator)) return false;
     context.exitContainer();
 
     return true;

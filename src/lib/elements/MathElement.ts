@@ -21,7 +21,8 @@ export class MathElement implements ContainerElement {
   isEmpty(): boolean {
     return (
       !this.getText() &&
-      this.mainParagraph.children.filter((e) => e instanceof TikzElement).length === 0
+      this.mainParagraph.children.filter((e) => e instanceof TikzElement && !e.noRender).length ===
+        0
     );
   }
 
@@ -45,17 +46,23 @@ export class MathElement implements ContainerElement {
   event(name: string, context: Context, initiator: Token) {
     switch (name) {
       case 'par':
-        // TODO: if in tag mode, give warning
+        if (this.tagMode) {
+          context.throw('NO_PARAGRAPHS_IN_INLINE_MODE', initiator);
+        }
         return true;
       case 'leqno':
-        // TODO: if in inline mode, give warning
+        if (this.isInline) {
+          context.throw('EQUATION_TAG_INLINE_MODE', initiator);
+        }
         this.tagMode = 'left';
         this.tagLeft ??= new ParagraphElement();
         this.paragraph = this.tagLeft;
         context.set('g.math-mode', undefined);
         return true;
       case 'reqno':
-        // TODO: if in inline mode, give warning
+        if (this.isInline) {
+          context.throw('EQUATION_TAG_INLINE_MODE', initiator);
+        }
         this.tagMode = 'right';
         this.tagRight ??= new ParagraphElement();
         this.paragraph = this.tagRight;
@@ -83,7 +90,7 @@ export class MathElement implements ContainerElement {
     // If there is a tikz element, other elements will be ignored.
     let tikz: TikzElement | undefined = undefined;
     for (let child of this.mainParagraph.children) {
-      if (child instanceof TikzElement) {
+      if (child instanceof TikzElement && !child.noRender) {
         tikz = child;
         break;
       }
@@ -96,6 +103,7 @@ export class MathElement implements ContainerElement {
       span.append(code);
     } else if (tikz) {
       span.append(...tikz.render(options));
+      span.classList.add('tikz-in-math');
     } else {
       render(this.getText(), span, {
         displayMode: !this.isInline,
@@ -122,11 +130,16 @@ export class MathElement implements ContainerElement {
     // Add inverse search data
     if (options?.inverseSearch) {
       let lines: number[] = [];
-      for (let child of this.children) {
-        if (child instanceof SpanElement) {
-          for (let text of child.children) {
-            if (text.position && text.position.file && !lines.includes(text.position.line))
-              lines.push(text.position.line);
+      if (tikz) {
+        let tikzLine = tikz.initiator?.start?.line;
+        if (tikzLine !== undefined) lines.push(tikzLine);
+      } else {
+        for (let child of this.children) {
+          if (child instanceof SpanElement) {
+            for (let text of child.children) {
+              if (text.position && text.position.file && !lines.includes(text.position.line))
+                lines.push(text.position.line);
+            }
           }
         }
       }

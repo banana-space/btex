@@ -73,6 +73,7 @@
 
 \def\newcommand#1{%
     \@@ifdef#1{%
+        \@@set{throw-arg-1}{#1}%
         \@@throw{COMMAND_ALREADY_DEFINED}%
     }{%
         \@ladef#1%
@@ -84,6 +85,7 @@
     \@@ifdef#1{%
         \@ladef#1%
     }{%
+        \@@set{throw-arg-1}{#1}%
         \@@throw{UNDEFINED_COMMAND}%
     }%
 }
@@ -174,6 +176,7 @@
         }%
     }{%
         \@iftrue{env-defined-#1}{%
+            \@@set{throw-arg-1}{#1}%
             \@@throw{ENVIRONMENT_ALREADY_DEFINED}%
         }{}%
     }%
@@ -352,7 +355,9 @@
 \newcounter{subsection}[section]
 \newcounter{subsubsection}[subsection]
 
+\def\pagenum{\@u edae\@u0022\@u edae}
 \def\thmprefix{\@u edaf\@u0022\@u edaf}
+
 \def\thesection{\thmprefix\arabic{section}}
 
 \newcounter{theorem}
@@ -745,7 +750,45 @@
 \pdef\Roman*{\Roman{enum-{list-level}}}
 
 
-% ==========        EQUATIONS           ==========
+% ==========           TABLES           ==========
+
+\envdef{@table}{#1#2}{%
+    \@ifmmode{%
+        \@@throw{TABLE_IN_MATH_MODE}%
+    }{}%
+    \@@set{table-cols}{#1}%
+    \@@def\@cellopt{}%
+    \@pdef\@cellopt!{\@@set{table-cell-opt}{{table-cell-opt}[!]}\@cellopt}%
+    \@pdef\@cellopt[##1]{\@@set{table-cell-opt}{{table-cell-opt}[##1]}\@cellopt}%
+    \@tdef&{\@@event{c}\@cellopt}%
+    \@tdef\\{\@@event{r}\@cellopt}%
+    \@pdef\\\\{\@u000a}%
+    \@tdef\hline{}%
+    #2%
+    \@@enter{table}%
+    \@cellopt%
+}{%
+    \@@exit{table}%
+}
+
+\envdef{tabular}{#1}{%
+    \@par%
+    \begin{@table}{#1}{}%
+}{%
+    \end{@table}%
+    \@par%
+}
+
+\envdef{plaintable}{#1}{%
+    \@par%
+    \begin{@table}{#1}{\@settrue{table-plain}}%
+}{%
+    \end{@table}%
+    \@par%
+}
+
+
+% ==========         EQUATIONS          ==========
 
 \newcounter{equation}
 
@@ -768,10 +811,6 @@
 }
 
 \envdef{equation*}{}{\[}{\]}
-
-\envdef{align}{}{\[\begin{aligned}}{\end{aligned}\]}
-
-\envdef{align*}{}{\[\begin{aligned}}{\end{aligned}\]}
 
 
 % ==========           TIKZ             ==========
@@ -814,7 +853,7 @@
 
 % ==========        CROSS-REF           ==========
 
-\def\@currentlabel{}
+\def\@currentlabel{\pagenum}
 
 \let\label\@@label
 
@@ -957,6 +996,13 @@
     \@@def\@subpagenumber{#2}%
     \@subpage%
 }
+\pdef\@subpage*#1{%
+    \@subpageitemstar{#1}%
+}
+\pdef\@subpage*[#1]{%
+    \@@set{subpage-number}{#1}%
+    \@subpage*%
+}
 
 \def\@subpageitem#1#2{%
     \@@def\@subdisplaytitle{#2}%
@@ -969,8 +1015,13 @@
     }%
 }
 
+\def\@subpageitemstar#1{%
+    \@item%
+    {\@subpagenumber}\@u2001#1%
+}
 
-% ==========          NAMES             ==========
+
+% ==========     NAMES & LANGUAGE       ==========
 
 \def\theoremname{定理}
 \def\corollaryname{推论}
@@ -997,3 +1048,880 @@
 \def\english{\setlanguage{en}\@english}
 \pdef\english[GB]{\setlanguage{en-gb}\@english}
 \pdef\english[US]{\setlanguage{en-us}\@english}
+
+\tdef\，{\@u ff0c}
+\tdef\。{\@u 3002}
+\tdef\；{\@u ff1b}
+\tdef\：{\@u ff1a}
+\tdef\！{\@u ff01}
+\tdef\？{\@u ff1f}
+\tdef\、{\@u 3001}
+\tdef\（{\@u ff08}
+\tdef\）{\@u ff09}
+\tdef\【{\@u 3010}
+\tdef\】{\@u 3011}
+
+\tdef\halfwidthpunctuation{%
+    \tdef，{, }%
+    \tdef。{. }%
+    \tdef；{; }%
+    \tdef：{: }%
+    \tdef！{! }%
+    \tdef？{? }%
+    \tdef、{､}%
+    \tdef（{ (}%
+    \tdef）{) }%
+    \tdef【{ [}%
+    \tdef】{] }%
+}
+
+\tdef\fullwidthpunctuation{%
+    \tdef，{\@u ff0c}%
+    \tdef。{\@u 3002}%
+    \tdef；{\@u ff1b}%
+    \tdef：{\@u ff1a}%
+    \tdef！{\@u ff01}%
+    \tdef？{\@u ff1f}%
+    \tdef、{\@u 3001}%
+    \tdef（{\@u ff08}%
+    \tdef）{\@u ff09}%
+    \tdef【{\@u 3010}%
+    \tdef】{\@u 3011}%
+}
+
+\halfwidthpunctuation
+
+
+% ==========          MATH             ==========
+
+\def\operatornamewithlimits{\operatorname*}
+
+\def\@mathcmd#1{%
+    \@tdef#1{%
+        \@settrue{text-class-error}%
+        \@@text{#1}%
+        \@setfalse{text-class-error}%
+    }%
+}
+
+\@mathcmd{\above}
+\@mathcmd{\acute}
+\@mathcmd{\alef}
+\@mathcmd{\alefsym}
+\@mathcmd{\aleph}
+\@mathcmd{\allowbreak}
+\@mathcmd{\Alpha}
+\@mathcmd{\alpha}
+\@mathcmd{\amalg}
+\@mathcmd{\And}
+\@mathcmd{\angle}
+\@mathcmd{\approx}
+\@mathcmd{\approxeq}
+\@mathcmd{\arccos}
+\@mathcmd{\arcctg}
+\@mathcmd{\arcsin}
+\@mathcmd{\arctan}
+\@mathcmd{\arctg}
+\@mathcmd{\arg}
+\@mathcmd{\argmax}
+\@mathcmd{\argmin}
+\@mathcmd{\ast}
+\@mathcmd{\asymp}
+\@mathcmd{\atop}
+\@mathcmd{\backepsilon}
+\@mathcmd{\backprime}
+\@mathcmd{\backsim}
+\@mathcmd{\backsimeq}
+\@mathcmd{\bar}
+\@mathcmd{\barwedge}
+\@mathcmd{\Bbb}
+\@mathcmd{\Bbbk}
+\@mathcmd{\bcancel}
+\@mathcmd{\because}
+\@mathcmd{\Beta}
+\@mathcmd{\beta}
+\@mathcmd{\beth}
+\@mathcmd{\between}
+\@mathcmd{\big}
+\@mathcmd{\Big}
+\@mathcmd{\bigcap}
+\@mathcmd{\bigcirc}
+\@mathcmd{\bigcup}
+\@mathcmd{\bigg}
+\@mathcmd{\Bigg}
+\@mathcmd{\biggl}
+\@mathcmd{\Biggl}
+\@mathcmd{\biggm}
+\@mathcmd{\Biggm}
+\@mathcmd{\biggr}
+\@mathcmd{\Biggr}
+\@mathcmd{\bigl}
+\@mathcmd{\Bigl}
+\@mathcmd{\bigm}
+\@mathcmd{\Bigm}
+\@mathcmd{\bigodot}
+\@mathcmd{\bigoplus}
+\@mathcmd{\bigotimes}
+\@mathcmd{\bigr}
+\@mathcmd{\Bigr}
+\@mathcmd{\bigsqcup}
+\@mathcmd{\bigstar}
+\@mathcmd{\bigtriangledown}
+\@mathcmd{\bigtriangleup}
+\@mathcmd{\biguplus}
+\@mathcmd{\bigvee}
+\@mathcmd{\bigwedge}
+\@mathcmd{\binom}
+\@mathcmd{\blacklozenge}
+\@mathcmd{\blacksquare}
+\@mathcmd{\blacktriangle}
+\@mathcmd{\blacktriangledown}
+\@mathcmd{\blacktriangleleft}
+\@mathcmd{\blacktriangleright}
+\@mathcmd{\bm}
+\@mathcmd{\bmod}
+\@mathcmd{\bold}
+\@mathcmd{\boldsymbol}
+\@mathcmd{\bot}
+\@mathcmd{\bowtie}
+\@mathcmd{\Box}
+\@mathcmd{\boxdot}
+\@mathcmd{\boxed}
+\@mathcmd{\boxminus}
+\@mathcmd{\boxplus}
+\@mathcmd{\boxtimes}
+\@mathcmd{\Bra}
+\@mathcmd{\bra}
+\@mathcmd{\braket}
+\@mathcmd{\brace}
+\@mathcmd{\brack}
+\@mathcmd{\breve}
+\@mathcmd{\bull}
+\@mathcmd{\Bumpeq}
+\@mathcmd{\bumpeq}
+\@mathcmd{\cal}
+\@mathcmd{\cancel}
+\@mathcmd{\Cap}
+\@mathcmd{\cap}
+\@mathcmd{\cdot}
+\@mathcmd{\cdotp}
+\@mathcmd{\cdots}
+\@mathcmd{\centerdot}
+\@mathcmd{\cfrac}
+\@mathcmd{\check}
+\@mathcmd{\ch}
+\@mathcmd{\checkmark}
+\@mathcmd{\Chi}
+\@mathcmd{\chi}
+\@mathcmd{\choose}
+\@mathcmd{\circ}
+\@mathcmd{\circeq}
+\@mathcmd{\circlearrowleft}
+\@mathcmd{\circlearrowright}
+\@mathcmd{\circledast}
+\@mathcmd{\circledcirc}
+\@mathcmd{\circleddash}
+\@mathcmd{\circledR}
+\@mathcmd{\circledS}
+\@mathcmd{\clubs}
+\@mathcmd{\clubsuit}
+\@mathcmd{\cnums}
+\@mathcmd{\colon}
+\@mathcmd{\Colonapprox}
+\@mathcmd{\colonapprox}
+\@mathcmd{\Coloneq}
+\@mathcmd{\coloneq}
+\@mathcmd{\Coloneqq}
+\@mathcmd{\coloneqq}
+\@mathcmd{\Colonsim}
+\@mathcmd{\colonsim}
+\@mathcmd{\colorbox}
+\@mathcmd{\complement}
+\@mathcmd{\Complex}
+\@mathcmd{\cong}
+\@mathcmd{\coprod}
+\@mathcmd{\copyright}
+\@mathcmd{\cos}
+\@mathcmd{\cosec}
+\@mathcmd{\cosh}
+\@mathcmd{\cot}
+\@mathcmd{\cotg}
+\@mathcmd{\coth}
+\@mathcmd{\cr}
+\@mathcmd{\csc}
+\@mathcmd{\ctg}
+\@mathcmd{\cth}
+\@mathcmd{\Cup}
+\@mathcmd{\cup}
+\@mathcmd{\curlyeqprec}
+\@mathcmd{\curlyeqsucc}
+\@mathcmd{\curlyvee}
+\@mathcmd{\curlywedge}
+\@mathcmd{\curvearrowleft}
+\@mathcmd{\curvearrowright}
+\@mathcmd{\dag}
+\@mathcmd{\Dagger}
+\@mathcmd{\daleth}
+\@mathcmd{\Darr}
+\@mathcmd{\dArr}
+\@mathcmd{\darr}
+\@mathcmd{\dashleftarrow}
+\@mathcmd{\dashrightarrow}
+\@mathcmd{\dashv}
+\@mathcmd{\dbinom}
+\@mathcmd{\dblcolon}
+\@mathcmd{\ddag}
+\@mathcmd{\ddot}
+\@mathcmd{\ddots}
+\@mathcmd{\deg}
+\@mathcmd{\degree}
+\@mathcmd{\delta}
+\@mathcmd{\Delta}
+\@mathcmd{\det}
+\@mathcmd{\digamma}
+\@mathcmd{\dfrac}
+\@mathcmd{\diagdown}
+\@mathcmd{\diagup}
+\@mathcmd{\Diamond}
+\@mathcmd{\diamond}
+\@mathcmd{\diamonds}
+\@mathcmd{\diamondsuit}
+\@mathcmd{\dim}
+\@mathcmd{\displaystyle}
+\@mathcmd{\div}
+\@mathcmd{\divideontimes}
+\@mathcmd{\dot}
+\@mathcmd{\Doteq}
+\@mathcmd{\doteq}
+\@mathcmd{\doteqdot}
+\@mathcmd{\dotplus}
+\@mathcmd{\dots}
+\@mathcmd{\dotsb}
+\@mathcmd{\dotsc}
+\@mathcmd{\dotsi}
+\@mathcmd{\dotsm}
+\@mathcmd{\dotso}
+\@mathcmd{\doublebarwedge}
+\@mathcmd{\doublecap}
+\@mathcmd{\doublecup}
+\@mathcmd{\Downarrow}
+\@mathcmd{\downarrow}
+\@mathcmd{\downdownarrows}
+\@mathcmd{\downharpoonleft}
+\@mathcmd{\downharpoonright}
+\@mathcmd{\ell}
+\@mathcmd{\empty}
+\@mathcmd{\emptyset}
+\@mathcmd{\enspace}
+\@mathcmd{\Epsilon}
+\@mathcmd{\epsilon}
+\@mathcmd{\eqcirc}
+\@mathcmd{\Eqcolon}
+\@mathcmd{\eqcolon}
+\@mathcmd{\Eqqcolon}
+\@mathcmd{\eqqcolon}
+\@mathcmd{\eqsim}
+\@mathcmd{\eqslantgtr}
+\@mathcmd{\eqslantless}
+\@mathcmd{\equiv}
+\@mathcmd{\Eta}
+\@mathcmd{\eta}
+\@mathcmd{\eth}
+\@mathcmd{\exist}
+\@mathcmd{\exists}
+\@mathcmd{\exp}
+\@mathcmd{\expandafter}
+\@mathcmd{\fallingdotseq}
+\@mathcmd{\fbox}
+\@mathcmd{\fcolorbox}
+\@mathcmd{\Finv}
+\@mathcmd{\flat}
+\@mathcmd{\footnotesize}
+\@mathcmd{\forall}
+\@mathcmd{\frac}
+\@mathcmd{\frak}
+\@mathcmd{\frown}
+\@mathcmd{\futurelet}
+\@mathcmd{\Game}
+\@mathcmd{\Gamma}
+\@mathcmd{\gamma}
+\@mathcmd{\gcd}
+\@mathcmd{\ge}
+\@mathcmd{\genfrac}
+\@mathcmd{\geq}
+\@mathcmd{\geqq}
+\@mathcmd{\geqslant}
+\@mathcmd{\gets}
+\@mathcmd{\gg}
+\@mathcmd{\ggg}
+\@mathcmd{\gggtr}
+\@mathcmd{\gimel}
+\@mathcmd{\global}
+\@mathcmd{\gnapprox}
+\@mathcmd{\gneq}
+\@mathcmd{\gneqq}
+\@mathcmd{\gnsim}
+\@mathcmd{\grave}
+\@mathcmd{\gt}
+\@mathcmd{\gtrdot}
+\@mathcmd{\gtrapprox}
+\@mathcmd{\gtreqless}
+\@mathcmd{\gtreqqless}
+\@mathcmd{\gtrless}
+\@mathcmd{\gtrsim}
+\@mathcmd{\gvertneqq}
+\@mathcmd{\Harr}
+\@mathcmd{\hArr}
+\@mathcmd{\harr}
+\@mathcmd{\hat}
+\@mathcmd{\hbar}
+\@mathcmd{\hdashline}
+\@mathcmd{\hearts}
+\@mathcmd{\heartsuit}
+\@mathcmd{\hline}
+\@mathcmd{\hom}
+\@mathcmd{\hookleftarrow}
+\@mathcmd{\hookrightarrow}
+\@mathcmd{\hphantom}
+\@mathcmd{\hskip}
+\@mathcmd{\hslash}
+\@mathcmd{\hspace}
+\@mathcmd{\htmlClass}
+\@mathcmd{\htmlData}
+\@mathcmd{\htmlId}
+\@mathcmd{\htmlStyle}
+\@mathcmd{\huge}
+\@mathcmd{\Huge}
+\@mathcmd{\iff}
+\@mathcmd{\iiint}
+\@mathcmd{\iint}
+\@mathcmd{\Im}
+\@mathcmd{\image}
+\@mathcmd{\imath}
+\@mathcmd{\impliedby}
+\@mathcmd{\implies}
+\@mathcmd{\in}
+\@mathcmd{\inf}
+\@mathcmd{\infin}
+\@mathcmd{\infty}
+\@mathcmd{\int}
+\@mathcmd{\intercal}
+\@mathcmd{\intop}
+\@mathcmd{\Iota}
+\@mathcmd{\iota}
+\@mathcmd{\isin}
+\@mathcmd{\jmath}
+\@mathcmd{\Join}
+\@mathcmd{\Kappa}
+\@mathcmd{\kappa}
+\@mathcmd{\KaTeX}
+\@mathcmd{\ker}
+\@mathcmd{\kern}
+\@mathcmd{\Ket}
+\@mathcmd{\ket}
+\@mathcmd{\Lambda}
+\@mathcmd{\lambda}
+\@mathcmd{\land}
+\@mathcmd{\langle}
+\@mathcmd{\Larr}
+\@mathcmd{\lArr}
+\@mathcmd{\larr}
+\@mathcmd{\large}
+\@mathcmd{\Large}
+\@mathcmd{\LARGE}
+\@mathcmd{\LaTeX}
+\@mathcmd{\lBrace}
+\@mathcmd{\lbrace}
+\@mathcmd{\lbrack}
+\@mathcmd{\lceil}
+\@mathcmd{\ldotp}
+\@mathcmd{\ldots}
+\@mathcmd{\le}
+\@mathcmd{\leadsto}
+\@mathcmd{\left}
+\@mathcmd{\leftarrow}
+\@mathcmd{\Leftarrow}
+\@mathcmd{\leftharpoondown}
+\@mathcmd{\leftharpoonup}
+\@mathcmd{\leftleftarrows}
+\@mathcmd{\Leftrightarrow}
+\@mathcmd{\leftrightarrow}
+\@mathcmd{\leftrightarrows}
+\@mathcmd{\leftrightharpoons}
+\@mathcmd{\leftrightsquigarrow}
+\@mathcmd{\leftthreetimes}
+\@mathcmd{\leq}
+\@mathcmd{\leqq}
+\@mathcmd{\leqslant}
+\@mathcmd{\lessapprox}
+\@mathcmd{\lessdot}
+\@mathcmd{\lesseqgtr}
+\@mathcmd{\lesseqqgtr}
+\@mathcmd{\lessgtr}
+\@mathcmd{\lesssim}
+\@mathcmd{\lfloor}
+\@mathcmd{\lg}
+\@mathcmd{\lgroup}
+\@mathcmd{\lhd}
+\@mathcmd{\lim}
+\@mathcmd{\liminf}
+\@mathcmd{\limits}
+\@mathcmd{\limsup}
+\@mathcmd{\ll}
+\@mathcmd{\llap}
+\@mathcmd{\llbracket}
+\@mathcmd{\llcorner}
+\@mathcmd{\Lleftarrow}
+\@mathcmd{\lll}
+\@mathcmd{\llless}
+\@mathcmd{\lmoustache}
+\@mathcmd{\ln}
+\@mathcmd{\lnapprox}
+\@mathcmd{\lneq}
+\@mathcmd{\lneqq}
+\@mathcmd{\lnot}
+\@mathcmd{\lnsim}
+\@mathcmd{\log}
+\@mathcmd{\long}
+\@mathcmd{\Longleftarrow}
+\@mathcmd{\longleftarrow}
+\@mathcmd{\Longleftrightarrow}
+\@mathcmd{\longleftrightarrow}
+\@mathcmd{\longmapsto}
+\@mathcmd{\Longrightarrow}
+\@mathcmd{\longrightarrow}
+\@mathcmd{\looparrowleft}
+\@mathcmd{\looparrowright}
+\@mathcmd{\lor}
+\@mathcmd{\lozenge}
+\@mathcmd{\lparen}
+\@mathcmd{\Lrarr}
+\@mathcmd{\lrArr}
+\@mathcmd{\lrarr}
+\@mathcmd{\lrcorner}
+\@mathcmd{\lq}
+\@mathcmd{\Lsh}
+\@mathcmd{\lt}
+\@mathcmd{\ltimes}
+\@mathcmd{\lVert}
+\@mathcmd{\lvert}
+\@mathcmd{\lvertneqq}
+\@mathcmd{\maltese}
+\@mathcmd{\mapsto}
+\@mathcmd{\mathbb}
+\@mathcmd{\mathbf}
+\@mathcmd{\mathbin}
+\@mathcmd{\mathcal}
+\@mathcmd{\mathchoice}
+\@mathcmd{\mathclap}
+\@mathcmd{\mathclose}
+\@mathcmd{\mathellipsis}
+\@mathcmd{\mathfrak}
+\@mathcmd{\mathinner}
+\@mathcmd{\mathit}
+\@mathcmd{\mathllap}
+\@mathcmd{\mathnormal}
+\@mathcmd{\mathop}
+\@mathcmd{\mathopen}
+\@mathcmd{\mathord}
+\@mathcmd{\mathpunct}
+\@mathcmd{\mathrel}
+\@mathcmd{\mathrlap}
+\@mathcmd{\mathring}
+\@mathcmd{\mathrm}
+\@mathcmd{\mathscr}
+\@mathcmd{\mathsf}
+\@mathcmd{\mathsterling}
+\@mathcmd{\mathtt}
+\@mathcmd{\max}
+\@mathcmd{\measuredangle}
+\@mathcmd{\medspace}
+\@mathcmd{\mho}
+\@mathcmd{\mid}
+\@mathcmd{\middle}
+\@mathcmd{\min}
+\@mathcmd{\minuso}
+\@mathcmd{\mkern}
+\@mathcmd{\mod}
+\@mathcmd{\models}
+\@mathcmd{\mp}
+\@mathcmd{\mskip}
+\@mathcmd{\Mu}
+\@mathcmd{\mu}
+\@mathcmd{\multimap}
+\@mathcmd{\N}
+\@mathcmd{\nabla}
+\@mathcmd{\natnums}
+\@mathcmd{\natural}
+\@mathcmd{\negmedspace}
+\@mathcmd{\ncong}
+\@mathcmd{\ne}
+\@mathcmd{\nearrow}
+\@mathcmd{\neg}
+\@mathcmd{\negthickspace}
+\@mathcmd{\negthinspace}
+\@mathcmd{\neq}
+\@mathcmd{\newline}
+\@mathcmd{\nexists}
+\@mathcmd{\ngeq}
+\@mathcmd{\ngeqq}
+\@mathcmd{\ngeqslant}
+\@mathcmd{\ngtr}
+\@mathcmd{\ni}
+\@mathcmd{\nleftarrow}
+\@mathcmd{\nLeftarrow}
+\@mathcmd{\nLeftrightarrow}
+\@mathcmd{\nleftrightarrow}
+\@mathcmd{\nleq}
+\@mathcmd{\nleqq}
+\@mathcmd{\nleqslant}
+\@mathcmd{\nless}
+\@mathcmd{\nmid}
+\@mathcmd{\nobreak}
+\@mathcmd{\nobreakspace}
+\@mathcmd{\noexpand}
+\@mathcmd{\nolimits}
+\@mathcmd{\normalsize}
+\@mathcmd{\not}
+\@mathcmd{\notin}
+\@mathcmd{\notni}
+\@mathcmd{\nparallel}
+\@mathcmd{\nprec}
+\@mathcmd{\npreceq}
+\@mathcmd{\nRightarrow}
+\@mathcmd{\nrightarrow}
+\@mathcmd{\nshortmid}
+\@mathcmd{\nshortparallel}
+\@mathcmd{\nsim}
+\@mathcmd{\nsubseteq}
+\@mathcmd{\nsubseteqq}
+\@mathcmd{\nsucc}
+\@mathcmd{\nsucceq}
+\@mathcmd{\nsupseteq}
+\@mathcmd{\nsupseteqq}
+\@mathcmd{\ntriangleleft}
+\@mathcmd{\ntrianglelefteq}
+\@mathcmd{\ntriangleright}
+\@mathcmd{\ntrianglerighteq}
+\@mathcmd{\Nu}
+\@mathcmd{\nu}
+\@mathcmd{\nVDash}
+\@mathcmd{\nVdash}
+\@mathcmd{\nvDash}
+\@mathcmd{\nvdash}
+\@mathcmd{\nwarrow}
+\@mathcmd{\odot}
+\@mathcmd{\oiiint}
+\@mathcmd{\oiint}
+\@mathcmd{\oint}
+\@mathcmd{\omega}
+\@mathcmd{\Omega}
+\@mathcmd{\Omicron}
+\@mathcmd{\omicron}
+\@mathcmd{\ominus}
+\@mathcmd{\operatorname}
+\@mathcmd{\oplus}
+\@mathcmd{\oslash}
+\@mathcmd{\otimes}
+\@mathcmd{\over}
+\@mathcmd{\overbrace}
+\@mathcmd{\overgroup}
+\@mathcmd{\overleftarrow}
+\@mathcmd{\overleftharpoon}
+\@mathcmd{\overleftrightarrow}
+\@mathcmd{\overline}
+\@mathcmd{\overlinesegment}
+\@mathcmd{\Overrightarrow}
+\@mathcmd{\overrightarrow}
+\@mathcmd{\overrightharpoon}
+\@mathcmd{\overset}
+\@mathcmd{\owns}
+\@mathcmd{\P}
+\@mathcmd{\parallel}
+\@mathcmd{\partial}
+\@mathcmd{\perp}
+\@mathcmd{\phantom}
+\@mathcmd{\Phi}
+\@mathcmd{\phi}
+\@mathcmd{\Pi}
+\@mathcmd{\pi}
+\@mathcmd{\pitchfork}
+\@mathcmd{\plim}
+\@mathcmd{\plusmn}
+\@mathcmd{\pm}
+\@mathcmd{\pmb}
+\@mathcmd{\pmod}
+\@mathcmd{\pod}
+\@mathcmd{\pounds}
+\@mathcmd{\Pr}
+\@mathcmd{\prec}
+\@mathcmd{\precapprox}
+\@mathcmd{\preccurlyeq}
+\@mathcmd{\preceq}
+\@mathcmd{\precnapprox}
+\@mathcmd{\precneqq}
+\@mathcmd{\precnsim}
+\@mathcmd{\precsim}
+\@mathcmd{\prime}
+\@mathcmd{\prod}
+\@mathcmd{\propto}
+\@mathcmd{\providecommand}
+\@mathcmd{\psi}
+\@mathcmd{\Psi}
+\@mathcmd{\R}
+\@mathcmd{\raisebox}
+\@mathcmd{\rang}
+\@mathcmd{\rangle}
+\@mathcmd{\Rarr}
+\@mathcmd{\rArr}
+\@mathcmd{\rarr}
+\@mathcmd{\rBrace}
+\@mathcmd{\rbrace}
+\@mathcmd{\rbrack}
+\@mathcmd{\rceil}
+\@mathcmd{\Re}
+\@mathcmd{\real}
+\@mathcmd{\Reals}
+\@mathcmd{\reals}
+\@mathcmd{\relax}
+\@mathcmd{\hail}
+\@mathcmd{\restriction}
+\@mathcmd{\rfloor}
+\@mathcmd{\rgroup}
+\@mathcmd{\rhd}
+\@mathcmd{\Rho}
+\@mathcmd{\rho}
+\@mathcmd{\right}
+\@mathcmd{\Rightarrow}
+\@mathcmd{\rightarrow}
+\@mathcmd{\rightarrowtail}
+\@mathcmd{\rightharpoondown}
+\@mathcmd{\rightharpoonup}
+\@mathcmd{\rightleftarrows}
+\@mathcmd{\rightleftharpoons}
+\@mathcmd{\rightrightarrows}
+\@mathcmd{\rightsquigarrow}
+\@mathcmd{\rightthreetimes}
+\@mathcmd{\risingdotseq}
+\@mathcmd{\rlap}
+\@mathcmd{\rmoustache}
+\@mathcmd{\rparen}
+\@mathcmd{\rq}
+\@mathcmd{\rrbracket}
+\@mathcmd{\Rrightarrow}
+\@mathcmd{\Rsh}
+\@mathcmd{\rtimes}
+\@mathcmd{\rule}
+\@mathcmd{\rVert}
+\@mathcmd{\rvert}
+\@mathcmd{\scriptscriptstyle}
+\@mathcmd{\scriptsize}
+\@mathcmd{\scriptstyle}
+\@mathcmd{\sdot}
+\@mathcmd{\searrow}
+\@mathcmd{\sec}
+\@mathcmd{\sect}
+\@mathcmd{\setminus}
+\@mathcmd{\sf}
+\@mathcmd{\sharp}
+\@mathcmd{\shortmid}
+\@mathcmd{\shortparallel}
+\@mathcmd{\Sigma}
+\@mathcmd{\sigma}
+\@mathcmd{\sim}
+\@mathcmd{\simeq}
+\@mathcmd{\sin}
+\@mathcmd{\sinh}
+\@mathcmd{\sixptsize}
+\@mathcmd{\sh}
+\@mathcmd{\small}
+\@mathcmd{\smallfrown}
+\@mathcmd{\smallint}
+\@mathcmd{\smallsetminus}
+\@mathcmd{\smallsmile}
+\@mathcmd{\smash}
+\@mathcmd{\smile}
+\@mathcmd{\sout}
+\@mathcmd{\space}
+\@mathcmd{\spades}
+\@mathcmd{\spadesuit}
+\@mathcmd{\sphericalangle}
+\@mathcmd{\sqcap}
+\@mathcmd{\sqcup}
+\@mathcmd{\square}
+\@mathcmd{\sqrt}
+\@mathcmd{\sqsubset}
+\@mathcmd{\sqsubseteq}
+\@mathcmd{\sqsupset}
+\@mathcmd{\sqsupseteq}
+\@mathcmd{\stackrel}
+\@mathcmd{\star}
+\@mathcmd{\sub}
+\@mathcmd{\sube}
+\@mathcmd{\Subset}
+\@mathcmd{\subset}
+\@mathcmd{\subseteq}
+\@mathcmd{\subseteqq}
+\@mathcmd{\subsetneq}
+\@mathcmd{\subsetneqq}
+\@mathcmd{\substack}
+\@mathcmd{\succ}
+\@mathcmd{\succapprox}
+\@mathcmd{\succcurlyeq}
+\@mathcmd{\succeq}
+\@mathcmd{\succnapprox}
+\@mathcmd{\succneqq}
+\@mathcmd{\succnsim}
+\@mathcmd{\succsim}
+\@mathcmd{\sum}
+\@mathcmd{\sup}
+\@mathcmd{\supe}
+\@mathcmd{\Supset}
+\@mathcmd{\supset}
+\@mathcmd{\supseteq}
+\@mathcmd{\supseteqq}
+\@mathcmd{\supsetneq}
+\@mathcmd{\supsetneqq}
+\@mathcmd{\surd}
+\@mathcmd{\swarrow}
+\@mathcmd{\tag}
+\@mathcmd{\tan}
+\@mathcmd{\tanh}
+\@mathcmd{\Tau}
+\@mathcmd{\tau}
+\@mathcmd{\tbinom}
+\@mathcmd{\TeX}
+\@mathcmd{\text}
+\@mathcmd{\tfrac}
+\@mathcmd{\tg}
+\@mathcmd{\th}
+\@mathcmd{\therefore}
+\@mathcmd{\Theta}
+\@mathcmd{\theta}
+\@mathcmd{\thetasym}
+\@mathcmd{\thickapprox}
+\@mathcmd{\thicksim}
+\@mathcmd{\thickspace}
+\@mathcmd{\thinspace}
+\@mathcmd{\tilde}
+\@mathcmd{\times}
+\@mathcmd{\tiny}
+\@mathcmd{\to}
+\@mathcmd{\top}
+\@mathcmd{\triangle}
+\@mathcmd{\triangledown}
+\@mathcmd{\triangleleft}
+\@mathcmd{\trianglelefteq}
+\@mathcmd{\triangleq}
+\@mathcmd{\triangleright}
+\@mathcmd{\trianglerighteq}
+\@mathcmd{\tt}
+\@mathcmd{\twoheadleftarrow}
+\@mathcmd{\twoheadrightarrow}
+\@mathcmd{\Uarr}
+\@mathcmd{\uArr}
+\@mathcmd{\uarr}
+\@mathcmd{\ulcorner}
+\@mathcmd{\underbrace}
+\@mathcmd{\undergroup}
+\@mathcmd{\underleftarrow}
+\@mathcmd{\underleftrightarrow}
+\@mathcmd{\underline}
+\@mathcmd{\underlinesegment}
+\@mathcmd{\underrightarrow}
+\@mathcmd{\underset}
+\@mathcmd{\unlhd}
+\@mathcmd{\unrhd}
+\@mathcmd{\Uparrow}
+\@mathcmd{\uparrow}
+\@mathcmd{\Updownarrow}
+\@mathcmd{\updownarrow}
+\@mathcmd{\upharpoonleft}
+\@mathcmd{\upharpoonright}
+\@mathcmd{\uplus}
+\@mathcmd{\Upsilon}
+\@mathcmd{\upsilon}
+\@mathcmd{\upuparrows}
+\@mathcmd{\urcorner}
+\@mathcmd{\utilde}
+\@mathcmd{\varDelta}
+\@mathcmd{\varepsilon}
+\@mathcmd{\varGamma}
+\@mathcmd{\varkappa}
+\@mathcmd{\varLambda}
+\@mathcmd{\varnothing}
+\@mathcmd{\varOmega}
+\@mathcmd{\varPhi}
+\@mathcmd{\varphi}
+\@mathcmd{\varPi}
+\@mathcmd{\varpi}
+\@mathcmd{\varpropto}
+\@mathcmd{\varPsi}
+\@mathcmd{\varrho}
+\@mathcmd{\varSigma}
+\@mathcmd{\varsigma}
+\@mathcmd{\varsubsetneq}
+\@mathcmd{\varsubsetneqq}
+\@mathcmd{\varsupsetneq}
+\@mathcmd{\varsupsetneqq}
+\@mathcmd{\varTheta}
+\@mathcmd{\vartheta}
+\@mathcmd{\vartriangle}
+\@mathcmd{\vartriangleleft}
+\@mathcmd{\vartriangleright}
+\@mathcmd{\varUpsilon}
+\@mathcmd{\varXi}
+\@mathcmd{\vcentcolon}
+\@mathcmd{\Vdash}
+\@mathcmd{\vDash}
+\@mathcmd{\vdash}
+\@mathcmd{\vdots}
+\@mathcmd{\vec}
+\@mathcmd{\vee}
+\@mathcmd{\veebar}
+\@mathcmd{\verb}
+\@mathcmd{\Vert}
+\@mathcmd{\vert}
+\@mathcmd{\vphantom}
+\@mathcmd{\Vvdash}
+\@mathcmd{\wedge}
+\@mathcmd{\weierp}
+\@mathcmd{\widecheck}
+\@mathcmd{\widehat}
+\@mathcmd{\widetilde}
+\@mathcmd{\wp}
+\@mathcmd{\wr}
+\@mathcmd{\xcancel}
+\@mathcmd{\xdef}
+\@mathcmd{\Xi}
+\@mathcmd{\xi}
+\@mathcmd{\xhookleftarrow}
+\@mathcmd{\xhookrightarrow}
+\@mathcmd{\xLeftarrow}
+\@mathcmd{\xleftarrow}
+\@mathcmd{\xleftharpoondown}
+\@mathcmd{\xleftharpoonup}
+\@mathcmd{\xLeftrightarrow}
+\@mathcmd{\xleftrightarrow}
+\@mathcmd{\xleftrightharpoons}
+\@mathcmd{\xlongequal}
+\@mathcmd{\xmapsto}
+\@mathcmd{\xRightarrow}
+\@mathcmd{\xrightarrow}
+\@mathcmd{\xrightharpoondown}
+\@mathcmd{\xrightharpoonup}
+\@mathcmd{\xrightleftharpoons}
+\@mathcmd{\xtofrom}
+\@mathcmd{\xtwoheadleftarrow}
+\@mathcmd{\xtwoheadrightarrow}
+\@mathcmd{\yen}
+\@mathcmd{\Z}
+\@mathcmd{\Zeta}
+\@mathcmd{\zeta}
+
+\envdef{align}{}{\[\begin{aligned}}{\end{aligned}\]}
+\envdef{align*}{}{\[\begin{aligned}}{\end{aligned}\]}
+\envdef{alignat}{#1}{\[\begin{alignedat}{#1}}{\end{alignedat}\]}
+\envdef{alignat*}{#1}{\[\begin{alignedat}{#1}}{\end{alignedat}\]}
+\envdef{gather}{}{\[\begin{gathered}}{\end{gathered}\]}
+\envdef{gather*}{}{\[\begin{gathered}}{\end{gathered}\]}

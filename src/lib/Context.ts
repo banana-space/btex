@@ -329,7 +329,10 @@ export class Context {
     let labels: any = {};
     let hasLabels = false;
     for (let label of this.labels) {
-      let html = label.getHTML().replace(/\uedaf"\uedaf/g, '~~');
+      let html = label
+        .getHTML()
+        .replace(/\uedaf"\uedaf/g, '~~.')
+        .replace(/\uedae"\uedae/g, '~~');
       labels[label.key] = { id: label.bookmarkId, html };
       hasLabels = true;
     }
@@ -349,7 +352,9 @@ export class Context {
    */
   render(options?: RenderOptions): string {
     let html = this.root.render(options)[0]?.outerHTML ?? '';
-    html = html.replace(/\uedaf"\uedaf/g, '<btex-ref data-key="--prefix--"></btex-ref>');
+    html = html
+      .replace(/\uedaf"\uedaf/g, '<btex-ref data-key="--prefix--"></btex-ref>')
+      .replace(/\uedae"\uedae/g, '<btex-ref data-key="--pagenum--"></btex-ref>');
     return html;
   }
 
