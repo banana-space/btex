@@ -34,7 +34,7 @@ export class WorkerPool {
   onMessage(workerId: number, value: WorkerResult) {
     if (!value.taskId) return;
 
-    console.log(value);
+    // console.log(value);
 
     let id = value.taskId;
     delete value.taskId;
