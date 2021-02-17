@@ -473,6 +473,8 @@ export class Context {
   }
 
   private addTableOfContents() {
+    if (this.getBoolean('g.toc-disabled', false)) return;
+
     let headers = this.headers.filter((header) => !header.noToc);
 
     if (headers.length > 0) {

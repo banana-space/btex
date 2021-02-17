@@ -402,8 +402,14 @@
 \pdef\@subsubsection***{\@subsubsection**}
 
 \pdef\@par==#+1=={\section{#1}}
+\pdef\@par==*#+1=={\section*{#1}}
+\pdef\@par==**#+1=={\section**{#1}}
 \pdef\@par===#+1==={\subsection{#1}}
+\pdef\@par===*#+1==={\subsection*{#1}}
+\pdef\@par===**#+1==={\subsection**{#1}}
 \pdef\@par====#+1===={\subsubsection{#1}}
+\pdef\@par====*#+1===={\subsubsection*{#1}}
+\pdef\@par====**#+1===={\subsubsection**{#1}}
 \pdef\@par====={\@par{}=====}
 
 \def\nosectionnumbers{%
@@ -435,6 +441,8 @@
 }
 
 \numbersections
+
+\def\notoc{\@settrue{g.toc-disabled}}
 
 \envdef{flushleft}{}{%
     \@begingroup%
@@ -989,6 +997,7 @@
 }
 \pdef\@subpage[#1]{%
     \@@set{subpage-number}{#1}%
+    \@@def\@subpagenumber{#1}%
     \@subpage%
 }
 \pdef\@subpage[#1][#2]{%
@@ -1001,7 +1010,13 @@
 }
 \pdef\@subpage*[#1]{%
     \@@set{subpage-number}{#1}%
+    \@@def\@subpagenumber{#1}%
     \@subpage*%
+}
+\pdef\@subpage!{%
+    \@@set{subpage-number}{}%
+    \@@def\@subpagenumber##1{}%
+    \@subpage%
 }
 
 \def\@subpageitem#1#2{%
@@ -1011,13 +1026,13 @@
     \@link{%
         \@@get{subpage-title}%
     }{%
-        {\@subpagenumber}\@u2001#2%
+        {\@subpagenumber{\@u2001}}#2%
     }%
 }
 
 \def\@subpageitemstar#1{%
     \@item%
-    {\@subpagenumber}\@u2001#1%
+    {\@subpagenumber{\@u2001}}#1%
 }
 
 
