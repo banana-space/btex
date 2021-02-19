@@ -5,7 +5,6 @@ import { Internal } from '../Internal';
 
 export const CodeInternal: Internal = {
   execute(code: Code, context: Context): boolean {
-    let start = code.pointer;
     let initiator = code.token;
     code.step();
 
@@ -14,8 +13,8 @@ export const CodeInternal: Internal = {
 
     let text = '';
     if (!context.noOutput && source && group && group.tokens.length > 0) {
-      let startPosition = group.tokens[0].start;
-      let endPosition = group.tokens[group.tokens.length - 1].end;
+      let startPosition = group.tokens[0].source.start;
+      let endPosition = group.tokens[group.tokens.length - 1].source.end;
       let lines = source.split('\n');
 
       if (startPosition && endPosition) {
