@@ -643,6 +643,15 @@
             \begin{@theorem}{##2}%
         }{\end{@theorem}}%
     }%
+    \@pdef\newtheorem##1[##2]##3{%
+        \@envdef{##1}{}{%
+            #1%
+            \begin{@theorem}{%
+                \refstepcounter{##2}%
+                ##3 \@@cmd{the##2}%
+            }%
+        }{\end{@theorem}}%
+    }%
 }
 
 \def\@thmbegina{\@@set{g.div-class}{style-a}}
