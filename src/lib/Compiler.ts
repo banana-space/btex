@@ -152,7 +152,7 @@ export abstract class Compiler {
           let command = context.findCommand(name);
           if (!command || (mathMode && command.isTextCommand)) {
             if (mathMode) {
-              context.span.append(name + ' ', t);
+              context.span.append(name, t);
               if (/[a-zA-Z]$/.test(name)) context.span.spacyCommand = t;
             } else {
               if (context.throw('UNDEFINED_COMMAND', t, name) > options.maxErrors) return false;
