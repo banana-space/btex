@@ -33,7 +33,13 @@ export class CodeElement implements ContainerElement {
 
     let element = document.createElement(this.isInline ? 'code' : 'pre');
     if (this.lang) element.classList.add('code-' + this.lang);
-    element.append(document.createTextNode(this.text));
+
+    let isFirst = true;
+    for (let line of this.text.split('\n')) {
+      if (isFirst) isFirst = false;
+      else element.append(document.createElement('br'));
+      element.append(document.createTextNode(line));
+    }
     return [element];
   }
 }

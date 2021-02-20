@@ -589,6 +589,8 @@
 
 \tdef\circ{\@u2218}
 
+\tdef\texttilde{\@u007e}
+
 % ...
 
 

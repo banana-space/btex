@@ -37,18 +37,20 @@ export const CodeInternal: Internal = {
         if (textLines[textLines.length - 1].trim() === '') textLines.pop();
 
         if (textLines.length > 0) {
-          let indent = textLines.map((line) => line.match(/^\s*/)?.[0].length ?? 0);
+          let indent = textLines.map((line) =>
+            line.trim() ? line.match(/^\s*/)?.[0].length ?? 0 : 1000
+          );
           let leastIndent = indent[0];
           for (let i = 1; i < indent.length; i++)
             if (indent[i] < leastIndent) leastIndent = indent[i];
-          textLines = textLines.map((line) => line.substring(leastIndent));
+          textLines = textLines.map((line) => (line.trim() ? line.substring(leastIndent) : ''));
         }
 
         text = textLines.join('\n');
       }
 
-      // Escape {, }, \
-      text = text.replace(/#([{}\\ ])/g, '$1');
+      // Escape {, }, \, ~
+      text = text.replace(/#([{}\\~ ])/g, '$1');
 
       // In display mode, do an equivalent of \@par <pre> ... </pre> \@par
       let isDisplay = context.getBoolean('code-display', false);
