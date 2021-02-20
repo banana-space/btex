@@ -111,6 +111,9 @@ export class MathElement implements ContainerElement {
         strict: false,
         throwOnError: false,
       });
+
+      // Flatten span so that it won't be messed up by MW parser
+      span.innerHTML = span.innerHTML.replace(/\n/g, ' ');
     }
 
     if (!this.isInline && this.tagLeft) {
