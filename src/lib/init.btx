@@ -689,9 +689,12 @@
     \@par%
 }
 \envadef{proof}{}{%
-    \begin{proof}[\proofname]%
+    \@par%
+    \@gdef\@proofend{\qed}%
+    {\@bf\@rm{\proofname}.} %
 }{%
-    \end{proof}%
+    \@proofend%
+    \@par%
 }
 
 \tdef\qedsymbol{$\Box$}
