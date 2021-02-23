@@ -106,7 +106,7 @@
 
 {\@par}
 
-\def$#+1${\@@enter{math}#1\@@exit{math}}
+\tdef$#+1${\@@enter{math}#1\@@exit{math}}
 
 \def\({\@setfalse{math-display}\@@enter{math}}
 
@@ -573,6 +573,8 @@
 
 \tdef\ {\@u0020}
 
+\tdef\,{\@u2006}
+
 \tdef~{\@u00a0}
 
 \tdef\\{\@u000a}
@@ -590,6 +592,12 @@
 \tdef\circ{\@u2218}
 
 \tdef\texttilde{\@u007e}
+
+\tdef\smallskip{\@par}
+
+\tdef\medskip{\@par}
+
+\tdef\bigskip{\@par}
 
 % ...
 
