@@ -168,7 +168,8 @@ export const DefineInternal: Internal = {
     }
     if (context.get('def-global') !== undefined)
       command.isGlobal = context.getBoolean('def-global', false, true);
-    command.isTextCommand = context.getBoolean('def-text', false, true);
+    if (overwrite || context.get('def-text') !== undefined)
+      command.isTextCommand = context.getBoolean('def-text', false, true);
     context.defineCommand(command);
 
     code.spliceFrom(start);
