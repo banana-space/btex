@@ -197,6 +197,8 @@
 
 \def\@inc#1{\@@add{#1}{1}}
 
+\def\@dec#1{\@@add{#1}{-1}}
+
 \def\@newcounter#1{%
     \@@set{g.ctr-#1}{0}%
     \@defbyname{the#1}{\arabic{#1}}%
@@ -945,6 +947,63 @@
 
 \def\cite#1{{[\ref{cite:#1}]}}
 \pdef\cite[#1]#2{{[\ref{cite:#2}, #1]}}
+
+
+% ==========         FOOTNOTES          ==========
+
+\newcounter{footnote}
+
+\newcounter{actualfootnote}
+
+\def\@printfootnotes{}
+
+\def\@footnotemark{%
+    \@inc{g.ctr-footnote}%
+    {%
+        \@settrue{text-sup}%
+        \@@set{ref-key}{footnote:{g.ctr-footnote}}%
+        \@ref{\thefootnote}%
+    }%
+    \@dec{g.ctr-footnote}%
+}
+
+\def\@printfootnoteitem[#1][#2]#3{%
+    \@@set{ref-prefix}{f}%
+    \@item[#2.]%
+    \@settrue{text-sup}%
+    \@@def\@currentlabel{#2}%
+    \@@bmk%
+    \@@label{footnote:#1}%
+    \@setfalse{text-sup}%
+}
+
+\def\@footnotetext#1{%
+    \@inc{g.ctr-actualfootnote}%
+    \@patch\@printfootnotes{\@printfootnoteitem[}%
+    \@defexpand\@patch\@printfootnotes{\theactualfootnote}%
+    \@patch\@printfootnotes{][}%
+    \@defexpand\@patch\@printfootnotes{\thefootnote}%
+    \@patch\@printfootnotes{]#1}%
+}
+
+\let\footnotemark\@footnotemark
+
+\def\footnotetext#1{%
+    \@inc{g.ctr-footnote}%
+    \@footnotetext{#1}%
+}
+
+\def\footnote#1{\footnotemark\footnotetext{#1}}
+
+\def\printfootnotes{
+    {%
+        \@@set{text-size}{14}%
+        \@@set{g.list-classes}{footnotes}
+        \begin{@list}%
+            \@printfootnotes%
+        \end{@list}%
+    }%
+}
 
 
 % ==========           CODE             ==========

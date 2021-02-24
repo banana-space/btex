@@ -14,6 +14,8 @@ export class SpanElement implements RenderElement {
     preservesSpaces?: boolean;
     lang?: string;
     classes?: string;
+    sup?: boolean;
+    sub?: boolean;
   } = {};
 
   // Used for determining whether to add a space after a command, e.g. $\a b$ vs. $\a($
@@ -37,6 +39,8 @@ export class SpanElement implements RenderElement {
     this.style.colour = context.get('text-colour');
     this.style.fontSize = context.getFloat('text-size', 0) || undefined;
     this.style.lang = context.get('text-lang');
+    this.style.sup = context.getBoolean('text-sup', false);
+    this.style.sub = context.getBoolean('text-sub', false);
 
     this.style.classes = '';
     if (context.getBoolean('text-class-error', false)) this.style.classes += ' error';
@@ -52,7 +56,9 @@ export class SpanElement implements RenderElement {
       this.style.fontSize === span.style.fontSize &&
       (this.style.preservesSpaces ?? false) === (span.style.preservesSpaces ?? false) &&
       this.style.lang === span.style.lang &&
-      (this.style.classes ?? '') === (span.style.classes ?? '')
+      (this.style.classes ?? '') === (span.style.classes ?? '') &&
+      (this.style.sup ?? false) === (span.style.sup ?? false) &&
+      (this.style.sub ?? false) === (span.style.sub ?? false)
     );
   }
 
@@ -107,6 +113,10 @@ export class SpanElement implements RenderElement {
 
     if (this.style.lang && !SpanElement.langRegex.test(this.style.lang)) delete this.style.lang;
 
+    let tagName = 'span';
+    if (this.style.sub && !this.style.sup) tagName = 'sub';
+    if (this.style.sup && !this.style.sub) tagName = 'sup';
+
     if (options?.inverseSearch) {
       // Create <span> tags
       let spans: HTMLSpanElement[] = [];
@@ -124,7 +134,7 @@ export class SpanElement implements RenderElement {
 
       for (let i = 0; i < text.length; i++) {
         if (text[i]) {
-          let span = document.createElement('span');
+          let span = document.createElement(tagName);
           if (this.style.classes) span.setAttribute('class', this.style.classes);
           if (styles.length > 0) span.setAttribute('style', styles.join(';'));
           if (this.style.lang) span.setAttribute('lang', this.style.lang);
@@ -153,7 +163,7 @@ export class SpanElement implements RenderElement {
     }
 
     // Create a <span> tag
-    let span = document.createElement('span');
+    let span = document.createElement(tagName);
     if (this.style.lang) span.setAttribute('lang', this.style.lang);
     if (styles.length > 0) span.setAttribute('style', styles.join(';'));
     if (this.style.classes) span.setAttribute('class', this.style.classes);
