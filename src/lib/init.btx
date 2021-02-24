@@ -995,10 +995,9 @@
 
 \def\footnote#1{\footnotemark\footnotetext{#1}}
 
-\def\printfootnotes{
+\def\printfootnotes{%
     {%
-        \@@set{text-size}{14}%
-        \@@set{g.list-classes}{footnotes}
+        \@@set{g.list-classes}{footnotes}%
         \begin{@list}%
             \@printfootnotes%
         \end{@list}%
