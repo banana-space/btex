@@ -967,7 +967,7 @@
     \@dec{g.ctr-footnote}%
 }
 
-\def\@printfootnoteitem[#1][#2]#3{%
+\def\@printfootnoteitem[#1][#2]{%
     \@@set{ref-prefix}{f}%
     \@item[#2.]%
     \@settrue{text-sup}%
@@ -995,10 +995,9 @@
 
 \def\footnote#1{\footnotemark\footnotetext{#1}}
 
-\def\printfootnotes{
+\def\printfootnotes{%
     {%
-        \@@set{text-size}{14}%
-        \@@set{g.list-classes}{footnotes}
+        \@@set{g.list-classes}{footnotes}%
         \begin{@list}%
             \@printfootnotes%
         \end{@list}%
