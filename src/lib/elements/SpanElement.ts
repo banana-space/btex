@@ -147,7 +147,7 @@ export class SpanElement implements RenderElement {
       return spans;
     }
 
-    if (!this.style.lang && !this.style.classes) {
+    if (!this.style.lang && !this.style.classes && tagName === 'span') {
       if (styles.length === 0) {
         // Create text nodes directly
         return toHTML(fullText);
