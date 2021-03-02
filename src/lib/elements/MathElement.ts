@@ -3,7 +3,7 @@ import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
 import { ParagraphElement } from './ParagraphElement';
-import { SpanElement } from './SpanElement';
+import { SpanElement, SpanStyle } from './SpanElement';
 import { TikzElement } from './TikzElement';
 
 export class MathElement implements ContainerElement {
@@ -12,6 +12,7 @@ export class MathElement implements ContainerElement {
   paragraph: ParagraphElement = this.mainParagraph;
   children: RenderElement[] = this.mainParagraph.children;
   isInline: boolean = true;
+  style: SpanStyle = {};
 
   // Equation numbering for display equations
   tagMode?: 'left' | 'right';
@@ -35,6 +36,13 @@ export class MathElement implements ContainerElement {
   }
 
   enter(context: Context) {
+    this.style.colour = context.get('text-colour');
+    this.style.fontSize = context.getFloat('text-size', 0) || undefined;
+
+    this.style.classes = '';
+    if (context.getBoolean('text-class-header', false)) this.style.classes += ' item-header';
+    this.style.classes = this.style.classes.trim();
+
     this.isInline = context.container.isInline || !context.getBoolean('math-display', false, true);
     context.set('g.math-mode', '1');
   }
@@ -85,6 +93,19 @@ export class MathElement implements ContainerElement {
   render(options?: RenderOptions): HTMLElement[] {
     let span = document.createElement('span');
     span.classList.add(this.isInline ? 'inline-math' : 'display-math');
+
+    let styles = [];
+    if (this.style.colour && SpanElement.colourRegex.test(this.style.colour))
+      styles.push(`color:#${this.style.colour}`);
+    if (this.style.fontSize && isFinite(this.style.fontSize)) {
+      let fontSize = this.style.fontSize;
+      if (fontSize < SpanElement.minFontSize) fontSize = SpanElement.minFontSize;
+      if (fontSize > SpanElement.maxFontSize) fontSize = SpanElement.maxFontSize;
+      styles.push(`font-size:${fontSize}px`);
+    }
+
+    if (this.style.classes) span.classList.add(...this.style.classes.split(' '));
+    if (styles.length > 0) span.setAttribute('style', styles.join(';'));
 
     // Check if is tikz.
     // If there is a tikz element, other elements will be ignored.

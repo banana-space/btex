@@ -3,20 +3,22 @@ import { RenderElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
 import { TextNode } from './TextNode';
 
+export interface SpanStyle {
+  italic?: boolean;
+  bold?: boolean;
+  colour?: string;
+  fontSize?: number;
+  preservesSpaces?: boolean;
+  lang?: string;
+  classes?: string;
+  sup?: boolean;
+  sub?: boolean;
+}
+
 export class SpanElement implements RenderElement {
   name: 'span' = 'span';
   children: TextNode[] = [];
-  style: {
-    italic?: boolean;
-    bold?: boolean;
-    colour?: string;
-    fontSize?: number;
-    preservesSpaces?: boolean;
-    lang?: string;
-    classes?: string;
-    sup?: boolean;
-    sub?: boolean;
-  } = {};
+  style: SpanStyle = {};
 
   // Used for determining whether to add a space after a command, e.g. $\a b$ vs. $\a($
   spacyCommand?: Token;
