@@ -718,7 +718,7 @@
     \@par\@@enter{list}%
     \@inc{list-level}%
 }{%
-    \@@exit{list}%
+    \@@exit{list}\@par%
 }
 
 \def\@item{%
