@@ -6,7 +6,11 @@ export abstract class Parser {
    * Converts `text` to a list of tokens.
    */
   static parse(text: string, file?: string): Code {
-    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n') + ' ';
+    text =
+      text
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .replace(/\n\s*\n/g, '\n\n') + ' ';
 
     let tokens: Token[] = [];
     let line = 0;
