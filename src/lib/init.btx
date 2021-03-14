@@ -680,6 +680,8 @@
 
 \newtheorem{remark}{\remarkname}
 
+\newtheorem{example}{\examplename}
+
 \theoremstyle{plain}
 
 \envdef{proof}{[#1]}{%
@@ -1146,6 +1148,7 @@
 \def\propositionname{命题}
 \def\definitionname{定义}
 \def\remarkname{注}
+\def\examplename{例}
 \def\proofname{证明}
 \def\refname{参考文献}
 \def\tocname{目录}
@@ -1157,6 +1160,7 @@
     \@@def\propositionname{Proposition}%
     \@@def\definitionname{Definition}%
     \@@def\remarkname{Remark}%
+    \@@def\examplename{Example}%
     \@@def\proofname{Proof}%
     \@@def\refname{References}%
     \@@def\tocname{Contents}%
