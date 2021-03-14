@@ -322,8 +322,8 @@ export class Context {
 
     this.removeInaccessibleBookmarks();
     this.handleReferences();
-    this.addTableOfContents();
     this.root.normalise();
+    this.addTableOfContents();
 
     // Generate compiler data
     let labels: any = {};
