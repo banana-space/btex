@@ -10,7 +10,7 @@ export abstract class Parser {
       text
         .replace(/\r\n/g, '\n')
         .replace(/\r/g, '\n')
-        .replace(/\n\s*\n/g, '\n\n') + ' ';
+        .replace(/\n\s*?\n/g, '\n\n') + ' ';
 
     let tokens: Token[] = [];
     let line = 0;
@@ -72,9 +72,10 @@ export abstract class Parser {
             if (first === '\n') j--;
           }
 
-          tokens.push(Token.fromCode(text.substring(i, j), TokenType.Command, pos(i), pos(j)));
+          let commandName = text.substring(i, j);
+          tokens.push(Token.fromCode(commandName, TokenType.Command, pos(i), pos(j)));
           i = j - 1;
-          ignoreSpace = true;
+          ignoreSpace = !/^\\[^a-zA-Z]$/.test(commandName);
 
           if (first === '\n') {
             line++, i++;
