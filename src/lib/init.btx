@@ -911,7 +911,9 @@
 \pdef\@wlink#+1|#+2|#+3|{\@wlink#1|#2|}
 
 \tdef\@link#1#2{%
+    \@settrue{c-link-arg}%
     \@@set{ref-page}{#1}%
+    \@setfalse{c-link-arg}%
     \@ref{#2}%
 }
 

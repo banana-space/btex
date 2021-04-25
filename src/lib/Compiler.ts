@@ -84,6 +84,10 @@ export abstract class Compiler {
       return context.getBoolean('c-text-arg', false);
     }
 
+    function isInternalLinkArg(): boolean {
+      return context.getBoolean('c-link-arg', false);
+    }
+
     let parent = context;
     let options = context.options;
     if (!isGlobal) context = context.passToSubgroup();
@@ -178,7 +182,7 @@ export abstract class Compiler {
 
         case TokenType.Text:
         case TokenType.Whitespace:
-          if (!isTextArg()) {
+          if (!isTextArg() || isInternalLinkArg()) {
             command = context.findCommand(t.text);
             if (command && !(isMathMode() && command.isTextCommand) && !t.noExpand) {
               if (code.expandMacro(command, false)) break;
