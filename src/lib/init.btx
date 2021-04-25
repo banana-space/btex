@@ -733,6 +733,9 @@
     #1%
     \@@event{.}%
 }
+\pdef\@item[[#1]]{%
+    \@item{}[[#1]]%
+}
 \tlet\item\@item
 
 \def\@itemlabel{}
@@ -759,9 +762,13 @@
 \envdef{itemize}{}{%
     \begin{@list}%
     \@@if{{list-level}}{1}{%
-        \def\@itemlabel{\rm\bullet}%
+        \def\@itemlabel{$\bullet$}%
     }{%
-        \def\@itemlabel{\rm\circ}%
+        \@@if{{list-level}}{2}{%
+            \def\@itemlabel{$\circ$}%
+        }{%
+            \def\@itemlabel{$\tiny\blacksquare$}%
+        }%
     }%
 }{%
     \end{@list}%
