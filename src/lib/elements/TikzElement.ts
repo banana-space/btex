@@ -80,7 +80,7 @@ export class TikzElement implements ContainerElement {
           .replace(/height="([\d\.]+)(pt)?"/, function (_, height) {
             return 'height="' + height * 0.11 + 'em"';
           })
-          .replace(/(id="|href="#)/g, '$1' + rand);
+          .replace(/(id="|href="#|url\(#)/g, '$1' + rand);
       }
     }
 
