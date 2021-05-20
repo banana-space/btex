@@ -593,6 +593,10 @@
 
 \tdef\circ{\@u2218}
 
+\tdef\dots{\@u2026}
+
+\tdef\ldots{\@u2026}
+
 \tdef\texttilde{\@u007e}
 
 \tdef\smallskip{\@par}
@@ -612,7 +616,7 @@
     \@@enter{div}%
     \@settrue{text-class-header}%
     \@bf\@rm#1.\@md%
-    \@setfalse{text-class-header}%
+    \@setfalse{text-class-header} %
 }{%
     \@@exit{div}%
 }
@@ -622,7 +626,18 @@
     \@@enter{div}%
     \@settrue{text-class-header}%
     \@bf\@rm#1\@md{} (#2)\@bf.\@md%
-    \@setfalse{text-class-header}%
+    \@setfalse{text-class-header} %
+}{%
+    \@@exit{div}%
+}
+\envpdef{@theorem}{#1[[#2]]}{%
+    \@par%
+    \@@set{g.div-type}{block}%
+    \@@enter{div}%
+    \@settrue{text-class-header}%
+    \@bf\@rm#1.\@md%
+    \@setfalse{text-class-header} %
+    [[#2]]%
 }{%
     \@@exit{div}%
 }
@@ -710,6 +725,15 @@
     \@ifmmode{%
         \reqno{ \qedsymbol}%
     }{\qed}%
+}
+
+\envdef{quotation}{}{%
+    \@par%
+    \@@set{g.div-type}{block}%
+    \@@set{g.div-class}{quotation}%
+    \@@enter{div}%
+}{%
+    \@@exit{div}%
 }
 
 % ==========          LISTS             ==========
@@ -908,8 +932,8 @@
     \@ref{#1}%
 }
 
-\tdef\eqref#1{(\ref#1)}
-\pdef\eqref*#1{(\ref*#1)}
+\tdef\eqref#1{(\ref{#1})}
+\pdef\eqref*#1{(\ref*{#1})}
 
 \tdef[[#1]]{{\@wlink#1|}}
 
@@ -1567,7 +1591,6 @@
 \@mathcmd{\lbrack}
 \@mathcmd{\lceil}
 \@mathcmd{\ldotp}
-\@mathcmd{\ldots}
 \@mathcmd{\le}
 \@mathcmd{\leadsto}
 \@mathcmd{\left}

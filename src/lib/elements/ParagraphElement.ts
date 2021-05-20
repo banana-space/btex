@@ -49,11 +49,17 @@ export class ParagraphElement implements RenderElement {
 
     for (let child of this.children) {
       if (child instanceof SpanElement && !child.style.preservesSpaces) {
-        for (let text of child.children) {
+        for (let index = 0; index < child.children.length; index++) {
+          let text = child.children[index];
           let newText = text.text;
+          let nextText = child.children[index + 1];
 
           // Adjacent spaces are merged into one
           if (prevType === 'space' || prevType === 'cjk-punct') newText = newText.trimStart();
+
+          // Disallow spacing between cjk characters
+          // But preserve spaces at end as refs may follow
+          if (prevType === 'cjk' && nextText) newText = newText.trimStart();
 
           // Spacing between letters and CJK characters
           if (
@@ -61,7 +67,10 @@ export class ParagraphElement implements RenderElement {
             /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText)
           )
             newText = ' ' + newText;
-          if (prevType === 'cjk' && /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{%'"‘“]/u.test(newText)) {
+          if (
+            prevType === 'cjk' &&
+            /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{%'"‘“\uedae\uedaf]/u.test(newText)
+          ) {
             if (prevText) prevText.text += ' ';
             else newText = ' ' + newText;
           }
@@ -72,13 +81,13 @@ export class ParagraphElement implements RenderElement {
             if (/\s+$/.test(newText)) {
               newText = newText.trimEnd() + ' ';
               prevType = 'space';
-            } else if (/[\p{Ll}\p{Lu}\p{Nd}\p{Mn}]$/u.test(newText)) {
+            } else if (/[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\uedae\uedaf]$/u.test(newText)) {
               prevType = 'letter';
             } else if (/[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
               prevType = 'cjk';
-            } else if (/[\)\]\},.!%;:?'"’”]$/.test(newText)) {
+            } else if (/[\)\]\},.!%;:?'"’”\u2026]$/.test(newText)) {
               prevType = 'punct';
-            } else if (/[\u3000-\u301f\uff00-\uff60]$/.test(newText)) {
+            } else if (/[\u3000-\u301f\uff00-\uff60\uff64]$/.test(newText)) {
               prevType = 'cjk-punct';
             } else {
               prevType = 'other';
