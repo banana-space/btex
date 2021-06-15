@@ -977,7 +977,7 @@
 }
 
 \envdef{thebibliography}{}{%
-    \@section**{\refname}%
+    \@section*{\refname}%
     \begin{references}%
 }{%
     \end{references}%
