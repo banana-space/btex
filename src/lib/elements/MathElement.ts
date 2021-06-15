@@ -131,6 +131,7 @@ export class MathElement implements ContainerElement {
         output: 'html',
         strict: false,
         throwOnError: false,
+        trust: (context) => context.command !== '\\includegraphics',
       });
 
       // Flatten span so that it won't be messed up by MW parser
