@@ -786,12 +786,16 @@
 \envdef{itemize}{}{%
     \begin{@list}%
     \@@if{{list-level}}{1}{%
-        \def\@itemlabel{$\bullet$}%
+        \def\@itemlabel{\@u2022}%
     }{%
         \@@if{{list-level}}{2}{%
-            \def\@itemlabel{$\circ$}%
+            \def\@itemlabel{\@u2218}%
         }{%
-            \def\@itemlabel{$\tiny\blacksquare$}%
+            \@@if{{list-level}}{3}{%
+                \def\@itemlabel{\@u25aa}%
+            }{%
+                \def\@itemlabel{\@u25ab}%
+            }%
         }%
     }%
 }{%
@@ -1212,7 +1216,6 @@
 \tdef\：{\@u ff1a}
 \tdef\！{\@u ff01}
 \tdef\？{\@u ff1f}
-\tdef\、{\@u 3001}
 \tdef\（{\@u ff08}
 \tdef\）{\@u ff09}
 \tdef\【{\@u 3010}
@@ -1225,7 +1228,6 @@
     \tdef：{: }%
     \tdef！{! }%
     \tdef？{? }%
-    \tdef、{､}%
     \tdef（{ (}%
     \tdef）{) }%
     \tdef【{ [}%
@@ -1239,7 +1241,6 @@
     \tdef：{\@u ff1a}%
     \tdef！{\@u ff01}%
     \tdef？{\@u ff1f}%
-    \tdef、{\@u 3001}%
     \tdef（{\@u ff08}%
     \tdef）{\@u ff09}%
     \tdef【{\@u 3010}%
