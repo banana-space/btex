@@ -13,7 +13,9 @@ export const SubpageInternal: Internal = {
       return false;
     }
 
+    context.set('c-link-arg', '1');
     let text = Compiler.readText(code, context, initiator);
+    context.set('c-link-arg', '0');
     if (text === undefined) return false;
 
     let level = context.getInteger('subpage-level', 1, true);
