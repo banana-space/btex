@@ -55,7 +55,7 @@ export class ListElement implements ContainerElement {
         return true;
       case 'par':
         let child = this.children[this.children.length - 1];
-        if (!child) return false;
+        if (!child) return true;
         let list = this.contentMode ? child.content : child.label;
         this.paragraph = new ParagraphElement(context);
         list.push(this.paragraph);
