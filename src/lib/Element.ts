@@ -1,4 +1,5 @@
 import { Context } from './Context';
+import { DiagramElement } from './elements/DiagramElement';
 import { DivElement } from './elements/DivElement';
 import { HeaderElement } from './elements/HeaderElement';
 import { ListElement } from './elements/ListElement';
@@ -44,6 +45,7 @@ interface ContainerConstructor {
 }
 
 export const Containers: { [name: string]: ContainerConstructor } = {
+  diagram: DiagramElement,
   div: DivElement,
   header: HeaderElement,
   list: ListElement,

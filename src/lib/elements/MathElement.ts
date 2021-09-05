@@ -2,6 +2,7 @@ import { render } from 'katex';
 import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
+import { DiagramElement } from './DiagramElement';
 import { ParagraphElement } from './ParagraphElement';
 import { SpanElement, SpanStyle } from './SpanElement';
 import { TikzElement } from './TikzElement';
@@ -12,6 +13,7 @@ export class MathElement implements ContainerElement {
   paragraph: ParagraphElement = this.mainParagraph;
   children: RenderElement[] = this.mainParagraph.children;
   isInline: boolean = true;
+  isScriptStyle?: boolean;
   style: SpanStyle = {};
 
   // Equation numbering for display equations
@@ -87,7 +89,7 @@ export class MathElement implements ContainerElement {
   }
 
   getText(): string {
-    return this.mainParagraph.getText();
+    return (this.isScriptStyle ? '\\scriptstyle ' : '') + this.mainParagraph.getText().trim();
   }
 
   render(options?: RenderOptions): HTMLElement[] {
@@ -115,6 +117,13 @@ export class MathElement implements ContainerElement {
         tikz = child;
         break;
       }
+    }
+
+    // Read all diagrams.
+    // They will be rendered as \text{id} and replaced with actual html later
+    let diagrams: DiagramElement[] = [];
+    for (let child of this.mainParagraph.children) {
+      if (child instanceof DiagramElement) diagrams.push(child);
     }
 
     // Compile the equation
@@ -171,6 +180,24 @@ export class MathElement implements ContainerElement {
       lines.sort((a, b) => a - b);
       if (lines.length > 0)
         span.setAttribute('data-pos', lines.map((l) => (l + 1).toString()).join(','));
+    }
+
+    // Replace diagrams with actual html
+    if (diagrams.length > 0) {
+      let html = span.innerHTML;
+      for (let diagram of diagrams) {
+        let diagramHTML = diagram.render(options)[0].outerHTML;
+        let regex = new RegExp(
+          `<span class="mord text"><span class="mord">${diagram.id}</span></span>`,
+          'g'
+        );
+        html = html.replace(regex, diagramHTML);
+
+        regex = new RegExp('([^#"])' + diagram.id, 'g');
+        html = html.replace(regex, '$1');
+      }
+
+      span.innerHTML = html;
     }
 
     return [span];

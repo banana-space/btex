@@ -1,6 +1,7 @@
 import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token, TokenType } from '../Token';
+import { DiagramElement } from './DiagramElement';
 import { ReferenceElement } from './ReferenceElement';
 import { SpanElement } from './SpanElement';
 import { TextNode } from './TextNode';
@@ -217,6 +218,16 @@ export class ParagraphElement implements RenderElement {
     for (let child of this.children) {
       // Skip tikz elements
       if (child instanceof TikzElement) continue;
+
+      // Turn diagrams into \text{...}
+      if (child instanceof DiagramElement) {
+        child.render(options);
+        let node = document.createTextNode(
+          `\\rule{0em}{${child.renderedHeight / 2}em}\\text{${child.id}}`
+        );
+        result.push(node);
+        continue;
+      }
 
       result.push(...child.render(options));
     }

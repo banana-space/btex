@@ -914,6 +914,61 @@
 \def\tikz#1{\begin{tikzpicture}#1\end{tikzpicture}}
 
 
+% ==========          DIAGRAMS          ==========
+
+\envdef{@diagram}{#1}{%
+    \@ensuremath
+    \@@def&{\@@event{c}}%
+    \@@def\\{\@@event{r}}%
+    \@@def\ar[##1]{\@@event{ar}{\@ar##1,}}
+    \@@enter{diagram}%
+    \@diagramopt{#1}%
+}{%
+    \@@exit{diagram}%
+}
+
+\def\@diagramopt#1{{\@diagopt#1,}}
+\def\@diagopt{}
+\pdef\@diagopt,{\@diagopt}
+\pdef\@diagopt#+1,{\@@set{diagram-option}{#1}\@@event{option}\@diagopt}
+
+\def\@ar{}
+\pdef\@ar,{\@ar}
+\pdef\@ar#+1,{\@@set{ar-option}{#1}\@@event{ar-option}\@ar}
+\pdef\@ar"#+1"{%
+    \@@event{ar-label}%
+    \@@def&{\@u0026}%
+    \@@def\\{\@u005c\@u005c}%
+    #1%
+    \@@event{ar-endlabel}%
+    \@ar%
+}
+
+\def\@begindiagram#1{%
+    \@ifmmode{}{%
+        \@settrue{diagram-outside-math}%
+        \@settrue{math-display}%
+        \@@enter{math}%
+    }%
+    \begin{@diagram}{#1}%
+}
+
+\def\@enddiagram{%
+    \end{@diagram}%
+    \@iftrue{diagram-outside-math}{%
+        \@@exit{math}%
+    }{}%
+}
+
+\envdef{cd}{}{%
+    \@begindiagram{}%
+}{\@enddiagram}
+
+\envpdef{cd}{[#1]}{%
+    \@begindiagram{#1}%
+}{\@enddiagram}
+
+
 % ==========        CROSS-REF           ==========
 
 \def\@currentlabel{\pagenum}
