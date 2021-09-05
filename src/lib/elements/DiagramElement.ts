@@ -32,7 +32,8 @@ export class DiagramElement implements ContainerElement {
   columnSep: number = 2.4;
   rowSepBetweenOrigins: boolean = false;
   columnSepBetweenOrigins: boolean = false;
-  cellPadding: number = 0.5;
+  cellPaddingX: number = 0.5;
+  cellPaddingY: number = 0.3;
   labelPadding: number = 0.3;
 
   // render results
@@ -684,9 +685,9 @@ export class DiagramElement implements ContainerElement {
 
         let kh = this.getKatexHeight(cell.html);
         cell.size = {
-          width: jaxSize.width + 2 * this.cellPadding,
-          height: (kh.matched ? kh.height : jaxSize.height / 2) + this.cellPadding,
-          depth: (kh.matched ? kh.depth : jaxSize.height / 2) + this.cellPadding,
+          width: jaxSize.width + 2 * this.cellPaddingX,
+          height: (kh.matched ? kh.height : jaxSize.height / 2) + this.cellPaddingY,
+          depth: (kh.matched ? kh.depth : jaxSize.height / 2) + this.cellPaddingY,
         };
 
         if (cell.size.height > this.rowHeight[r]) this.rowHeight[r] = cell.size.height;
@@ -1062,10 +1063,15 @@ export class DiagramElement implements ContainerElement {
 }
 
 class Cell {
-  content: MathElement = new MathElement();
+  content: MathElement;
 
   html: string = '';
   size: BoxSize = { height: 0, depth: 0, width: 0 };
+
+  constructor() {
+    this.content = new MathElement();
+    this.content.isDiagramCell = true;
+  }
 }
 
 class Arrow {

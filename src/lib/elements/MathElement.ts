@@ -14,6 +14,7 @@ export class MathElement implements ContainerElement {
   children: RenderElement[] = this.mainParagraph.children;
   isInline: boolean = true;
   isScriptStyle?: boolean;
+  isDiagramCell?: boolean;
   style: SpanStyle = {};
 
   // Equation numbering for display equations
@@ -89,7 +90,11 @@ export class MathElement implements ContainerElement {
   }
 
   getText(): string {
-    return (this.isScriptStyle ? '\\scriptstyle ' : '') + this.mainParagraph.getText().trim();
+    return (
+      (this.isScriptStyle ? '\\scriptstyle ' : '') +
+      (this.isDiagramCell ? '\\vphantom{|}' : '') +
+      this.mainParagraph.getText().trim()
+    );
   }
 
   render(options?: RenderOptions): HTMLElement[] {
