@@ -389,6 +389,11 @@ export class DiagramElement implements ContainerElement {
           if (isFinite(numValue) && this.activeLabel)
             this.activeLabel.progress = Math.max(0, Math.min(1, numValue));
           return;
+        case 'distance':
+          if (isFinite(numValue) && this.activeLabel)
+            this.activeLabel.side =
+              Math.max(0, Math.min(100, numValue)) * (this.activeLabel.side >= 0 ? 1 : -1);
+          return;
         case 'bend left':
           if (isFinite(numValue)) arrow.bend = numValue;
           return;
