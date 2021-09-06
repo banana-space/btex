@@ -33,8 +33,9 @@ export class DiagramElement implements ContainerElement {
   rowSepBetweenOrigins: boolean = false;
   columnSepBetweenOrigins: boolean = false;
   cellPaddingX: number = 0.5;
-  cellPaddingY: number = 0.3;
+  cellPaddingY: number = 0.5;
   labelPadding: number = 0.3;
+  labelWhiteoutPadding: number = 0.3;
 
   // render results
   rendered: boolean = false;
@@ -176,11 +177,16 @@ export class DiagramElement implements ContainerElement {
     for (let r = 0; r < this.cells.length; r++) {
       for (let c = 0; c < this.cells[r].length; c++) {
         let cell = this.cells[r][c];
+        let compensation =
+          Math.max(0, 0.9 - cell.size.height + this.cellPaddingY) / 2 -
+          Math.max(0, 0.36 - cell.size.depth + this.cellPaddingY) / 2;
         let cellSpan = document.createElement('span');
         cellSpan.classList.add('cell');
         cellSpan.style.top =
-          (this.rowPosition[r] - cell.size.height / 2 + cell.size.depth / 2).toFixed(3) + 'em';
-        cellSpan.style.left = this.columnPosition[c] + 'em';
+          (this.rowPosition[r] - (cell.size.height - cell.size.depth) / 2 - compensation).toFixed(
+            3
+          ) + 'em';
+        cellSpan.style.left = this.columnPosition[c].toFixed(3) + 'em';
         cellSpan.innerHTML = cell.html;
 
         rootSpan.append(cellSpan);
@@ -239,6 +245,9 @@ export class DiagramElement implements ContainerElement {
         rect.setAttribute('width', label.size.width.toFixed(3));
         rect.setAttribute('height', label.size.height.toFixed(3));
         rect.setAttribute('fill', 'black');
+        rect.style.stroke = 'black';
+        rect.style.strokeWidth = (this.labelPadding + this.labelWhiteoutPadding).toFixed(3);
+        rect.style.strokeLinejoin = 'round';
 
         mask.append(rect);
       }
@@ -836,18 +845,18 @@ export class DiagramElement implements ContainerElement {
         label.html = label.content.render()[0].innerHTML;
         let kh = this.getKatexHeight(label.html);
         label.size = {
-          width: jaxSize.width + 2 * this.labelPadding,
-          height: (kh.matched ? kh.height + kh.depth : jaxSize.height) + 2 * this.labelPadding,
-          depth: 0,
+          width: jaxSize.width,
+          height: kh.matched ? kh.height + kh.depth : jaxSize.height,
         };
         label.heightAboveBaseline = kh.matched ? kh.height : jaxSize.height / 2;
 
         let origin = arrow.bezier.get(label.progress);
         let normal = arrow.bezier.normal(label.progress);
-        let offsetLength = Math.max(
-          Math.abs((label.size.width / 2) * normal.x + (label.size.height / 2) * normal.y),
-          Math.abs((label.size.width / 2) * normal.x - (label.size.height / 2) * normal.y)
-        );
+        let offsetLength =
+          Math.max(
+            Math.abs((label.size.width / 2) * normal.x + (label.size.height / 2) * normal.y),
+            Math.abs((label.size.width / 2) * normal.x - (label.size.height / 2) * normal.y)
+          ) + this.labelPadding;
         offsetLength += arrow.lineWidth / 2;
         if (arrow.lineType === 'double') offsetLength += arrow.lineWidth * 2.5;
 
@@ -858,12 +867,12 @@ export class DiagramElement implements ContainerElement {
 
         let bbox: BBox = {
           x: {
-            min: label.position.x - label.size.width / 2,
-            max: label.position.x + label.size.width / 2,
+            min: label.position.x - label.size.width / 2 - this.labelPadding,
+            max: label.position.x + label.size.width / 2 + this.labelPadding,
           },
           y: {
-            min: label.position.y - label.size.height / 2,
-            max: label.position.y + label.size.height / 2,
+            min: label.position.y - label.size.height / 2 - this.labelPadding,
+            max: label.position.y + label.size.height / 2 + this.labelPadding,
           },
         };
 
@@ -909,7 +918,7 @@ export class DiagramElement implements ContainerElement {
   private getCellBBox(row: number, column: number) {
     let X = this.columnPosition[column];
     let Y = this.rowPosition[row];
-    let Ya = Y - 0.25; // Y is baseline and Yc is centerline
+    let Ya = Y - 0.24; // Y is baseline and Yc is centerline
     let size = this.cells[row][column].size;
 
     let NW: Point = { x: X - size.width / 2, y: Y - size.height };
@@ -1104,7 +1113,7 @@ class ArrowLabel {
 
   position: Point = { x: 0, y: 0 };
   html: string = '';
-  size: BoxSize = { height: 0, depth: 0, width: 0 };
+  size: { width: number; height: number } = { width: 0, height: 0 };
   heightAboveBaseline: number = 0;
   whiteout?: boolean;
 
