@@ -293,7 +293,9 @@ export class DiagramElement implements ContainerElement {
 
       // draw labels
       for (let label of arrow.labels) {
-        let compensation = Math.max(0, (0.8 - label.heightAboveBaseline) / 3);
+        let compensation =
+          Math.max(0, 0.9 - label.heightAboveBaseline) / 2 -
+          Math.max(0, 0.36 - (label.size.height - label.heightAboveBaseline)) / 2;
 
         let labelSpan = document.createElement('span');
         labelSpan.classList.add('label');
