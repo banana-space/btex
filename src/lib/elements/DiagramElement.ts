@@ -35,7 +35,6 @@ export class DiagramElement implements ContainerElement {
   cellPaddingX: number = 0.5;
   cellPaddingY: number = 0.5;
   labelPadding: number = 0.3;
-  labelWhiteoutPadding: number = 0.3;
 
   // render results
   rendered: boolean = false;
@@ -246,7 +245,7 @@ export class DiagramElement implements ContainerElement {
         rect.setAttribute('height', label.size.height.toFixed(3));
         rect.setAttribute('fill', 'black');
         rect.style.stroke = 'black';
-        rect.style.strokeWidth = (this.labelPadding + this.labelWhiteoutPadding).toFixed(3);
+        rect.style.strokeWidth = (this.labelPadding * 2).toFixed(3);
         rect.style.strokeLinejoin = 'round';
 
         mask.append(rect);
