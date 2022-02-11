@@ -704,18 +704,49 @@
 \envdef{proof}{[#1]}{%
     \@par%
     \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@enter{div}%
     {\@bf\@rm#1.} %
 }{%
     \@proofend%
-    \@par%
+    \@@exit{div}%
 }
 \envadef{proof}{}{%
     \@par%
     \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@enter{div}%
     {\@bf\@rm{\proofname}.} %
 }{%
     \@proofend%
+    \@@exit{div}%
+}
+
+\envdef{proofc}{[#1]}{%
     \@par%
+    \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@set{g.div-class}{proof-collapsible}%
+    \@@enter{div}%
+    {\@bf\@rm#1.} %
+    \@@event{proofc}%
+    {\@bf\@rm#1.} %
+}{%
+    \@proofend%
+    \@@exit{div}%
+}
+\envadef{proofc}{}{%
+    \@par%
+    \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@set{g.div-class}{proof-collapsible}%
+    \@@enter{div}%
+    {\@bf\@rm{\proofname}.} %
+    \@@event{proofc}%
+    {\@bf\@rm{\proofname}.} %
+}{%
+    \@proofend%
+    \@@exit{div}%
 }
 
 \tdef\qedsymbol{$\Box$}
