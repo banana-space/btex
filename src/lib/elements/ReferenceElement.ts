@@ -3,12 +3,15 @@ import { ContainerElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
 import { LabelElement } from './LabelElement';
 import { ParagraphElement } from './ParagraphElement';
+import { SpanElement } from './SpanElement';
 
 export class ReferenceElement implements ContainerElement {
   name: 'ref' = 'ref';
   page?: string;
   key?: string;
   url?: string;
+  pageSuffix?: string;
+  inferPage?: boolean;
   noLink: boolean = false;
   isInline: boolean = true;
   paragraph: ParagraphElement = new ParagraphElement();
@@ -34,6 +37,8 @@ export class ReferenceElement implements ContainerElement {
     this.page = context.get('ref-page', true);
     this.key = context.get('ref-key', true);
     this.url = context.get('ref-url', true);
+    this.pageSuffix = context.get('ref-page-suffix', true);
+    this.inferPage = context.getBoolean('ref-infer-page', false, true);
     this.noLink = context.getBoolean('ref-no-link', false, true);
 
     if (this.url && /^https?:\/\/\w/.test(this.url)) {
@@ -75,19 +80,95 @@ export class ReferenceElement implements ContainerElement {
     if (this.key) ref.setAttribute('data-key', this.key);
     if (this.page) ref.setAttribute('data-page', this.page);
 
+    if (this.inferPage) {
+      let tempParagraph = this.paragraph.clone();
+      if (this.pageSuffix) {
+        let noSpace =
+          this.spacingType?.last === 'cjk' &&
+          /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(this.pageSuffix);
+
+        let span = new SpanElement();
+        if (!noSpace) span.append(' ');
+        span.append(this.pageSuffix);
+        tempParagraph.append(span);
+      }
+      let page = tempParagraph.getText();
+
+      for (let symbol in symbolName)
+        page = page.replace(new RegExp(symbol, 'g'), ' ' + symbolName[symbol] + ' ');
+      page = page.trim().replace(/\s+/g, ' ');
+
+      this.page = page;
+    }
+
     if (this.noLink) {
       return [ref];
     } else {
+      let isCategory =
+        (this.page?.startsWith('分类:') || this.page?.startsWith('Category:')) && this.inferPage;
+
       let link = document.createElement('btex-link');
       if (this.key) link.setAttribute('data-key', this.key);
       if (this.page) link.setAttribute('data-page', this.page);
+      if (isCategory) link.setAttribute('data-is-category', 'True');
 
       if (this.paragraph.isEmpty()) {
         link.append(ref);
-      } else {
+      } else if (!isCategory) {
         link.append(...this.paragraph.renderInner(options));
       }
       return [link];
     }
   }
 }
+
+const symbolName: { [symbol: string]: string } = {
+  Α: 'Alpha',
+  Β: 'Beta',
+  Γ: 'Gamma',
+  Δ: 'Delta',
+  Ε: 'Epsilon',
+  Ζ: 'Zeta',
+  Η: 'Eta',
+  Θ: 'Theta',
+  Ι: 'Iota',
+  Κ: 'Kappa',
+  Λ: 'Lambda',
+  Μ: 'Mu',
+  Ν: 'Nu',
+  Ξ: 'Xi',
+  Ο: 'Omicron',
+  Π: 'Pi',
+  Ρ: 'Rho',
+  Σ: 'Sigma',
+  Τ: 'Tau',
+  Υ: 'Upsilon',
+  Φ: 'Phi',
+  Χ: 'Chi',
+  Ψ: 'Psi',
+  Ω: 'Omega',
+  α: 'alpha',
+  β: 'beta',
+  γ: 'gamma',
+  δ: 'delta',
+  ε: 'epsilon',
+  ζ: 'zeta',
+  η: 'eta',
+  θ: 'theta',
+  ι: 'iota',
+  κ: 'kappa',
+  λ: 'lambda',
+  μ: 'mu',
+  ν: 'nu',
+  ξ: 'xi',
+  ο: 'omicron',
+  π: 'pi',
+  ρ: 'rho',
+  σ: 'sigma',
+  τ: 'tau',
+  υ: 'upsilon',
+  φ: 'phi',
+  χ: 'chi',
+  ψ: 'psi',
+  ω: 'omega',
+};

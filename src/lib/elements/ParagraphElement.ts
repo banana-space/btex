@@ -25,6 +25,14 @@ export class ParagraphElement implements RenderElement {
     }
   }
 
+  // Incomplete clone - children are not cloned.
+  clone(): ParagraphElement {
+    let paragraph = new ParagraphElement();
+    paragraph.children = [...this.children];
+    paragraph.style = this.style;
+    return paragraph;
+  }
+
   normalise(): {
     first: string;
     last: string;

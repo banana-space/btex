@@ -687,6 +687,8 @@
 
 \newtheorem{proposition}{\propositionname}
 
+\newtheorem{conjecture}{\conjecturename}
+
 \theoremstyle{definition}
 
 \newtheorem{definition}{\definitionname}
@@ -996,11 +998,10 @@
 
 \tdef[[#1]]{{\@wlink#1|}}
 
-\tdef\@wlink#+1|{\@link{#1}{#1}}
+\tdef\@wlink#+1|{\@settrue{ref-infer-page}\@link{}{#1}}
 \pdef\@wlink#+1|#+2|{\@link{#1}{#2}}
 \pdef\@wlink#+1|#+2|#+3|{\@wlink#1|#2|}
-\pdef\@wlink#+1||#+2|{\@link{#1#2}{#1}}
-\pdef\@wlink#+1||(#+2)|{\@link{#1 (#2)}{#1}}
+\pdef\@wlink#+1||#+2|{\@settrue{ref-infer-page}\@@set{ref-page-suffix}{#2}\@link{}{#1}}
 \pdef\@wlink#+1||#+2|#+3|{\@wlink#1||#2|}
 
 \tdef\@link#1#2{%
@@ -1240,6 +1241,7 @@
 \def\theoremname{定理}
 \def\corollaryname{推论}
 \def\lemmaname{引理}
+\def\conjecturename{猜想}
 \def\propositionname{命题}
 \def\definitionname{定义}
 \def\remarkname{注}
@@ -1252,6 +1254,7 @@
     \@@def\theoremname{Theorem}%
     \@@def\corollaryname{Corollary}%
     \@@def\lemmaname{Lemma}%
+    \@@def\conjecturename{Conjecture}%
     \@@def\propositionname{Proposition}%
     \@@def\definitionname{Definition}%
     \@@def\remarkname{Remark}%

@@ -64,7 +64,7 @@ export class SpanElement implements RenderElement {
     );
   }
 
-  append(text: string, source: Token) {
+  append(text: string, source?: Token) {
     if (this.spacyCommand) {
       if (/^[a-zA-Z]/.test(text)) this.children.push(new TextNode(' ', this.spacyCommand));
       delete this.spacyCommand;
