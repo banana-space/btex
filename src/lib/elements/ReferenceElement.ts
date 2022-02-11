@@ -3,7 +3,7 @@ import { ContainerElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
 import { LabelElement } from './LabelElement';
 import { ParagraphElement } from './ParagraphElement';
-import { SpanElement } from './SpanElement';
+import { SpanElement, SpanStyle } from './SpanElement';
 
 export class ReferenceElement implements ContainerElement {
   name: 'ref' = 'ref';
@@ -16,6 +16,7 @@ export class ReferenceElement implements ContainerElement {
   isInline: boolean = true;
   paragraph: ParagraphElement = new ParagraphElement();
   target?: LabelElement;
+  style: SpanStyle = {};
   spacingType?: {
     first: string;
     last: string;
@@ -34,6 +35,14 @@ export class ReferenceElement implements ContainerElement {
   }
 
   enter(context: Context) {
+    this.style.italic = context.getBoolean('text-italic', false) || undefined;
+    this.style.bold = context.getBoolean('text-bold', false) || undefined;
+    this.style.fontSize = context.getFloat('text-size', 0) || undefined;
+
+    this.style.classes = '';
+    if (context.getBoolean('text-class-header', false)) this.style.classes += ' item-header';
+    this.style.classes = this.style.classes.trim();
+
     this.page = context.get('ref-page', true);
     this.key = context.get('ref-key', true);
     this.url = context.get('ref-url', true);
@@ -58,6 +67,20 @@ export class ReferenceElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): Node[] {
+    let span = document.createElement('span');
+    let styles = [];
+    if (this.style) {
+      if (this.style.italic) styles.push('font-style:italic');
+      if (this.style.bold) styles.push('font-weight:bold');
+      if (this.style.fontSize && isFinite(this.style.fontSize)) {
+        let fontSize = this.style.fontSize;
+        if (fontSize < SpanElement.minFontSize) fontSize = SpanElement.minFontSize;
+        if (fontSize > SpanElement.maxFontSize) fontSize = SpanElement.maxFontSize;
+        styles.push(`font-size:${fontSize}px`);
+      }
+      if (styles.length > 0) span.setAttribute('style', styles.join(';'));
+    }
+
     if (this.target) {
       let nodes = this.target.paragraph.renderInner(options);
       if (this.noLink) return nodes;
@@ -65,7 +88,9 @@ export class ReferenceElement implements ContainerElement {
       let link = document.createElement('a');
       link.setAttribute('href', '#' + encodeURIComponent(this.target.bookmarkId));
       link.append(...nodes);
-      return [link];
+
+      span.append(link);
+      return [span];
     }
 
     if (this.url) {
@@ -73,10 +98,14 @@ export class ReferenceElement implements ContainerElement {
       a.classList.add('external');
       a.setAttribute('href', this.url);
       a.append(...this.paragraph.renderInner(options));
-      return [a];
+
+      span.append(a);
+      return [span];
     }
 
     let ref = document.createElement('btex-ref');
+    span.append(ref);
+
     if (this.key) ref.setAttribute('data-key', this.key);
     if (this.page) ref.setAttribute('data-page', this.page);
 
@@ -102,7 +131,7 @@ export class ReferenceElement implements ContainerElement {
     }
 
     if (this.noLink) {
-      return [ref];
+      return [span];
     } else {
       let isCategory =
         (this.page?.startsWith('分类:') || this.page?.startsWith('Category:')) && this.inferPage;
@@ -113,7 +142,7 @@ export class ReferenceElement implements ContainerElement {
       if (isCategory) link.setAttribute('data-is-category', 'True');
 
       if (this.paragraph.isEmpty()) {
-        link.append(ref);
+        link.append(span);
       } else if (!isCategory) {
         link.append(...this.paragraph.renderInner(options));
       }
