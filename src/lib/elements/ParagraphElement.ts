@@ -2,7 +2,6 @@ import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token, TokenType } from '../Token';
 import { DiagramElement } from './DiagramElement';
-import { ReferenceElement } from './ReferenceElement';
 import { SpanElement } from './SpanElement';
 import { TextNode } from './TextNode';
 import { TikzElement } from './TikzElement';

@@ -27,7 +27,8 @@ export class ReferenceElement implements ContainerElement {
   }
 
   normalise() {
-    this.spacingType = this.paragraph.normalise();
+    if (this.paragraph.isEmpty()) this.spacingType = { first: 'letter', last: 'letter' };
+    else this.spacingType = this.paragraph.normalise();
 
     if (this.page) {
       this.page = this.page.normalize('NFC');
