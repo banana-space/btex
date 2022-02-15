@@ -124,9 +124,14 @@ export class ReferenceElement implements ContainerElement {
       }
       let page = tempParagraph.getText();
 
+      page = page.replace(/_/g, ' ');
       for (let symbol in symbolName)
-        page = page.replace(new RegExp(symbol, 'g'), ' ' + symbolName[symbol] + ' ');
-      page = page.trim().replace(/\s+/g, ' ');
+        page = page.replace(new RegExp(symbol, 'g'), '_' + symbolName[symbol] + '_');
+      page = page
+        .replace(/([\w\p{sc=Hani}])_+([\w\p{sc=Hani}])/gu, '$1 $2')
+        .replace(/_/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 
       this.page = page;
     }
