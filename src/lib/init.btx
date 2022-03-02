@@ -883,7 +883,6 @@
 }
 
 \pdef\@astpar#+1
-
 * {%
     \@item\@astlabel#1%
     \@@def\@currentlabel{}%
@@ -892,7 +891,6 @@
 }
 
 \pdef\@astpar#+1
-
 *[#+2]{%
     \@item\@astlabel#1%
     \@@def\@currentlabel{#2}%
@@ -901,7 +899,6 @@
 }
 
 \pdef\@astpar#+1
-
 *[#+2][#+3]{%
     \@item\@astlabel#1%
     \@@def\@currentlabel{#3}%
@@ -910,13 +907,17 @@
 }
 
 \pdef\@astpar#+1
-
 *[[#+2]]{%
     \@item\@astlabel#1%
     \@@def\@currentlabel{}%
     \@@def\@astlabel{}%
     \@astpar[[#2]]%
 }
+
+\pdef\@astpar#+1
+
+*{\@astpar#1
+*}
 
 \pdef\@astpar#+1
 
