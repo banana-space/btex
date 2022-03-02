@@ -879,6 +879,7 @@
 {%
     \@item\@astlabel#1%
     \end{itemize}%
+    \@par%
 }
 
 \pdef\@astpar#+1
