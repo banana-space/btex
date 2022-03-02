@@ -128,6 +128,7 @@ export class ReferenceElement implements ContainerElement {
       for (let symbol in symbolName)
         page = page.replace(new RegExp(symbol, 'g'), '_' + symbolName[symbol] + '_');
       page = page
+        .replace(/\u200b/g, '')
         .replace(/([\w\p{sc=Hani}])_+([\w\p{sc=Hani}])/gu, '$1 $2')
         .replace(/_/g, '')
         .replace(/\s+/g, ' ')

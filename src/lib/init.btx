@@ -817,17 +817,18 @@
 }
 
 \envdef{itemize}{}{%
+    \@@def\@currentlabel{}%
     \begin{@list}%
     \@@if{{list-level}}{1}{%
-        \def\@itemlabel{\@u2022}%
+        \def\@itemlabel{\@@bmk\@u2022}%
     }{%
         \@@if{{list-level}}{2}{%
-            \def\@itemlabel{\@u2218}%
+            \def\@itemlabel{\@@bmk\@u2218}%
         }{%
             \@@if{{list-level}}{3}{%
-                \def\@itemlabel{\@u25aa}%
+                \def\@itemlabel{\@@bmk\@u25aa}%
             }{%
-                \def\@itemlabel{\@u25ab}%
+                \def\@itemlabel{\@@bmk\@u25ab}%
             }%
         }%
     }%
@@ -844,6 +845,89 @@
 \pdef\roman*{\roman{enum-{list-level}}}
 
 \pdef\Roman*{\Roman{enum-{list-level}}}
+
+
+\pdef\@par* {%
+    \@par%
+    \begin{itemize}%
+    \@astpar%
+}
+
+\pdef\@par*[#+1]{%
+    \@par%
+    \begin{itemize}%
+    \@@def\@currentlabel{#1}%
+    \@astpar%
+}
+
+\pdef\@par*[#+1][#+2]{%
+    \@par%
+    \begin{itemize}%
+    \@@def\@currentlabel{#2}%
+    \@@def\@astlabel{\@@label{cite:#1}}%
+    \@@set{ref-prefix}{c}%
+    \@astpar%
+}
+
+\def\@astlabel{}
+
+\def\@astpar#+1
+{\@astpar#1 }
+
+\pdef\@astpar#+1
+
+{%
+    \@item\@astlabel#1%
+    \end{itemize}%
+}
+
+\pdef\@astpar#+1
+
+* {%
+    \@item\@astlabel#1%
+    \@@def\@currentlabel{}%
+    \@@def\@astlabel{}%
+    \@astpar%
+}
+
+\pdef\@astpar#+1
+
+*[#+2]{%
+    \@item\@astlabel#1%
+    \@@def\@currentlabel{#2}%
+    \@@def\@astlabel{}%
+    \@astpar%
+}
+
+\pdef\@astpar#+1
+
+*[#+2][#+3]{%
+    \@item\@astlabel#1%
+    \@@def\@currentlabel{#3}%
+    \@@def\@astlabel{\@@label{cite:#2}}%
+    \@astpar%
+}
+
+\pdef\@astpar#+1
+
+*[[#+2]]{%
+    \@item\@astlabel#1%
+    \@@def\@currentlabel{}%
+    \@@def\@astlabel{}%
+    \@astpar[[#2]]%
+}
+
+\pdef\@astpar#+1
+
+
+{\@astpar#1
+
+}
+
+\adef\@astpar{%
+    \@item\@astlabel%
+}
+
 
 
 % ==========           TABLES           ==========
