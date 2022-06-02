@@ -905,12 +905,12 @@ export class DiagramElement implements ContainerElement {
     let matched = false;
     while (true) {
       let match = html.match(
-        /<span class="strut" style="height:\s*(-?[\d\.]+)em;\s*vertical-align:\s*(-?[\d\.]+)em/
+        /<span class="strut" style="height:\s*(-?[\d\.]+)em(?:;\s*vertical-align:\s*(-?[\d\.]+)em)?/
       );
       if (!match) break;
       matched = true;
-      height = Math.max(height, +match[1] + +match[2]);
-      depth = Math.max(depth, -match[2]);
+      height = Math.max(height, +match[1] + (+match[2] || 0));
+      depth = Math.max(depth, -match[2] || 0);
       html = html.substring((match.index ?? 0) + 54);
     }
     return { matched, height, depth };

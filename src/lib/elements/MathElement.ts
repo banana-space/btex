@@ -1,4 +1,4 @@
-import { render } from 'katex';
+import katex from 'katex';
 import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
@@ -136,7 +136,7 @@ export class MathElement implements ContainerElement {
       span.append(...tikz.render(options));
       span.classList.add('tikz-in-math');
     } else {
-      render(this.getText(), span, {
+      katex.render(this.getText(), span, {
         displayMode: !this.isInline,
         output: 'html',
         strict: false,
