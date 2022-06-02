@@ -869,6 +869,12 @@
     \@astpar%
 }
 
+\pdef\@par*[[#+1]]{%
+    \@par%
+    \begin{itemize}%
+    \@astpar[[#1]]%
+}
+
 \def\@astlabel{}
 
 \def\@astpar#+1
