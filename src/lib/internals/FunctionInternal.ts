@@ -21,11 +21,11 @@ export const FunctionInternal: Internal = {
     let pipePositions: number[] = [-1];
     let nest = 0;
 
-    for (let i = 0; i < arg.tokens.length; i++) {
-      if (arg.tokens[i].type === TokenType.BeginGroup) nest++;
-      if (arg.tokens[i].type === TokenType.EndGroup) nest--;
-      if (nest === 0 && arg.tokens[i].type === TokenType.Text && arg.tokens[i].text === '|')
-        pipePositions.push(i);
+    for (let j = 0; j < arg.tokens.length; j++) {
+      if (arg.tokens[j].type === TokenType.BeginGroup) nest++;
+      if (arg.tokens[j].type === TokenType.EndGroup) nest--;
+      if (nest === 0 && arg.tokens[j].type === TokenType.Text && arg.tokens[j].text === '|')
+        pipePositions.push(j);
     }
     pipePositions.push(arg.tokens.length);
 
@@ -46,6 +46,22 @@ export const FunctionInternal: Internal = {
 
         context.set('fun-name', name);
         context.enterContainer(container, initiator);
+
+        // use ',' as separator for biblatex entries; recalculate pipe positions
+        if (/^@\w+/.test(name)) {
+          pipePositions = [-1, pipePositions[1]];
+          for (let j = pipePositions[1] + 1; j < arg.tokens.length; j++) {
+            if (arg.tokens[j].type === TokenType.BeginGroup) nest++;
+            if (arg.tokens[j].type === TokenType.EndGroup) nest--;
+            if (
+              nest === 0 &&
+              arg.tokens[j].type === TokenType.Text &&
+              (arg.tokens[j].text === ',' || arg.tokens[j].text === '|')
+            )
+              pipePositions.push(j);
+          }
+          pipePositions.push(arg.tokens.length);
+        }
       } else {
         context.container.event('fun-arg', context, arg.tokens[pipePositions[i - 1]]);
         Compiler.compileGroup(
