@@ -1,3 +1,8 @@
+/******************
+ * HACKED PARTS:
+ * Search for '"AMS-Regular":' (metrics for double-struck font)
+ */
+
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();

@@ -111,6 +111,7 @@ export class ReferenceElement implements ContainerElement {
     if (this.page) ref.setAttribute('data-page', this.page);
 
     if (this.inferPage) {
+      // Handle [[$\mathbb{Z}$]] etc.
       let tempParagraph = this.paragraph.clone();
       if (this.pageSuffix) {
         let noSpace =
