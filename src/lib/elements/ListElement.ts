@@ -8,6 +8,7 @@ export class ListElement implements ContainerElement {
   children: {
     label: RenderElement[];
     content: RenderElement[];
+    classes: string[];
     indent?: number;
   }[] = [];
 
@@ -44,14 +45,17 @@ export class ListElement implements ContainerElement {
         this.paragraph = new ParagraphElement();
         let indent: number | undefined = context.getInteger('list-indent', 0, true);
         if (!(indent >= 1 && indent <= 3)) indent = undefined;
-        this.children.push({ label: [this.paragraph], content: [], indent });
+        this.children.push({ label: [this.paragraph], content: [], classes: [], indent });
         this.contentMode = false;
         return true;
       case '.':
         if (this.children.length === 0 || this.contentMode) return false;
         this.contentMode = true;
         this.paragraph = new ParagraphElement(context);
+
         this.children[this.children.length - 1].content.push(this.paragraph);
+        if (context.getBoolean('list-item-no-sep-above', false, true) && this.children.length > 1)
+          this.children[this.children.length - 2].classes.push('list-item-no-sep');
         return true;
       case 'par':
         let child = this.children[this.children.length - 1];
@@ -74,6 +78,7 @@ export class ListElement implements ContainerElement {
     for (let child of this.children) {
       let tr = document.createElement('tr');
       tr.classList.add('list-item');
+      for (let cls of child.classes) tr.classList.add(cls);
       if (child.indent) tr.classList.add(`list-item-indent-${child.indent}`);
       table.append(tr);
 

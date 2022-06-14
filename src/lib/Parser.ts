@@ -10,12 +10,19 @@ export abstract class Parser {
       text
         .replace(/\r\n/g, '\n')
         .replace(/\r/g, '\n')
-        .replace(/\n\s*?\n/g, '\n\n') + ' ';
+        .replace(/\n\s*?(?=\n)/g, '\n')
+        .replace(/\t/g, '    ') + ' ';
 
     let tokens: Token[] = [];
     let line = 0;
     let lineStart = 0;
     let ignoreSpace = false;
+
+    // For '*' lists
+    let currentIndent = -1;
+    let lastLineWasEmpty = true;
+    let currentLineHasBullet = false;
+    let listIndentStack = [-1];
 
     function pos(i: number): TextPosition {
       return { line, col: i - lineStart, file };
@@ -35,10 +42,30 @@ export abstract class Parser {
           tokens.push(Token.fromCode('\n', TokenType.Whitespace, pos(i), pos(i + 1)));
           line++;
           lineStart = i + 1;
+          lastLineWasEmpty = currentIndent === -1;
+          currentIndent = -1;
+          currentLineHasBullet = false;
         } else if (!ignoreSpace) {
           tokens.push(Token.fromCode(ch, TokenType.Whitespace, pos(i), pos(i + 1)));
         }
         continue;
+      }
+
+      // Handle indentation change
+      if (currentIndent === -1) {
+        currentIndent = i - lineStart;
+
+        if (!currentLineHasBullet) {
+          while (
+            listIndentStack[listIndentStack.length - 1] >=
+            currentIndent + (lastLineWasEmpty ? 0 : 1)
+          ) {
+            listIndentStack.pop();
+            let listEndToken = Token.fromCode('', TokenType.Special, pos(i), pos(i));
+            listEndToken.specialCommand = '\\@bulletendlist';
+            tokens.push(listEndToken);
+          }
+        }
       }
 
       ignoreSpace = false;
@@ -109,10 +136,51 @@ export abstract class Parser {
         // text
         default:
           // TODO: remove invalid characters
-          tokens.push(Token.fromCode(ch, TokenType.Text, pos(i), pos(i + ch.length)));
+          let token = Token.fromCode(ch, TokenType.Text, pos(i), pos(i + ch.length));
+
+          // line started by '* '
+          if (currentIndent === i - lineStart) {
+            if (ch === '*' && (text[i + 1] === ' ' || text[i + 1] === '\n')) {
+              token.type = TokenType.Special;
+              token.specialCommand = lastLineWasEmpty ? '\\@bulletitem' : '\\@bulletitemnosep';
+              currentLineHasBullet = true;
+
+              while (listIndentStack[listIndentStack.length - 1] > i - lineStart) {
+                listIndentStack.pop();
+
+                let listEndToken = Token.fromParent('', TokenType.Special, token);
+                listEndToken.specialCommand = '\\@bulletendlist';
+                tokens.push(listEndToken);
+              }
+
+              if (listIndentStack[listIndentStack.length - 1] < i - lineStart) {
+                listIndentStack.push(i - lineStart);
+
+                let listStartToken = Token.fromParent('', TokenType.Special, token);
+                listStartToken.specialCommand = '\\@bulletbeginlist';
+                tokens.push(listStartToken);
+              }
+            }
+          }
+
+          tokens.push(token);
           i += ch.length - 1;
           break;
       }
+    }
+
+    // End unended lists
+    while (listIndentStack.length > 1) {
+      listIndentStack.pop();
+
+      let listEndToken = Token.fromCode(
+        '',
+        TokenType.Special,
+        pos(text.length - 1),
+        pos(text.length - 1)
+      );
+      listEndToken.specialCommand = '\\@bulletendlist';
+      tokens.push(listEndToken);
     }
 
     return new Code(tokens);

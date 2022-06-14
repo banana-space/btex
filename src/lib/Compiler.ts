@@ -139,12 +139,17 @@ export abstract class Compiler {
           break;
 
         case TokenType.Command:
+        case TokenType.Special:
           if (context.recordExpansion() > options.maxMacroExpansions) {
             context.throw('MAX_EXPANSIONS_EXCEEDED', t, options.maxMacroExpansions.toString());
             return false;
           }
 
-          let name = t.text;
+          let name = t.type === TokenType.Command ? t.text : t.specialCommand;
+          if (!name) {
+            code.step();
+            break;
+          }
 
           let internal = Internals[name];
           if (internal) {

@@ -847,93 +847,39 @@
 \pdef\Roman*{\Roman{enum-{list-level}}}
 
 
-\pdef\@par* {%
-    \@par%
+\def\@bulletbeginlist{%
     \begin{itemize}%
-    \@astpar%
 }
 
-\pdef\@par*[#+1]{%
-    \@par%
-    \begin{itemize}%
-    \@@def\@currentlabel{#1}%
-    \@astpar%
-}
-
-\pdef\@par*[#+1][#+2]{%
-    \@par%
-    \begin{itemize}%
-    \@@def\@currentlabel{#2}%
-    \@@def\@astlabel{\@@label{cite:#1}}%
-    \@@set{ref-prefix}{c}%
-    \@astpar%
-}
-
-\pdef\@par*[[#+1]]{%
-    \@par%
-    \begin{itemize}%
-    \@astpar[[#1]]%
-}
-
-\def\@astlabel{}
-
-\def\@astpar#+1
-{\@astpar#1 }
-
-\pdef\@astpar#+1
-
-{%
-    \@item\@astlabel#1%
+\def\@bulletendlist{%
     \end{itemize}%
-    \@par%
 }
 
-\pdef\@astpar#+1
-* {%
-    \@item\@astlabel#1%
-    \@@def\@currentlabel{}%
-    \@@def\@astlabel{}%
-    \@astpar%
+\def\@bulletitem{\@item}
+
+\pdef\@bulletitem[#+1]{%
+    \@@def\@currentlabel{#1}%
+    \@item%
 }
 
-\pdef\@astpar#+1
-*[#+2]{%
-    \@item\@astlabel#1%
+\pdef\@bulletitem[[#+1]]{%
+    \@item{}[[#1]]%
+}
+
+\pdef\@bulletitem[#+1][#+2]{%
     \@@def\@currentlabel{#2}%
-    \@@def\@astlabel{}%
-    \@astpar%
+    \@@set{ref-prefix}{c}%
+    \@item\@@label{cite:#1}%
 }
 
-\pdef\@astpar#+1
-*[#+2][#+3]{%
-    \@item\@astlabel#1%
-    \@@def\@currentlabel{#3}%
-    \@@def\@astlabel{\@@label{cite:#2}}%
-    \@astpar%
+\pdef\@bulletitem[#+1][[#+2]]{%
+    \@@def\@currentlabel{#1}%
+    \@item{}[[#2]]%
 }
 
-\pdef\@astpar#+1
-*[[#+2]]{%
-    \@item\@astlabel#1%
-    \@@def\@currentlabel{}%
-    \@@def\@astlabel{}%
-    \@astpar[[#2]]%
-}
-
-\pdef\@astpar#+1
-
-*{\@astpar#1
-*}
-
-\pdef\@astpar#+1
-
-
-{\@astpar#1
-
-}
-
-\adef\@astpar{%
-    \@item\@astlabel%
+\def\@bulletitemnosep{%
+    \@settrue{list-item-no-sep-above}%
+    \@bulletitem%
 }
 
 
