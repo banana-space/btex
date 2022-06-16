@@ -56,6 +56,10 @@ export abstract class Parser {
         currentIndent = i - lineStart;
 
         if (!currentLineHasBullet) {
+          // Insert end-list tokens before any newlines, because some commands search for '\n\n==' etc.
+          let insertPosition = tokens.length;
+          while (tokens[insertPosition - 1]?.type === TokenType.Whitespace) insertPosition--;
+
           while (
             listIndentStack[listIndentStack.length - 1] >=
             currentIndent + (lastLineWasEmpty ? 0 : 1)
@@ -63,7 +67,7 @@ export abstract class Parser {
             listIndentStack.pop();
             let listEndToken = Token.fromCode('', TokenType.Special, pos(i), pos(i));
             listEndToken.specialCommand = '\\@bulletendlist';
-            tokens.push(listEndToken);
+            tokens.splice(insertPosition, 0, listEndToken);
           }
         }
       }

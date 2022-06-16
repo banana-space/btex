@@ -54,8 +54,11 @@ export class ListElement implements ContainerElement {
         this.paragraph = new ParagraphElement(context);
 
         this.children[this.children.length - 1].content.push(this.paragraph);
-        if (context.getBoolean('list-item-no-sep-above', false, true) && this.children.length > 1)
-          this.children[this.children.length - 2].classes.push('list-item-no-sep');
+        if (context.getBoolean('list-item-no-sep-above', false, true)) {
+          if (this.children.length > 1)
+            this.children[this.children.length - 2].classes.push('list-item-no-sep');
+          else this.classes = ((this.classes ?? '') + ' list-no-sep-above').trim();
+        }
         return true;
       case 'par':
         let child = this.children[this.children.length - 1];
