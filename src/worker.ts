@@ -25,17 +25,7 @@ parentPort?.on('message', (value: WorkerData) => {
   }
 });
 
-function work(data: WorkerData): WorkerResult {
-  if (data.expiresAt && new Date().getTime() > data.expiresAt) {
-    return {
-      taskId: data.taskId ?? 0,
-      html: '',
-      data: '',
-      errors: ['SERVER_IS_BUSY'],
-      warnings: [],
-    };
-  }
-
+export function rawWork(data: WorkerData): WorkerResult {
   // Reconstruct the Context object from JSON data
   if (data.options?.equationMode) data.options.inline = true;
 
@@ -87,10 +77,24 @@ function work(data: WorkerData): WorkerResult {
   let html = context.render(data.renderOptions);
 
   return {
-    taskId: data.taskId ?? 0,
     html,
     data: JSON.stringify(context.compilerData),
     errors: context.errors.map((e) => e.getMessage('zh')),
     warnings: context.warnings.map((e) => e.getMessage('zh')),
   };
+}
+
+function work(data: WorkerData): WorkerResult {
+  if (data.expiresAt && new Date().getTime() > data.expiresAt) {
+    return {
+      taskId: data.taskId ?? 0,
+      html: '',
+      data: '',
+      errors: ['SERVER_IS_BUSY'],
+      warnings: [],
+    };
+  }
+  let result = rawWork(data);
+  result.taskId = data.taskId ?? 0;
+  return result;
 }
