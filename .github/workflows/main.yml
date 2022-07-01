@@ -9,8 +9,6 @@ jobs:
     steps:
     - name: Checkout project
       uses: actions/checkout@v2
-    - name: Test
-      run: git branch --remotes
     - name: Setup Node.js
       uses: actions/setup-node@v2.1.4
       with:
@@ -19,6 +17,7 @@ jobs:
       run: |
         yarn
         yarn build
+        ls -l
     - name: Commit
       run: |
         git fetch --all
