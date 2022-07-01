@@ -13,6 +13,10 @@ jobs:
         uses: actions/setup-node@v2.1.4
         with:
           node-version: 12
+      - name: Prepare Build
+        run: |
+          yarn
+          yarn build
       - name: TypeScript Build
         uses: alexthemaster/action-build-typescript@v1.2.1
         with:
