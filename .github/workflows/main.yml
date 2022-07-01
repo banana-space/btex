@@ -1,0 +1,21 @@
+name: Compile to Javascript
+on:
+  push:
+    branches: ["main", "ci-*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2.1.4
+        with:
+          node-version: 12
+      - name: TypeScript Build
+        uses: alexthemaster/action-build-typescript@v1.2.1
+        with:
+          pushToBranch: true
+          branch: 'dist'
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
