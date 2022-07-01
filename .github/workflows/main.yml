@@ -22,7 +22,8 @@ jobs:
     - name: Commit
       run: |
         git fetch --all
-        git checkout --detach
+        git checkout --track origin/dist
+        git checkout ${{ github.ref }} --detach
         git reset --soft dist --
         git add dist/ -f
         git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
