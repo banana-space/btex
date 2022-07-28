@@ -1,7 +1,7 @@
 import { Context } from '../Context';
 import { ContainerElement, RenderOptions } from '../Element';
 import { ParagraphElement } from './ParagraphElement';
-import request from 'sync-request';
+// import request from 'sync-request';
 import { URL } from 'url';
 import { Token } from '../Token';
 import { MathElement } from './MathElement';
@@ -58,12 +58,12 @@ export class TikzElement implements ContainerElement {
     if (this.svg === undefined) {
       this.svg = '';
       let body: string | Buffer = '';
-      try {
-        body = request('POST', url).body;
-        if (body instanceof Buffer) {
-          body = body.toString();
-        }
-      } catch {}
+      // try {
+      //   body = request('POST', url).body;
+      //   if (body instanceof Buffer) {
+      //     body = body.toString();
+      //   }
+      // } catch {}
 
       if (body && typeof body === 'string') {
         // rescale 1pt -> 0.11em for better display
