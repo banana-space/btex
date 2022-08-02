@@ -79,11 +79,12 @@ export class TikzElement implements ContainerElement {
       this.svg = '';
       let body = '';
       try {
-        body = (await axios.post(url.href)).data;
+        body = (await axios.post<string>(url.href, {
+          responseType: 'text'
+        })).data;
       } catch {
         return;
       }
-      console.log("Request obtained:", body);
 
       if (body) {
         // rescale 1pt -> 0.11em for better display
