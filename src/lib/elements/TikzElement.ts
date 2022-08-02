@@ -48,9 +48,7 @@ export class TikzElement implements ContainerElement {
   }
 
   exit(context: Context) {
-    console.log("Exiting");
-    let text = this.getText();
-    context.promises.push(this.asyncRender(text));
+    context.promises.push(this.asyncRender(this.getText()));
   }
 
   render(options?: RenderOptions): Node[] {

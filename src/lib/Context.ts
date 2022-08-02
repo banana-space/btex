@@ -357,7 +357,6 @@ export class Context {
    */
   async render(options?: RenderOptions): Promise<string> {
     let result = this.root.render(options);
-    console.log("Evaluating promises!");
     await Promise.all(this.promises);
     let html = result[0]?.outerHTML ?? '';
     html = html
