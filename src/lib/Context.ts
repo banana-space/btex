@@ -350,7 +350,7 @@ export class Context {
   /**
    * Renders everything to HTML.
    */
-  render(options?: RenderOptions): string {
+  async render(options?: RenderOptions): Promise<string> {
     let html = this.root.render(options)[0]?.outerHTML ?? '';
     html = html
       .replace(/\uedaf"\uedaf/g, '<btex-ref data-key="--prefix--"></btex-ref>')
