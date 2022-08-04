@@ -12,20 +12,21 @@ const window = new JSDOM().window;
 global['document'] = window.document;
 
 parentPort?.on('message', (value: WorkerData) => {
-  try {
-    parentPort?.postMessage(work(value));
-  } catch {
-    parentPort?.postMessage({
-      taskId: value.taskId ?? 0,
-      html: '',
-      data: '',
-      errors: ['UNKNOWN'],
-      warnings: [],
-    });
-  }
+  work(value).then(
+    res => parentPort?.postMessage(res),
+    () => {
+      parentPort?.postMessage({
+        taskId: value.taskId ?? 0,
+        html: '',
+        data: '',
+        errors: ['UNKNOWN'],
+        warnings: [],
+      });
+    }
+  )
 });
 
-export function rawWork(data: WorkerData): WorkerResult {
+export async function rawWork(data: WorkerData): Promise<WorkerResult> {
   // Reconstruct the Context object from JSON data
   if (data.options?.equationMode) data.options.inline = true;
 
@@ -74,7 +75,7 @@ export function rawWork(data: WorkerData): WorkerResult {
   }
 
   // Render to HTML
-  let html = context.render(data.renderOptions);
+  let html = await context.render(data.renderOptions);
 
   return {
     html,
@@ -84,7 +85,7 @@ export function rawWork(data: WorkerData): WorkerResult {
   };
 }
 
-function work(data: WorkerData): WorkerResult {
+async function work(data: WorkerData): Promise<WorkerResult> {
   if (data.expiresAt && new Date().getTime() > data.expiresAt) {
     return {
       taskId: data.taskId ?? 0,
@@ -94,7 +95,7 @@ function work(data: WorkerData): WorkerResult {
       warnings: [],
     };
   }
-  let result = rawWork(data);
+  let result = await rawWork(data);
   result.taskId = data.taskId ?? 0;
   return result;
 }

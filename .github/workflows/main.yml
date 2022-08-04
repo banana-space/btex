@@ -1,0 +1,37 @@
+name: Compile to Javascript
+on:
+  push:
+    branches: ["main", "ci-*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout project
+      uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v2.1.4
+      with:
+        node-version: 12
+    - name: Prepare Branches
+      run: |
+        git fetch --all
+        git checkout --track origin/dist
+        git checkout ${{ github.ref }}
+    - name: Build
+      run: |
+        yarn
+        yarn build
+    - name: Commit
+      run: |
+        git checkout --detach
+        git reset --soft dist --
+        git add dist -f
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git commit -m "Update compiled files"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: dist
