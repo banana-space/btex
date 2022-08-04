@@ -1,10 +1,10 @@
 import { Context } from '../Context';
-import { ContainerElement, RenderElement, RenderOptions } from '../Element';
+import { ContainerElement, RenderOptions } from '../Element';
 import { ParagraphElement } from './ParagraphElement';
-import request from 'sync-request';
 import { URL } from 'url';
 import { Token } from '../Token';
 import { MathElement } from './MathElement';
+import axios from 'axios';
 
 export class TikzElement implements ContainerElement {
   name: 'tikz' = 'tikz';
@@ -14,6 +14,7 @@ export class TikzElement implements ContainerElement {
   noRender: boolean = false;
   initiator?: Token;
   svg?: string;
+  placeholder?: HTMLElement;
 
   isEmpty(): boolean {
     return !this.getText();
@@ -46,26 +47,46 @@ export class TikzElement implements ContainerElement {
     this.initiator = initiator;
   }
 
+  exit(context: Context) {
+    context.promises.push(this.asyncRender(this.getText()));
+  }
+
   render(options?: RenderOptions): Node[] {
     if (this.noRender) return [];
+
+    let span = document.createElement('span');
+    span.classList.add('error');
+    span.append(document.createTextNode('[TikZ 编译错误]'));
+
+    if (options?.inverseSearch && this.initiator) {
+      span.setAttribute('data-pos', ((this.initiator.start?.line ?? 0) + 1).toString());
+    }
+    this.placeholder = span;
+
+    return [span];
+  }
+
+  async asyncRender(text: string): Promise<undefined> {
+    if (this.noRender) return;
 
     let url = new URL('http://127.0.0.1:9292');
     url.searchParams.append('type', this.variant);
 
-    let text = this.getText().trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
-    url.searchParams.append('tex', text);
+    let tex = text.trim().replace(/\n/g, ' ').replace(/\s+/g, ' ');
+    url.searchParams.append('tex', tex);
 
     if (this.svg === undefined) {
       this.svg = '';
-      let body: string | Buffer = '';
+      let body = '';
       try {
-        body = request('POST', url).body;
-        if (body instanceof Buffer) {
-          body = body.toString();
-        }
-      } catch {}
+        body = (await axios.post<string>(url.href, {
+          responseType: 'text'
+        })).data;
+      } catch {
+        return;
+      }
 
-      if (body && typeof body === 'string') {
+      if (body) {
         // rescale 1pt -> 0.11em for better display
         // (originally 10pt = 1em; but we scale all math 110% for clarity)
         // and resolve <glyph id=""> clash
@@ -89,17 +110,8 @@ export class TikzElement implements ContainerElement {
       div.innerHTML = this.svg;
 
       let element = div.firstChild;
-      if (element) return [element];
+      if (element !== null)
+        this.placeholder?.replaceWith(element);
     }
-
-    let span = document.createElement('span');
-    span.classList.add('error');
-    span.append(document.createTextNode('[TikZ 编译错误]'));
-
-    if (options?.inverseSearch && this.initiator) {
-      span.setAttribute('data-pos', ((this.initiator.start?.line ?? 0) + 1).toString());
-    }
-
-    return [span];
   }
 }

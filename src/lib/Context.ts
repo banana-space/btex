@@ -79,6 +79,10 @@ export class Context {
   subpages: SubpageDeclaration[] = [];
   subpageOfLevel: string[] = [];
 
+  // Pending async renderings
+  // TODO other changes needed?
+  promises: Promise<void>[] = [];
+
   // External links
   externalLinks: string[] = [];
 
@@ -106,6 +110,7 @@ export class Context {
       this.subpages = basedOn.subpages;
       this.references = basedOn.references;
       this.externalLinks = basedOn.externalLinks;
+      this.promises = basedOn.promises;
     } else {
       this.global = this;
       this.root = new RootElement();
@@ -350,8 +355,10 @@ export class Context {
   /**
    * Renders everything to HTML.
    */
-  render(options?: RenderOptions): string {
-    let html = this.root.render(options)[0]?.outerHTML ?? '';
+  async render(options?: RenderOptions): Promise<string> {
+    let result = this.root.render(options);
+    await Promise.all(this.promises);
+    let html = result[0]?.outerHTML ?? '';
     html = html
       .replace(/\uedaf"\uedaf/g, '<btex-ref data-key="--prefix--"></btex-ref>')
       .replace(/\uedae"\uedae/g, '<btex-ref data-key="--pagenum--"></btex-ref>');

@@ -1,0 +1,1 @@
+{"version":3,"file":"SubpageInternal.d.ts","sourceRoot":"","sources":["../../../src/lib/internals/SubpageInternal.ts"],"names":[],"mappings":"AAGA,OAAO,EAAE,QAAQ,EAAE,MAAM,aAAa,CAAC;AAEvC,eAAO,MAAM,eAAe,EAAE,QA0C7B,CAAC;AAEF,MAAM,WAAW,kBAAkB;IACjC,KAAK,EAAE,MAAM,CAAC;IACd,YAAY,EAAE,MAAM,CAAC;IACrB,MAAM,EAAE,MAAM,CAAC;IACf,KAAK,EAAE,MAAM,CAAC;CACf"}

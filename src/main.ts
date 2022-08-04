@@ -1,18 +1,20 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { createServer } from 'http';
+import { join } from 'path';
 import { JSDOM } from 'jsdom';
 import { Compiler, CompilerOptions, defaultCompilerOptions } from './lib/Compiler';
 import { Context } from './lib/Context';
 import { RenderOptions } from './lib/Element';
 import { Parser } from './lib/Parser';
 import { WorkerPool, WorkerResult } from './WorkerPool';
+import { rawWork } from './worker';
 
 const window = new JSDOM().window;
 global['document'] = window.document;
 
 // Initialise context using lib/init.btx
 const globalContext = new Context();
-Compiler.compile(Parser.parse(readFileSync('./src/lib/init.btx').toString()), globalContext);
+Compiler.compile(Parser.parse(readFileSync(join(__dirname, '../src/lib/init.btx')).toString()), globalContext);
 
 const pool = new WorkerPool(4);
 
@@ -29,6 +31,18 @@ function runWorker(
     renderOptions,
     globalContext,
   });
+}
+
+export function render(data: string, preamble?: string) : Promise<string> {
+  return runWorker(data, preamble, defaultCompilerOptions, { inverseSearch: false }).then(
+    result => {
+      if (result.errors.length) {
+        return result.errors.join();
+      } else {
+        return result.html;
+      }
+    },
+    err => { return err; });
 }
 
 function getTimestamp() {
@@ -91,7 +105,9 @@ async function test() {
   process.exit(0);
 }
 
-serve();
+if (require.main === module) {
+  serve();
 
-// Uncomment to compile ./test/test.btx to ./test/test.html
-// test();
+  // Uncomment to compile ./test/test.btx to ./test/test.html
+  // test();
+}
