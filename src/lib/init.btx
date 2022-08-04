@@ -1,0 +1,2210 @@
+\@@let\let\@@let
+
+\let\def\@@def
+
+\def\@true{1}
+
+\def\@false{0}
+
+\def\@iftrue#1{\@@if{{#1}}\@true}
+
+\def\@settrue#1{\@@set{#1}\@true}
+
+\def\@setfalse#1{\@@set{#1}\@false}
+
+\def\@ifmmode{\@iftrue{g.math-mode}}
+
+\def\@defappend{\@@set{def-append}\@true}
+
+\def\@defprepend{\@@set{def-prepend}\@true}
+
+\def\@defexpand{\@@set{def-expand}\@true}
+
+\def\@defglobal{\@@set{def-global}\@true}
+
+\def\@deftext{\@@set{def-text}\@true}
+
+\def\@adef{\@defappend\@@def}
+\let\adef\@adef
+
+\def\@pdef{\@defprepend\@@def}
+\let\pdef\@pdef
+
+\def\@gdef{\@defglobal\@@def}
+\let\gdef\@gdef
+
+\def\@edef{\@defexpand\@@def}
+\let\edef\@edef
+
+\def\@tdef{\@deftext\@@def}
+\let\tdef\@tdef
+
+\def\@patch{\@settrue{def-patch}\@@def}
+
+\def\alet{\@defappend\@@let}
+
+\def\plet{\@defprepend\@@let}
+
+\def\glet{\@defglobal\@@let}
+
+\def\tlet{\@deftext\@@let}
+
+\def\@defbyname#1{%
+    \@@set{def-name}{#1}%
+    \@@def@%
+}
+
+\def\@patchbyname#1{%
+    \@@set{def-name}{#1}%
+    \@settrue{def-patch}%
+    \@@def@%
+}
+
+\def\@ladef{%
+    \@settrue{def-latex-style}%
+    \@@def%
+}
+
+\def\@ladefcmd#1{%
+    \@settrue{def-latex-style}%
+    \@@set{def-name}{#1}%
+    \@@def@%
+}
+
+\def\newcommand#1{%
+    \@@ifdef#1{%
+        \@@set{throw-arg-1}{#1}%
+        \@@throw{COMMAND_ALREADY_DEFINED}%
+    }{%
+        \@ladef#1%
+    }%
+}
+\pdef\newcommand*{\newcommand}
+
+\def\renewcommand#1{%
+    \@@ifdef#1{%
+        \@ladef#1%
+    }{%
+        \@@set{throw-arg-1}{#1}%
+        \@@throw{UNDEFINED_COMMAND}%
+    }%
+}
+\pdef\renewcommand*{\renewcommand}
+
+
+% ==========  GROUPS AND ENVIRONMENTS   ==========
+
+\def\@begingroup{\@@enter{group}}
+\let\begingroup\@begingroup
+
+\def\@endgroup{\@@exit{group}}
+\let\endgroup\@endgroup
+
+\def\@par{\@@event{par}}
+\let\par\@par
+\def
+
+{\@par}
+
+\tdef$#+1${\@@enter{math}#1\@@exit{math}}
+
+\def\({\@setfalse{math-display}\@@enter{math}}
+
+\def\){\@@exit{math}}
+
+\pdef$$#+1$${\@settrue{math-display}\@@enter{math}#1\@@exit{math}}
+
+\def\[{\@settrue{math-display}\@@enter{math}}
+
+\def\]{\@@exit{math}}
+
+\def\begin#1{%
+    \@iftrue{env-defined-#1}{%
+        \@begingroup%
+        \@@set{env-name}{#1}%
+        \@@cmd{env.#1.begin}%
+    }{%
+        \@ifmmode{%
+            \@begingroup%
+            \@@set{env-name}{#1}%
+            \@@text{\begin}{#1}%
+        }{%
+            \@@set{throw-arg-1}{#1}%
+            \@@throw{UNDEFINED_ENVIRONMENT}%
+        }%
+    }%
+}
+
+\def\end#1{%
+    \@iftrue{env-defined-#1}{%
+        \@@cmd{env.#1.end}%
+        \@@if{{env-name}}{#1}{}{%
+            \@@set{throw-arg-1}{#1}%
+            \@@throw{UNMATCHED_ENVIRONMENT}%
+        }%
+    }{\@@text{\end}{#1}}%
+    \@endgroup%
+}
+
+\def\@envdef#1#2#3#4{%
+    \@settrue{env-defined-#1}%
+    \@defbyname{env.#1.begin}#2{#3}%
+    \@defbyname{env.#1.end}{#4}%
+}
+\let\envdef\@envdef
+
+\def\@envpdef#1#2#3#4{%
+    \@settrue{env-defined-#1}%
+    \@defprepend\@defbyname{env.#1.begin}#2{#3}%
+    \@defprepend\@defbyname{env.#1.end}{#4}%
+}
+\let\envpdef\@envpdef
+
+\def\@envadef#1#2#3#4{%
+    \@settrue{env-defined-#1}%
+    \@defappend\@defbyname{env.#1.begin}#2{#3}%
+    \@defappend\@defbyname{env.#1.end}{#4}%
+}
+\let\envadef\@envadef
+
+\def\@newenvironment#1#2#3#4{%
+    \@iftrue{env-renew}{%
+        \@@set{env-renew}\@false%
+        \@iftrue{env-defined-#1}{}{%
+            \@@set{throw-arg-1}{#1}%
+            \@@throw{UNDEFINED_ENVIRONMENT}%
+        }%
+    }{%
+        \@iftrue{env-defined-#1}{%
+            \@@set{throw-arg-1}{#1}%
+            \@@throw{ENVIRONMENT_ALREADY_DEFINED}%
+        }{}%
+    }%
+    \@settrue{env-defined-#1}%
+    \@ladefcmd{env.#1.begin}#2{#3}%
+    \@defbyname{env.#1.end}{#4}%
+}
+
+\def\@newenvhelper#1#2{\@newenvironment{#1}{#2}}
+\pdef\@newenvhelper#1#2[#3]{\@newenvhelper{#1}{#2[#3]}}
+
+\def\newenvironment#1{\@newenvhelper{#1}{}}
+
+\def\renewenvironment{\@settrue{env-renew}\newenvironment}
+
+
+% ==========          COUNTERS          ==========
+
+\def\@inc#1{\@@add{#1}{1}}
+
+\def\@dec#1{\@@add{#1}{-1}}
+
+\def\@newcounter#1{%
+    \@@set{g.ctr-#1}{0}%
+    \@defbyname{the#1}{\arabic{#1}}%
+    \@defbyname{@next#1}{}%
+}
+
+\def\newcounter#1{%
+    \@newcounter{#1}%
+}
+\pdef\newcounter#1[#2]{%
+    \@newcounter{#1}%
+    \numberwithin{#1}{#2}%
+}
+
+\def\stepcounter#1{%
+    \@inc{g.ctr-#1}%
+    \@@cmd{@next#1}%
+}
+
+\def\refstepcounter#1{%
+    \@inc{g.ctr-#1}%
+    \@@cmd{@next#1}%
+    \@edef\@currentlabel{\@@cmd{the#1}}%
+    \@@bmk%
+}
+
+\def\addtocounter#1#2{%
+    \@@add{g.ctr-#1}{#2}%
+    \@@cmd{@next#1}%
+}
+
+\def\setcounter#1#2{%
+    \@@set{g.ctr-#1}{#2}%
+    \@@cmd{@next#1}%
+}
+
+\def\@addtoreset#1#2{%
+    \@patchbyname{@next#2}{%
+        \setcounter{#1}{0}%
+    }%
+}
+
+\def\numberwithin#1#2{%
+    \@addtoreset{#1}{#2}%
+    \@defbyname{the#1}{%
+        \@@cmd{the#2}.\arabic{#1}%
+    }%
+}
+
+\def\arabic#1{%
+    \@@set{get-format}{0}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\alph#1{%
+    \@@set{get-format}{1}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\Alph#1{%
+    \@@set{get-format}{2}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\roman#1{%
+    \@@set{get-format}{3}%
+    \@@get{g.ctr-#1}%
+}
+
+\def\Roman#1{%
+    \@@set{get-format}{4}%
+    \@@get{g.ctr-#1}%
+}
+
+
+% ==========        TEXT FORMAT         ==========
+
+\def\@toggle#1{\@iftrue{#1}{\@setfalse}{\@settrue}{#1}}
+
+\def\@it{\@settrue{text-italic}}
+\tlet\it\@it
+
+\def\@rm{\@setfalse{text-italic}}
+\tlet\rm\@rm
+
+\def\@em{\@toggle{text-italic}}
+\tlet\em\@em
+
+\def\@bf{\@settrue{text-bold}}
+\tlet\bf\@bf
+
+\def\@md{\@setfalse{text-bold}}
+\tlet\md\@md
+
+\def\@colour#1{\@@set{text-colour}{#1}}
+\tlet\colour\@colour
+\tlet\color\@colour
+
+\def\@size#1{\@@set{text-size}{#1}}
+\tlet\size\@size
+
+\def\@lang#1#2{{\@@set{text-lang}{#1}#2}}
+\tlet\lang\@lang
+
+\tdef\textit#1{{\@it#1}}
+
+\tdef\textrm#1{{\@rm#1}}
+
+\tdef\emph#1{{\@em#1}}
+
+\tdef\textbf#1{{\@bf#1}}
+
+\tdef\textmd#1{{\@md#1}}
+
+\tdef\textcolour#1#2{{\@colour{#1}#2}}
+\tlet\textcolor\textcolour
+
+\tdef\textsize#1#2{{\@size{#1}#2}}
+
+\tdef\floatright#1{%
+    \@@set{g.div-type}{floatright}%
+    \@@enter{div}%
+        #1%
+    \@@exit{div}%
+}
+
+\tdef\@header#1#2{%
+    \@@set{header-type}{#1}%
+    \@par%
+    \@@enter{header}%
+        #2%
+    \@@exit{header}%
+    \@iftrue{header-numbered}{%
+        \@setfalse{header-numbered}%
+    }{%
+        \@@def\@currentlabel{#2}%
+    }%
+    \@par%
+}
+\pdef\@header#1[#2]#3{%
+    \@@set{header-type}{#1}%
+    \@@set{header-hash}{#2}%
+    \@par%
+    \@@enter{header}%
+        #3%
+    \@@exit{header}%
+    \@iftrue{header-numbered}{%
+        \@setfalse{header-numbered}%
+    }{%
+        \@@def\@currentlabel{#3}%
+    }%
+    \@par%
+}
+
+\newcounter{section}
+\newcounter{subsection}[section]
+\newcounter{subsubsection}[subsection]
+
+\def\pagenum{\@u edae\@u0022\@u edae}
+\def\thmprefix{\@u edaf\@u0022\@u edaf}
+
+\def\thesection{\thmprefix\arabic{section}}
+
+\newcounter{theorem}
+
+\tdef\@section{%
+    \refstepcounter{section}%
+    \@@def\@headernumber{\thesection}%
+    \@settrue{header-numbered}%
+    \@header{h2}%
+}
+\pdef\@section*{\@header{h2}}
+\pdef\@section**{%
+    \@settrue{header-no-toc}%
+    \@header{h2}%
+}
+\pdef\@section***{\@section**}
+
+\tdef\@subsection{%
+    \refstepcounter{subsection}%
+    \@@def\@headernumber{\thesubsection}%
+    \@settrue{header-numbered}%
+    \@header{h3}%
+}
+\pdef\@subsection*{\@header{h3}}
+\pdef\@subsection**{%
+    \@settrue{header-no-toc}%
+    \@header{h3}%
+}
+\pdef\@subsection***{\@subsection**}
+
+\tdef\@subsubsection{%
+    \refstepcounter{subsubsection}%
+    \@@def\@headernumber{\thesubsubsection}%
+    \@settrue{header-numbered}%
+    \@header{h4}%
+}
+\pdef\@subsubsection*{\@header{h4}}
+\pdef\@subsubsection**{%
+    \@settrue{header-no-toc}%
+    \@header{h4}%
+}
+\pdef\@subsubsection***{\@subsubsection**}
+
+\pdef\@par==#+1=={\section{#1}}
+\pdef\@par==*#+1=={\section*{#1}}
+\pdef\@par==**#+1=={\section**{#1}}
+\pdef\@par===#+1==={\subsection{#1}}
+\pdef\@par===*#+1==={\subsection*{#1}}
+\pdef\@par===**#+1==={\subsection**{#1}}
+\pdef\@par====#+1===={\subsubsection{#1}}
+\pdef\@par====*#+1===={\subsubsection*{#1}}
+\pdef\@par====**#+1===={\subsubsection**{#1}}
+\pdef\@par====={\@par{}=====}
+
+\def\nosectionnumbers{%
+    \@tdef\section{\@section*}%
+    \@tdef\subsection{\@subsection*}%
+    \@tdef\subsubsection{\@subsubsection*}%
+    \def\thetheorem{\thmprefix\arabic{theorem}}%
+}
+
+\def\numbersections{%
+    \@tdef\section{\@section}%
+    \@tdef\subsection{\@subsection*}%
+    \@tdef\subsubsection{\@subsubsection*}%
+    \numberwithin{theorem}{section}%
+}
+
+\def\numbersubsections{%
+    \@tdef\section{\@section}%
+    \@tdef\subsection{\@subsection}%
+    \@tdef\subsubsection{\@subsubsection*}%
+    \numberwithin{theorem}{subsection}%
+}
+
+\def\numbersubsubsections{%
+    \@tdef\section{\@section}%
+    \@tdef\subsection{\@subsection}%
+    \@tdef\subsubsection{\@subsubsection}%
+    \numberwithin{theorem}{subsubsection}%
+}
+
+\numbersections
+
+\def\notoc{\@settrue{g.toc-disabled}}
+
+\envdef{flushleft}{}{%
+    \@begingroup%
+    \@@set{par-align}{left}%
+    \@par%
+}{
+    \@endgroup%
+    \@par%
+}
+
+\envdef{center}{}{%
+    \@begingroup%
+    \@@set{par-align}{center}%
+    \@par%
+}{
+    \@endgroup%
+    \@par%
+}
+
+\envdef{centre}{}{%
+    \@begingroup%
+    \@@set{par-align}{center}%
+    \@par%
+}{
+    \@endgroup%
+    \@par%
+}
+
+\envdef{flushright}{}{%
+    \@begingroup%
+    \@@set{par-align}{right}%
+    \@par%
+}{
+    \@endgroup%
+    \@par%
+}
+
+
+% ==========     SPECIAL CHARACTERS     ==========
+
+\def\@u#1#2#3#4{\@@char{#1#2#3#4}}
+
+\def\@ensuremath{%
+    \@ifmmode{}{%
+        \@@throw{MATH_MODE_REQUIRED}%
+    }%
+}
+
+\tdef--{\@u2013}
+
+\pdef---{\@u2014}
+
+\tdef`{\@u2018}
+
+\pdef``{\@u201c}
+
+\tdef'{\@u2019}
+
+\pdef''{\@u201d}
+
+\tdef\`#1{#1\@u0300}
+
+\tdef\'#1{#1\@u0301}
+
+\tdef\^#1{#1\@u0302}
+
+\tdef\~#1{#1\@u0303}
+
+\tdef\=#1{#1\@u0304}
+
+\tdef\u#1{#1\@u0306}
+
+\tdef\.#1{#1\@u0307}
+
+\tdef\"#1{#1\@u0308}
+
+\tdef\r#1{#1\@u030a}
+
+\tdef\H#1{#1\@u030b}
+
+\tdef\v#1{#1\@u030c}
+
+\tdef\c#1{#1\@u0327}
+
+\tdef\AA{\@u00c5}
+
+\tdef\AE{\@u00c6}
+
+\tdef\ae{\@u00e6}
+
+\tdef\i{\@u0131}
+
+\tdef\j{\@u0237}
+
+\tdef\L{\@u0141}
+
+\tdef\l{\@u0142}
+
+\tdef\O{\@u00d8}
+
+\tdef\o{\@u00f8}
+
+\tdef\OE{\@u0152}
+
+\tdef\oe{\@u0153}
+
+\tdef\S{\@u00a7}
+
+\tdef\SS{\@u1e9e}
+
+\tdef\ss{\@u00df}
+
+\tdef\{{\@u007b}
+
+\tdef\}{\@u007d}
+
+\tdef\#{\@u0023}
+
+\tdef\${\@u0024}
+
+\tdef\%{\@u0025}
+
+\tdef\&{\@u0026}
+
+\tdef\_{\@u005f}
+
+\tdef\backslash{\@u005c}
+
+\tdef\ {\@u0020}
+
+\tdef\,{\@u2006}
+
+\tdef~{\@u00a0}
+
+\tdef\\{\@u000a}
+
+\tdef\quad{\@u2001}
+
+\tdef\qquad{\@u2001\@u2001}
+
+\tdef\dagger{\@u2020}
+
+\tdef\ddagger{\@u2021}
+
+\tdef\bullet{\@u2022}
+
+\tdef\circ{\@u2218}
+
+\tdef\dots{\@u2026}
+
+\tdef\ldots{\@u2026}
+
+\tdef\texttilde{\@u007e}
+
+\tdef\smallskip{\@par}
+
+\tdef\medskip{\@par}
+
+\tdef\bigskip{\@par}
+
+% ...
+
+
+% ==========          THEOREMS          ==========
+
+\envdef{@theorem}{#1}{%
+    \@par%
+    \@@set{g.div-type}{block}%
+    \@@enter{div}%
+    \@settrue{text-class-header}%
+    \@bf\@rm#1.\@md%
+    \@setfalse{text-class-header} %
+}{%
+    \@@exit{div}%
+}
+\envpdef{@theorem}{#1[#2]}{%
+    \@par%
+    \@@set{g.div-type}{block}%
+    \@@enter{div}%
+    \@settrue{text-class-header}%
+    \@bf\@rm#1\@md{} (#2)\@bf.\@md%
+    \@setfalse{text-class-header} %
+}{%
+    \@@exit{div}%
+}
+\envpdef{@theorem}{#1[[#2]]}{%
+    \@par%
+    \@@set{g.div-type}{block}%
+    \@@enter{div}%
+    \@settrue{text-class-header}%
+    \@bf\@rm#1.\@md%
+    \@setfalse{text-class-header} %
+    [[#2]]%
+}{%
+    \@@exit{div}%
+}
+
+\def\theoremstyle#1{%
+    \@@if{#1}{plain}{%
+        \@changethmbegin{\@thmbegina}%
+    }{\@@if{#1}{definition}{%
+        \@changethmbegin{\@thmbeginb}%
+    }{\@@if{#1}{remark}{%
+        \@changethmbegin{\@thmbeginc}%
+    }{\@@throw{UNKNOWN_THEOREM_STYLE}}}}%
+}
+
+\def\@changethmbegin#1{%
+    \@@def\newtheorem##1##2{%
+        \@envdef{##1}{}{%
+            #1%
+            \begin{@theorem}{%
+                \refstepcounter{theorem}%
+                ##2 \thetheorem%
+            }%
+        }{\end{@theorem}}%
+    }%
+    \@pdef\newtheorem*##1##2{%
+        \@envdef{##1}{}{%
+            #1%
+            \begin{@theorem}{##2}%
+        }{\end{@theorem}}%
+    }%
+    \@pdef\newtheorem##1[##2]##3{%
+        \newtheorem{##1}{##3}%
+    }%
+}
+
+\def\@thmbegina{\@@set{g.div-class}{style-a}}
+\def\@thmbeginb{\@@set{g.div-class}{style-b}}
+\def\@thmbeginc{\@@set{g.div-class}{style-c}}
+
+\theoremstyle{plain}
+
+\newtheorem{theorem}{\theoremname}
+
+\newtheorem{corollary}{\corollaryname}
+
+\newtheorem{lemma}{\lemmaname}
+
+\newtheorem{proposition}{\propositionname}
+
+\newtheorem{conjecture}{\conjecturename}
+
+\theoremstyle{definition}
+
+\newtheorem{definition}{\definitionname}
+
+\theoremstyle{remark}
+
+\newtheorem{remark}{\remarkname}
+
+\newtheorem{example}{\examplename}
+
+\theoremstyle{plain}
+
+\envdef{proof}{[#1]}{%
+    \@par%
+    \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@enter{div}%
+    {\@bf\@rm#1.} %
+}{%
+    \@proofend%
+    \@@exit{div}%
+}
+\envadef{proof}{}{%
+    \@par%
+    \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@enter{div}%
+    {\@bf\@rm{\proofname}.} %
+}{%
+    \@proofend%
+    \@@exit{div}%
+}
+
+\envdef{proofc}{[#1]}{%
+    \@par%
+    \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@set{g.div-class}{proof-collapsible}%
+    \@@enter{div}%
+    {\@bf\@rm#1.} %
+    \@@event{proofc}%
+    {\@bf\@rm#1.} %
+}{%
+    \@proofend%
+    \@@exit{div}%
+}
+\envadef{proofc}{}{%
+    \@par%
+    \@gdef\@proofend{\qed}%
+    \@@set{g.div-type}{proof}%
+    \@@set{g.div-class}{proof-collapsible}%
+    \@@enter{div}%
+    {\@bf\@rm{\proofname}.} %
+    \@@event{proofc}%
+    {\@bf\@rm{\proofname}.} %
+}{%
+    \@proofend%
+    \@@exit{div}%
+}
+
+\tdef\qedsymbol{$\Box$}
+
+\def\qed{\floatright{\qedsymbol}}
+
+\def\qedhere{%
+    \@gdef\@proofend{}%
+    \@ifmmode{%
+        \reqno{ \qedsymbol}%
+    }{\qed}%
+}
+
+\envdef{quotation}{}{%
+    \@par%
+    \@@set{g.div-type}{block}%
+    \@@set{g.div-class}{quotation}%
+    \@@enter{div}%
+}{%
+    \@@exit{div}%
+}
+
+% ==========          LISTS             ==========
+
+\@@set{list-level}{0}
+
+\envdef{@list}{}{%
+    \@par\@@enter{list}%
+    \@inc{list-level}%
+}{%
+    \@@exit{list}\@par%
+}
+
+\def\@item{%
+    \@@event{+}%
+    \@itemlabel%
+    \@@event{.}%
+}
+\pdef\@item[#1]{%
+    \@@event{+}%
+    #1%
+    \@@event{.}%
+}
+\pdef\@item[[#1]]{%
+    \@item{}[[#1]]%
+}
+\tlet\item\@item
+
+\def\@itemlabel{}
+
+\envdef{@enum}{#1}{%
+    \begin{@list}%
+    \newcounter{enum-{list-level}}%
+    \def\@itemlabel{\refstepcounter{enum-{list-level}}#1}%
+}{%
+    \end{@list}%
+}
+
+\envdef{enumerate}{}{%
+    \begin{@enum}{\rm\arabic*.}%
+}{%
+    \end{@enum}%
+}
+\envpdef{enumerate}{[label=#+1]}{%
+    \begin{@enum}{#1}%
+}{%
+    \end{@enum}%
+}
+
+\envdef{itemize}{}{%
+    \@@def\@currentlabel{}%
+    \begin{@list}%
+    \@@if{{list-level}}{1}{%
+        \def\@itemlabel{\@@bmk\@u2022}%
+    }{%
+        \@@if{{list-level}}{2}{%
+            \def\@itemlabel{\@@bmk\@u2218}%
+        }{%
+            \@@if{{list-level}}{3}{%
+                \def\@itemlabel{\@@bmk\@u25aa}%
+            }{%
+                \def\@itemlabel{\@@bmk\@u25ab}%
+            }%
+        }%
+    }%
+}{%
+    \end{@list}%
+}
+
+\pdef\arabic*{\arabic{enum-{list-level}}}
+
+\pdef\alph*{\alph{enum-{list-level}}}
+
+\pdef\Alph*{\Alph{enum-{list-level}}}
+
+\pdef\roman*{\roman{enum-{list-level}}}
+
+\pdef\Roman*{\Roman{enum-{list-level}}}
+
+
+\def\@bulletbeginlist{%
+    \begin{itemize}%
+}
+
+\def\@bulletendlist{%
+    \end{itemize}%
+}
+
+\def\@bulletitem{\@item}
+
+\pdef\@bulletitem[#+1]{%
+    \@@def\@currentlabel{#1}%
+    \@item%
+}
+
+\pdef\@bulletitem[[#+1]]{%
+    \@item{}[[#1]]%
+}
+
+\pdef\@bulletitem[#+1][#+2]{%
+    \@@def\@currentlabel{#2}%
+    \@@set{ref-prefix}{c}%
+    \@item\@@label{cite:#1}%
+}
+
+\pdef\@bulletitem[#+1][[#+2]]{%
+    \@@def\@currentlabel{#1}%
+    \@item{}[[#2]]%
+}
+
+\def\@bulletitemnosep{%
+    \@settrue{list-item-no-sep-above}%
+    \@bulletitem%
+}
+
+
+
+% ==========           TABLES           ==========
+
+\envdef{@table}{#1#2}{%
+    \@ifmmode{%
+        \@@throw{TABLE_IN_MATH_MODE}%
+    }{}%
+    \@@set{table-cols}{#1}%
+    \@@def\@cellopt{}%
+    \@pdef\@cellopt!{\@@set{table-cell-opt}{{table-cell-opt}[!]}\@cellopt}%
+    \@pdef\@cellopt[##1]{\@@set{table-cell-opt}{{table-cell-opt}[##1]}\@cellopt}%
+    \@tdef&{\@@event{c}\@cellopt}%
+    \@tdef\\{\@@event{r}\@cellopt}%
+    \@pdef\\\\{\@u000a}%
+    \@tdef\hline{}%
+    #2%
+    \@@enter{table}%
+    \@cellopt%
+}{%
+    \@@exit{table}%
+}
+
+\envdef{tabular}{#1}{%
+    \@par%
+    \begin{@table}{#1}{}%
+}{%
+    \end{@table}%
+    \@par%
+}
+
+\envdef{plaintable}{#1}{%
+    \@par%
+    \begin{@table}{#1}{\@settrue{table-plain}}%
+}{%
+    \end{@table}%
+    \@par%
+}
+
+
+% ==========         EQUATIONS          ==========
+
+\newcounter{equation}
+
+\def\eqno{\reqno}
+
+\def\leqno{\@@event{leqno}}
+
+\def\reqno{\@@event{reqno}}
+
+\def\xeqno{\@@event{xeqno}}
+
+\def\theequation{\thmprefix\arabic{equation}}
+
+\envdef{equation}{}{%
+    \[%
+    \refstepcounter{equation}%
+    \eqno(\theequation)\xeqno%
+}{%
+    \]%
+}
+
+\envdef{equation*}{}{\[}{\]}
+
+
+% ==========           TIKZ             ==========
+
+\envdef{tikzpicture}{}{%
+    \@@set{tikz-variant}{tikzpicture}%
+    \begin{@tikz}%
+}{%
+    \end{@tikz}%
+}
+
+\envdef{tikzcd}{}{%
+    \@@set{tikz-variant}{tikzcd}%
+    \begin{@tikz}%
+}{%
+    \end{@tikz}%
+}
+
+\@@set{tikz-nest}{0}
+
+\envdef{@tikz}{}{%
+    \@ifmmode{}{%
+        \@settrue{tikz-outside-math}%
+        \@settrue{math-display}%
+        \@@enter{math}%
+    }%
+    \@inc{tikz-nest}%
+    \@@enter{tikz}%
+}{%
+    \@@exit{tikz}%
+    \@iftrue{tikz-outside-math}{%
+        \@@if{{tikz-nest}}{1}{%
+            \@@exit{math}%
+        }{}%
+    }{}%
+}
+
+\def\tikz#1{\begin{tikzpicture}#1\end{tikzpicture}}
+
+
+% ==========          DIAGRAMS          ==========
+
+\envdef{@diagram}{#1}{%
+    \@ensuremath
+    \@@def&{\@@event{c}}%
+    \@@def\\{\@@event{r}}%
+    \@@def\ar[##1]{\@@event{ar}{\@ar##1,}}
+    \@@enter{diagram}%
+    \@diagramopt{#1}%
+}{%
+    \@@exit{diagram}%
+}
+
+\def\@diagramopt#1{{\@diagopt#1,}}
+\def\@diagopt{}
+\pdef\@diagopt,{\@diagopt}
+\pdef\@diagopt#+1,{\@@set{diagram-option}{#1}\@@event{option}\@diagopt}
+
+\def\@ar{}
+\pdef\@ar,{\@ar}
+\pdef\@ar#+1,{\@@set{ar-option}{#1}\@@event{ar-option}\@ar}
+\pdef\@ar"#+1"{%
+    \@@event{ar-label}%
+    \@@def&{\@u0026}%
+    \@@def\\{\@u005c\@u005c}%
+    #1%
+    \@@event{ar-endlabel}%
+    \@ar%
+}
+
+\def\@begindiagram#1{%
+    \@ifmmode{}{%
+        \@settrue{diagram-outside-math}%
+        \@settrue{math-display}%
+        \@@enter{math}%
+    }%
+    \begin{@diagram}{#1}%
+}
+
+\def\@enddiagram{%
+    \end{@diagram}%
+    \@iftrue{diagram-outside-math}{%
+        \@@exit{math}%
+    }{}%
+}
+
+\envdef{cd}{}{%
+    \@begindiagram{}%
+}{\@enddiagram}
+
+\envpdef{cd}{[#1]}{%
+    \@begindiagram{#1}%
+}{\@enddiagram}
+
+
+% ==========        CROSS-REF           ==========
+
+\def\@currentlabel{\pagenum}
+
+\let\label\@@label
+
+\tdef\@ref#1{\@@enter{ref}#1\@@exit{ref}}
+
+\tdef\ref#1{%
+    \@@set{ref-key}{#1}%
+    \@ref{}%
+}
+\pdef\ref*#1{%
+    \@settrue{ref-no-link}%
+    \@@set{ref-key}{#1}%
+    \@ref{}%
+}
+\pdef\ref[#1]#2{%
+    \@@set{ref-key}{#2}%
+    \@ref{#1}%
+}
+
+\tdef\eqref#1{(\ref{#1})}
+\pdef\eqref*#1{(\ref*{#1})}
+
+\tdef[[#1]]{{\@wlink#1|}}
+
+\tdef\@wlink#+1|{\@settrue{ref-infer-page}\@link{}{#1}}
+\pdef\@wlink#+1|#+2|{\@link{#1}{#2}}
+\pdef\@wlink#+1|#+2|#+3|{\@wlink#1|#2|}
+\pdef\@wlink#+1||#+2|{\@settrue{ref-infer-page}\@@set{ref-page-suffix}{#2}\@link{}{#1}}
+\pdef\@wlink#+1||#+2|#+3|{\@wlink#1||#2|}
+
+\tdef\@link#1#2{%
+    \@settrue{c-link-arg}%
+    \@@set{ref-page}{#1}%
+    \@setfalse{c-link-arg}%
+    \@ref{#2}%
+}
+
+\tdef\@href#1#2{%
+    \@@set{ref-url}{#1}%
+    \@ref{#2}%
+}
+
+\tdef\href{\@href}
+\tdef\url#1{\@href{#1}{#1}}
+
+\envdef{references}{}{%
+    \@@def\bibitem##1{%
+        \@@set{ref-prefix}{c}%
+        \@item%
+        \@@label{cite:##1}%
+    }%
+    \@pdef\bibitem[##1]##2{%
+        \@@set{ref-prefix}{c}%
+        \@item[{[##1]}]%
+        \@@def\@currentlabel{##1}%
+        \@@label{cite:##2}%
+    }%
+    \begin{@enum}{\rm[\arabic*]}%
+}{%
+    \end{@enum}%
+}
+
+\envdef{thebibliography}{}{%
+    \@section*{\refname}%
+    \begin{references}%
+}{%
+    \end{references}%
+}
+
+\def\cite#1{{[\ref{cite:#1}]}}
+\pdef\cite[#1]#2{{[\ref{cite:#2}, #1]}}
+
+
+% ==========         FOOTNOTES          ==========
+
+\newcounter{footnote}
+
+\newcounter{actualfootnote}
+
+\def\@printfootnotes{}
+
+\def\@footnotemark{%
+    \@inc{g.ctr-footnote}%
+    {%
+        \@settrue{text-sup}%
+        \@@set{ref-key}{footnote:{g.ctr-footnote}}%
+        \@ref{\thefootnote}%
+    }%
+    \@dec{g.ctr-footnote}%
+}
+
+\def\@printfootnoteitem[#1][#2]{%
+    \@@set{ref-prefix}{f}%
+    \@item[#2.]%
+    \@settrue{text-sup}%
+    \@@def\@currentlabel{#2}%
+    \@@bmk%
+    \@@label{footnote:#1}%
+    \@setfalse{text-sup}%
+}
+
+\def\@footnotetext#1{%
+    \@inc{g.ctr-actualfootnote}%
+    \@patch\@printfootnotes{\@printfootnoteitem[}%
+    \@defexpand\@patch\@printfootnotes{\theactualfootnote}%
+    \@patch\@printfootnotes{][}%
+    \@defexpand\@patch\@printfootnotes{\thefootnote}%
+    \@patch\@printfootnotes{]#1}%
+}
+
+\let\footnotemark\@footnotemark
+
+\def\footnotetext#1{%
+    \@inc{g.ctr-footnote}%
+    \@footnotetext{#1}%
+}
+
+\def\footnote#1{\footnotemark\footnotetext{#1}}
+
+\def\printfootnotes{%
+    {%
+        \@@set{g.list-classes}{footnotes}%
+        \begin{@list}%
+            \@printfootnotes%
+        \end{@list}%
+    }%
+}
+
+
+% ==========           CODE             ==========
+
+\def\@code{\@@set{code-lang}{btex}\@@code}
+\pdef\@code*{\@@code}
+\pdef\@code[#1]{\@@set{code-lang}{#1}\@@code}
+
+\def\code{\@code}
+
+\def\codeblock{\@settrue{code-display}\@code}
+
+
+% ==========       PAGE OPTIONS         ==========
+
+\def\@data#1#2{%
+    \@@set{data-key}{#1}%
+    \@@data{#2}%
+}
+
+\def\setdisplaytitle{\@data{displayTitle}}
+
+\def\sethtmltitle{\@data{htmlTitle}}
+
+\def\setlanguage{\@data{lang}}
+
+\envdef{structure}{}{%
+    \newcounter{subpage}%
+    \newcounter{ssubpage}[subpage]%
+    \newcounter{sssubpage}[ssubpage]%
+    \@@def\subpage{%
+        \stepcounter{subpage}%
+        \@@set{subpage-level}{1}%
+        \@@set{subpage-number}{\thesubpage}%
+        \@@def\@subpagenumber{\thesubpage}%
+        \@subpage%
+    }%
+    \@@def\subsubpage{%
+        \stepcounter{ssubpage}%
+        \@@set{subpage-level}{2}%
+        \@@set{subpage-number}{\thessubpage}%
+        \@@def\@subpagenumber{\thessubpage}%
+        \@@set{list-indent}{1}%
+        \@subpage%
+    }%
+    \@@def\subsubsubpage{%
+        \stepcounter{sssubpage}%
+        \@@set{subpage-level}{3}%
+        \@@set{subpage-number}{\thesssubpage}%
+        \@@def\@subpagenumber{\thesssubpage}%
+        \@@set{list-indent}{2}%
+        \@subpage%
+    }%
+    \@pdef\subpage!{%
+        \@@set{subpage-level}{1}%
+        \@subpage!%
+    }%
+    \@pdef\subsubpage!{%
+        \@@set{subpage-level}{2}%
+        \@@set{list-indent}{1}%
+        \@subpage!%
+    }%
+    \@pdef\subsubsubpage!{%
+        \@@set{subpage-level}{3}%
+        \@@set{list-indent}{2}%
+        \@subpage!%
+    }%
+    \@pdef\subpage[{%
+        \@@set{subpage-level}{1}%
+        \@subpage[%
+    }%
+    \@pdef\subsubpage[{%
+        \@@set{subpage-level}{2}%
+        \@@set{list-indent}{1}%
+        \@subpage[%
+    }%
+    \@pdef\subsubsubpage[{%
+        \@@set{subpage-level}{3}%
+        \@@set{list-indent}{2}%
+        \@subpage[%
+    }%
+    \@section**{\tocname}%
+    \@@set{g.list-classes}{subpage-list}%
+    \begin{@list}%
+}{%
+    \end{@list}%
+}
+
+\def\@subpage#1{%
+    \@subpageitem{#1}{#1}%
+}
+\pdef\@subpage#1[#2]{%
+    \@subpageitem{#1}{#2}%
+}
+\pdef\@subpage[#1]{%
+    \@@set{subpage-number}{#1}%
+    \@@def\@subpagenumber{#1}%
+    \@subpage%
+}
+\pdef\@subpage[#1][#2]{%
+    \@@set{subpage-number}{#1}%
+    \@@def\@subpagenumber{#2}%
+    \@subpage%
+}
+\pdef\@subpage*#1{%
+    \@subpageitemstar{#1}%
+}
+\pdef\@subpage*[#1]{%
+    \@@set{subpage-number}{#1}%
+    \@@def\@subpagenumber{#1}%
+    \@subpage*%
+}
+\pdef\@subpage!{%
+    \@@set{subpage-number}{}%
+    \@@def\@subpagenumber##1{}%
+    \@subpage%
+}
+
+\def\@subpageitem#1#2{%
+    \@@def\@subdisplaytitle{#2}%
+    \@@subpage{#1}%
+    \@item%
+    \@link{%
+        \@@get{subpage-title}%
+    }{%
+        {\@subpagenumber{\@u2001}}#2%
+    }%
+}
+
+\def\@subpageitemstar#1{%
+    \@item%
+    {\@subpagenumber{\@u2001}}#1%
+}
+
+
+% ==========     NAMES & LANGUAGE       ==========
+
+\def\theoremname{定理}
+\def\corollaryname{推论}
+\def\lemmaname{引理}
+\def\conjecturename{猜想}
+\def\propositionname{命题}
+\def\definitionname{定义}
+\def\remarkname{注}
+\def\examplename{例}
+\def\proofname{证明}
+\def\refname{参考文献}
+\def\tocname{目录}
+
+\def\@english{%
+    \@@def\theoremname{Theorem}%
+    \@@def\corollaryname{Corollary}%
+    \@@def\lemmaname{Lemma}%
+    \@@def\conjecturename{Conjecture}%
+    \@@def\propositionname{Proposition}%
+    \@@def\definitionname{Definition}%
+    \@@def\remarkname{Remark}%
+    \@@def\examplename{Example}%
+    \@@def\proofname{Proof}%
+    \@@def\refname{References}%
+    \@@def\tocname{Contents}%
+}
+
+\def\english{\setlanguage{en}\@english}
+\pdef\english[GB]{\setlanguage{en-gb}\@english}
+\pdef\english[US]{\setlanguage{en-us}\@english}
+
+\tdef\，{\@u ff0c}
+\tdef\。{\@u 3002}
+\tdef\；{\@u ff1b}
+\tdef\：{\@u ff1a}
+\tdef\！{\@u ff01}
+\tdef\？{\@u ff1f}
+\tdef\（{\@u ff08}
+\tdef\）{\@u ff09}
+\tdef\【{\@u 3010}
+\tdef\】{\@u 3011}
+
+\tdef\halfwidthpunctuation{%
+    \tdef，{, }%
+    \tdef。{. }%
+    \tdef；{; }%
+    \tdef：{: }%
+    \tdef！{! }%
+    \tdef？{? }%
+    \tdef（{ (}%
+    \tdef）{) }%
+    \tdef【{ [}%
+    \tdef】{] }%
+}
+
+\tdef\fullwidthpunctuation{%
+    \tdef，{\@u ff0c}%
+    \tdef。{\@u 3002}%
+    \tdef；{\@u ff1b}%
+    \tdef：{\@u ff1a}%
+    \tdef！{\@u ff01}%
+    \tdef？{\@u ff1f}%
+    \tdef（{\@u ff08}%
+    \tdef）{\@u ff09}%
+    \tdef【{\@u 3010}%
+    \tdef】{\@u 3011}%
+}
+
+\halfwidthpunctuation
+
+
+% ==========          MATH             ==========
+
+\def\operatornamewithlimits{\operatorname*}
+
+\def\@mathcmd#1{%
+    \@tdef#1{%
+        \@settrue{text-class-error}%
+        \@@text{#1}%
+        \@setfalse{text-class-error}%
+    }%
+}
+
+\@mathcmd{\above}
+\@mathcmd{\acute}
+\@mathcmd{\alef}
+\@mathcmd{\alefsym}
+\@mathcmd{\aleph}
+\@mathcmd{\allowbreak}
+\@mathcmd{\Alpha}
+\@mathcmd{\alpha}
+\@mathcmd{\amalg}
+\@mathcmd{\And}
+\@mathcmd{\angle}
+\@mathcmd{\approx}
+\@mathcmd{\approxeq}
+\@mathcmd{\arccos}
+\@mathcmd{\arcctg}
+\@mathcmd{\arcsin}
+\@mathcmd{\arctan}
+\@mathcmd{\arctg}
+\@mathcmd{\arg}
+\@mathcmd{\argmax}
+\@mathcmd{\argmin}
+\@mathcmd{\ast}
+\@mathcmd{\asymp}
+\@mathcmd{\atop}
+\@mathcmd{\backepsilon}
+\@mathcmd{\backprime}
+\@mathcmd{\backsim}
+\@mathcmd{\backsimeq}
+\@mathcmd{\bar}
+\@mathcmd{\barwedge}
+\@mathcmd{\Bbb}
+\@mathcmd{\Bbbk}
+\@mathcmd{\bcancel}
+\@mathcmd{\because}
+\@mathcmd{\Beta}
+\@mathcmd{\beta}
+\@mathcmd{\beth}
+\@mathcmd{\between}
+\@mathcmd{\big}
+\@mathcmd{\Big}
+\@mathcmd{\bigcap}
+\@mathcmd{\bigcirc}
+\@mathcmd{\bigcup}
+\@mathcmd{\bigg}
+\@mathcmd{\Bigg}
+\@mathcmd{\biggl}
+\@mathcmd{\Biggl}
+\@mathcmd{\biggm}
+\@mathcmd{\Biggm}
+\@mathcmd{\biggr}
+\@mathcmd{\Biggr}
+\@mathcmd{\bigl}
+\@mathcmd{\Bigl}
+\@mathcmd{\bigm}
+\@mathcmd{\Bigm}
+\@mathcmd{\bigodot}
+\@mathcmd{\bigoplus}
+\@mathcmd{\bigotimes}
+\@mathcmd{\bigr}
+\@mathcmd{\Bigr}
+\@mathcmd{\bigsqcup}
+\@mathcmd{\bigstar}
+\@mathcmd{\bigtriangledown}
+\@mathcmd{\bigtriangleup}
+\@mathcmd{\biguplus}
+\@mathcmd{\bigvee}
+\@mathcmd{\bigwedge}
+\@mathcmd{\binom}
+\@mathcmd{\blacklozenge}
+\@mathcmd{\blacksquare}
+\@mathcmd{\blacktriangle}
+\@mathcmd{\blacktriangledown}
+\@mathcmd{\blacktriangleleft}
+\@mathcmd{\blacktriangleright}
+\@mathcmd{\bm}
+\@mathcmd{\bmod}
+\@mathcmd{\bold}
+\@mathcmd{\boldsymbol}
+\@mathcmd{\bot}
+\@mathcmd{\bowtie}
+\@mathcmd{\Box}
+\@mathcmd{\boxdot}
+\@mathcmd{\boxed}
+\@mathcmd{\boxminus}
+\@mathcmd{\boxplus}
+\@mathcmd{\boxtimes}
+\@mathcmd{\Bra}
+\@mathcmd{\bra}
+\@mathcmd{\braket}
+\@mathcmd{\brace}
+\@mathcmd{\brack}
+\@mathcmd{\breve}
+\@mathcmd{\bull}
+\@mathcmd{\Bumpeq}
+\@mathcmd{\bumpeq}
+\@mathcmd{\cal}
+\@mathcmd{\cancel}
+\@mathcmd{\Cap}
+\@mathcmd{\cap}
+\@mathcmd{\cdot}
+\@mathcmd{\cdotp}
+\@mathcmd{\cdots}
+\@mathcmd{\centerdot}
+\@mathcmd{\cfrac}
+\@mathcmd{\check}
+\@mathcmd{\ch}
+\@mathcmd{\checkmark}
+\@mathcmd{\Chi}
+\@mathcmd{\chi}
+\@mathcmd{\choose}
+\@mathcmd{\circeq}
+\@mathcmd{\circlearrowleft}
+\@mathcmd{\circlearrowright}
+\@mathcmd{\circledast}
+\@mathcmd{\circledcirc}
+\@mathcmd{\circleddash}
+\@mathcmd{\circledR}
+\@mathcmd{\circledS}
+\@mathcmd{\clubs}
+\@mathcmd{\clubsuit}
+\@mathcmd{\cnums}
+\@mathcmd{\colon}
+\@mathcmd{\Colonapprox}
+\@mathcmd{\colonapprox}
+\@mathcmd{\Coloneq}
+\@mathcmd{\coloneq}
+\@mathcmd{\Coloneqq}
+\@mathcmd{\coloneqq}
+\@mathcmd{\Colonsim}
+\@mathcmd{\colonsim}
+\@mathcmd{\colorbox}
+\@mathcmd{\complement}
+\@mathcmd{\Complex}
+\@mathcmd{\cong}
+\@mathcmd{\coprod}
+\@mathcmd{\copyright}
+\@mathcmd{\cos}
+\@mathcmd{\cosec}
+\@mathcmd{\cosh}
+\@mathcmd{\cot}
+\@mathcmd{\cotg}
+\@mathcmd{\coth}
+\@mathcmd{\cr}
+\@mathcmd{\csc}
+\@mathcmd{\ctg}
+\@mathcmd{\cth}
+\@mathcmd{\Cup}
+\@mathcmd{\cup}
+\@mathcmd{\curlyeqprec}
+\@mathcmd{\curlyeqsucc}
+\@mathcmd{\curlyvee}
+\@mathcmd{\curlywedge}
+\@mathcmd{\curvearrowleft}
+\@mathcmd{\curvearrowright}
+\@mathcmd{\dag}
+\@mathcmd{\Dagger}
+\@mathcmd{\daleth}
+\@mathcmd{\Darr}
+\@mathcmd{\dArr}
+\@mathcmd{\darr}
+\@mathcmd{\dashleftarrow}
+\@mathcmd{\dashrightarrow}
+\@mathcmd{\dashv}
+\@mathcmd{\dbinom}
+\@mathcmd{\dblcolon}
+\@mathcmd{\ddag}
+\@mathcmd{\ddot}
+\@mathcmd{\ddots}
+\@mathcmd{\deg}
+\@mathcmd{\degree}
+\@mathcmd{\delta}
+\@mathcmd{\Delta}
+\@mathcmd{\det}
+\@mathcmd{\digamma}
+\@mathcmd{\dfrac}
+\@mathcmd{\diagdown}
+\@mathcmd{\diagup}
+\@mathcmd{\Diamond}
+\@mathcmd{\diamond}
+\@mathcmd{\diamonds}
+\@mathcmd{\diamondsuit}
+\@mathcmd{\dim}
+\@mathcmd{\displaystyle}
+\@mathcmd{\div}
+\@mathcmd{\divideontimes}
+\@mathcmd{\dot}
+\@mathcmd{\Doteq}
+\@mathcmd{\doteq}
+\@mathcmd{\doteqdot}
+\@mathcmd{\dotplus}
+\@mathcmd{\dots}
+\@mathcmd{\dotsb}
+\@mathcmd{\dotsc}
+\@mathcmd{\dotsi}
+\@mathcmd{\dotsm}
+\@mathcmd{\dotso}
+\@mathcmd{\doublebarwedge}
+\@mathcmd{\doublecap}
+\@mathcmd{\doublecup}
+\@mathcmd{\Downarrow}
+\@mathcmd{\downarrow}
+\@mathcmd{\downdownarrows}
+\@mathcmd{\downharpoonleft}
+\@mathcmd{\downharpoonright}
+\@mathcmd{\ell}
+\@mathcmd{\empty}
+\@mathcmd{\emptyset}
+\@mathcmd{\enspace}
+\@mathcmd{\Epsilon}
+\@mathcmd{\epsilon}
+\@mathcmd{\eqcirc}
+\@mathcmd{\Eqcolon}
+\@mathcmd{\eqcolon}
+\@mathcmd{\Eqqcolon}
+\@mathcmd{\eqqcolon}
+\@mathcmd{\eqsim}
+\@mathcmd{\eqslantgtr}
+\@mathcmd{\eqslantless}
+\@mathcmd{\equiv}
+\@mathcmd{\Eta}
+\@mathcmd{\eta}
+\@mathcmd{\eth}
+\@mathcmd{\exist}
+\@mathcmd{\exists}
+\@mathcmd{\exp}
+\@mathcmd{\expandafter}
+\@mathcmd{\fallingdotseq}
+\@mathcmd{\fbox}
+\@mathcmd{\fcolorbox}
+\@mathcmd{\Finv}
+\@mathcmd{\flat}
+\@mathcmd{\footnotesize}
+\@mathcmd{\forall}
+\@mathcmd{\frac}
+\@mathcmd{\frak}
+\@mathcmd{\frown}
+\@mathcmd{\futurelet}
+\@mathcmd{\Game}
+\@mathcmd{\Gamma}
+\@mathcmd{\gamma}
+\@mathcmd{\gcd}
+\@mathcmd{\ge}
+\@mathcmd{\genfrac}
+\@mathcmd{\geq}
+\@mathcmd{\geqq}
+\@mathcmd{\geqslant}
+\@mathcmd{\gets}
+\@mathcmd{\gg}
+\@mathcmd{\ggg}
+\@mathcmd{\gggtr}
+\@mathcmd{\gimel}
+\@mathcmd{\global}
+\@mathcmd{\gnapprox}
+\@mathcmd{\gneq}
+\@mathcmd{\gneqq}
+\@mathcmd{\gnsim}
+\@mathcmd{\grave}
+\@mathcmd{\gt}
+\@mathcmd{\gtrdot}
+\@mathcmd{\gtrapprox}
+\@mathcmd{\gtreqless}
+\@mathcmd{\gtreqqless}
+\@mathcmd{\gtrless}
+\@mathcmd{\gtrsim}
+\@mathcmd{\gvertneqq}
+\@mathcmd{\Harr}
+\@mathcmd{\hArr}
+\@mathcmd{\harr}
+\@mathcmd{\hat}
+\@mathcmd{\hbar}
+\@mathcmd{\hdashline}
+\@mathcmd{\hearts}
+\@mathcmd{\heartsuit}
+\@mathcmd{\hline}
+\@mathcmd{\hom}
+\@mathcmd{\hookleftarrow}
+\@mathcmd{\hookrightarrow}
+\@mathcmd{\hphantom}
+\@mathcmd{\hskip}
+\@mathcmd{\hslash}
+\@mathcmd{\hspace}
+\@mathcmd{\htmlClass}
+\@mathcmd{\htmlData}
+\@mathcmd{\htmlId}
+\@mathcmd{\htmlStyle}
+\@mathcmd{\huge}
+\@mathcmd{\Huge}
+\@mathcmd{\iff}
+\@mathcmd{\iiint}
+\@mathcmd{\iint}
+\@mathcmd{\Im}
+\@mathcmd{\image}
+\@mathcmd{\imath}
+\@mathcmd{\impliedby}
+\@mathcmd{\implies}
+\@mathcmd{\in}
+\@mathcmd{\inf}
+\@mathcmd{\infin}
+\@mathcmd{\infty}
+\@mathcmd{\int}
+\@mathcmd{\intercal}
+\@mathcmd{\intop}
+\@mathcmd{\Iota}
+\@mathcmd{\iota}
+\@mathcmd{\isin}
+\@mathcmd{\jmath}
+\@mathcmd{\Join}
+\@mathcmd{\Kappa}
+\@mathcmd{\kappa}
+\@mathcmd{\KaTeX}
+\@mathcmd{\ker}
+\@mathcmd{\kern}
+\@mathcmd{\Ket}
+\@mathcmd{\ket}
+\@mathcmd{\Lambda}
+\@mathcmd{\lambda}
+\@mathcmd{\land}
+\@mathcmd{\langle}
+\@mathcmd{\Larr}
+\@mathcmd{\lArr}
+\@mathcmd{\larr}
+\@mathcmd{\large}
+\@mathcmd{\Large}
+\@mathcmd{\LARGE}
+\@mathcmd{\LaTeX}
+\@mathcmd{\lBrace}
+\@mathcmd{\lbrace}
+\@mathcmd{\lbrack}
+\@mathcmd{\lceil}
+\@mathcmd{\ldotp}
+\@mathcmd{\le}
+\@mathcmd{\leadsto}
+\@mathcmd{\left}
+\@mathcmd{\leftarrow}
+\@mathcmd{\Leftarrow}
+\@mathcmd{\leftharpoondown}
+\@mathcmd{\leftharpoonup}
+\@mathcmd{\leftleftarrows}
+\@mathcmd{\Leftrightarrow}
+\@mathcmd{\leftrightarrow}
+\@mathcmd{\leftrightarrows}
+\@mathcmd{\leftrightharpoons}
+\@mathcmd{\leftrightsquigarrow}
+\@mathcmd{\leftthreetimes}
+\@mathcmd{\leq}
+\@mathcmd{\leqq}
+\@mathcmd{\leqslant}
+\@mathcmd{\lessapprox}
+\@mathcmd{\lessdot}
+\@mathcmd{\lesseqgtr}
+\@mathcmd{\lesseqqgtr}
+\@mathcmd{\lessgtr}
+\@mathcmd{\lesssim}
+\@mathcmd{\lfloor}
+\@mathcmd{\lg}
+\@mathcmd{\lgroup}
+\@mathcmd{\lhd}
+\@mathcmd{\lim}
+\@mathcmd{\liminf}
+\@mathcmd{\limits}
+\@mathcmd{\limsup}
+\@mathcmd{\ll}
+\@mathcmd{\llap}
+\@mathcmd{\llbracket}
+\@mathcmd{\llcorner}
+\@mathcmd{\Lleftarrow}
+\@mathcmd{\lll}
+\@mathcmd{\llless}
+\@mathcmd{\lmoustache}
+\@mathcmd{\ln}
+\@mathcmd{\lnapprox}
+\@mathcmd{\lneq}
+\@mathcmd{\lneqq}
+\@mathcmd{\lnot}
+\@mathcmd{\lnsim}
+\@mathcmd{\log}
+\@mathcmd{\long}
+\@mathcmd{\Longleftarrow}
+\@mathcmd{\longleftarrow}
+\@mathcmd{\Longleftrightarrow}
+\@mathcmd{\longleftrightarrow}
+\@mathcmd{\longmapsto}
+\@mathcmd{\Longrightarrow}
+\@mathcmd{\longrightarrow}
+\@mathcmd{\looparrowleft}
+\@mathcmd{\looparrowright}
+\@mathcmd{\lor}
+\@mathcmd{\lozenge}
+\@mathcmd{\lparen}
+\@mathcmd{\Lrarr}
+\@mathcmd{\lrArr}
+\@mathcmd{\lrarr}
+\@mathcmd{\lrcorner}
+\@mathcmd{\lq}
+\@mathcmd{\Lsh}
+\@mathcmd{\lt}
+\@mathcmd{\ltimes}
+\@mathcmd{\lVert}
+\@mathcmd{\lvert}
+\@mathcmd{\lvertneqq}
+\@mathcmd{\maltese}
+\@mathcmd{\mapsto}
+\@mathcmd{\mathbb}
+\@mathcmd{\mathbf}
+\@mathcmd{\mathbin}
+\@mathcmd{\mathcal}
+\@mathcmd{\mathchoice}
+\@mathcmd{\mathclap}
+\@mathcmd{\mathclose}
+\@mathcmd{\mathellipsis}
+\@mathcmd{\mathfrak}
+\@mathcmd{\mathinner}
+\@mathcmd{\mathit}
+\@mathcmd{\mathllap}
+\@mathcmd{\mathnormal}
+\@mathcmd{\mathop}
+\@mathcmd{\mathopen}
+\@mathcmd{\mathord}
+\@mathcmd{\mathpunct}
+\@mathcmd{\mathrel}
+\@mathcmd{\mathrlap}
+\@mathcmd{\mathring}
+\@mathcmd{\mathrm}
+\@mathcmd{\mathscr}
+\@mathcmd{\mathsf}
+\@mathcmd{\mathsterling}
+\@mathcmd{\mathtt}
+\@mathcmd{\max}
+\@mathcmd{\measuredangle}
+\@mathcmd{\medspace}
+\@mathcmd{\mho}
+\@mathcmd{\mid}
+\@mathcmd{\middle}
+\@mathcmd{\min}
+\@mathcmd{\minuso}
+\@mathcmd{\mkern}
+\@mathcmd{\mod}
+\@mathcmd{\models}
+\@mathcmd{\mp}
+\@mathcmd{\mskip}
+\@mathcmd{\Mu}
+\@mathcmd{\mu}
+\@mathcmd{\multimap}
+\@mathcmd{\N}
+\@mathcmd{\nabla}
+\@mathcmd{\natnums}
+\@mathcmd{\natural}
+\@mathcmd{\negmedspace}
+\@mathcmd{\ncong}
+\@mathcmd{\ne}
+\@mathcmd{\nearrow}
+\@mathcmd{\neg}
+\@mathcmd{\negthickspace}
+\@mathcmd{\negthinspace}
+\@mathcmd{\neq}
+\@mathcmd{\newline}
+\@mathcmd{\nexists}
+\@mathcmd{\ngeq}
+\@mathcmd{\ngeqq}
+\@mathcmd{\ngeqslant}
+\@mathcmd{\ngtr}
+\@mathcmd{\ni}
+\@mathcmd{\nleftarrow}
+\@mathcmd{\nLeftarrow}
+\@mathcmd{\nLeftrightarrow}
+\@mathcmd{\nleftrightarrow}
+\@mathcmd{\nleq}
+\@mathcmd{\nleqq}
+\@mathcmd{\nleqslant}
+\@mathcmd{\nless}
+\@mathcmd{\nmid}
+\@mathcmd{\nobreak}
+\@mathcmd{\nobreakspace}
+\@mathcmd{\noexpand}
+\@mathcmd{\nolimits}
+\@mathcmd{\normalsize}
+\@mathcmd{\not}
+\@mathcmd{\notin}
+\@mathcmd{\notni}
+\@mathcmd{\nparallel}
+\@mathcmd{\nprec}
+\@mathcmd{\npreceq}
+\@mathcmd{\nRightarrow}
+\@mathcmd{\nrightarrow}
+\@mathcmd{\nshortmid}
+\@mathcmd{\nshortparallel}
+\@mathcmd{\nsim}
+\@mathcmd{\nsubseteq}
+\@mathcmd{\nsubseteqq}
+\@mathcmd{\nsucc}
+\@mathcmd{\nsucceq}
+\@mathcmd{\nsupseteq}
+\@mathcmd{\nsupseteqq}
+\@mathcmd{\ntriangleleft}
+\@mathcmd{\ntrianglelefteq}
+\@mathcmd{\ntriangleright}
+\@mathcmd{\ntrianglerighteq}
+\@mathcmd{\Nu}
+\@mathcmd{\nu}
+\@mathcmd{\nVDash}
+\@mathcmd{\nVdash}
+\@mathcmd{\nvDash}
+\@mathcmd{\nvdash}
+\@mathcmd{\nwarrow}
+\@mathcmd{\odot}
+\@mathcmd{\oiiint}
+\@mathcmd{\oiint}
+\@mathcmd{\oint}
+\@mathcmd{\omega}
+\@mathcmd{\Omega}
+\@mathcmd{\Omicron}
+\@mathcmd{\omicron}
+\@mathcmd{\ominus}
+\@mathcmd{\operatorname}
+\@mathcmd{\oplus}
+\@mathcmd{\oslash}
+\@mathcmd{\otimes}
+\@mathcmd{\over}
+\@mathcmd{\overbrace}
+\@mathcmd{\overgroup}
+\@mathcmd{\overleftarrow}
+\@mathcmd{\overleftharpoon}
+\@mathcmd{\overleftrightarrow}
+\@mathcmd{\overline}
+\@mathcmd{\overlinesegment}
+\@mathcmd{\Overrightarrow}
+\@mathcmd{\overrightarrow}
+\@mathcmd{\overrightharpoon}
+\@mathcmd{\overset}
+\@mathcmd{\owns}
+\@mathcmd{\P}
+\@mathcmd{\parallel}
+\@mathcmd{\partial}
+\@mathcmd{\perp}
+\@mathcmd{\phantom}
+\@mathcmd{\Phi}
+\@mathcmd{\phi}
+\@mathcmd{\Pi}
+\@mathcmd{\pi}
+\@mathcmd{\pitchfork}
+\@mathcmd{\plim}
+\@mathcmd{\plusmn}
+\@mathcmd{\pm}
+\@mathcmd{\pmb}
+\@mathcmd{\pmod}
+\@mathcmd{\pod}
+\@mathcmd{\pounds}
+\@mathcmd{\Pr}
+\@mathcmd{\prec}
+\@mathcmd{\precapprox}
+\@mathcmd{\preccurlyeq}
+\@mathcmd{\preceq}
+\@mathcmd{\precnapprox}
+\@mathcmd{\precneqq}
+\@mathcmd{\precnsim}
+\@mathcmd{\precsim}
+\@mathcmd{\prime}
+\@mathcmd{\prod}
+\@mathcmd{\propto}
+\@mathcmd{\providecommand}
+\@mathcmd{\psi}
+\@mathcmd{\Psi}
+\@mathcmd{\R}
+\@mathcmd{\raisebox}
+\@mathcmd{\rang}
+\@mathcmd{\rangle}
+\@mathcmd{\Rarr}
+\@mathcmd{\rArr}
+\@mathcmd{\rarr}
+\@mathcmd{\rBrace}
+\@mathcmd{\rbrace}
+\@mathcmd{\rbrack}
+\@mathcmd{\rceil}
+\@mathcmd{\Re}
+\@mathcmd{\real}
+\@mathcmd{\Reals}
+\@mathcmd{\reals}
+\@mathcmd{\relax}
+\@mathcmd{\hail}
+\@mathcmd{\restriction}
+\@mathcmd{\rfloor}
+\@mathcmd{\rgroup}
+\@mathcmd{\rhd}
+\@mathcmd{\Rho}
+\@mathcmd{\rho}
+\@mathcmd{\right}
+\@mathcmd{\Rightarrow}
+\@mathcmd{\rightarrow}
+\@mathcmd{\rightarrowtail}
+\@mathcmd{\rightharpoondown}
+\@mathcmd{\rightharpoonup}
+\@mathcmd{\rightleftarrows}
+\@mathcmd{\rightleftharpoons}
+\@mathcmd{\rightrightarrows}
+\@mathcmd{\rightsquigarrow}
+\@mathcmd{\rightthreetimes}
+\@mathcmd{\risingdotseq}
+\@mathcmd{\rlap}
+\@mathcmd{\rmoustache}
+\@mathcmd{\rparen}
+\@mathcmd{\rq}
+\@mathcmd{\rrbracket}
+\@mathcmd{\Rrightarrow}
+\@mathcmd{\Rsh}
+\@mathcmd{\rtimes}
+\@mathcmd{\rule}
+\@mathcmd{\rVert}
+\@mathcmd{\rvert}
+\@mathcmd{\scriptscriptstyle}
+\@mathcmd{\scriptsize}
+\@mathcmd{\scriptstyle}
+\@mathcmd{\sdot}
+\@mathcmd{\searrow}
+\@mathcmd{\sec}
+\@mathcmd{\sect}
+\@mathcmd{\setminus}
+\@mathcmd{\sf}
+\@mathcmd{\sharp}
+\@mathcmd{\shortmid}
+\@mathcmd{\shortparallel}
+\@mathcmd{\Sigma}
+\@mathcmd{\sigma}
+\@mathcmd{\sim}
+\@mathcmd{\simeq}
+\@mathcmd{\sin}
+\@mathcmd{\sinh}
+\@mathcmd{\sixptsize}
+\@mathcmd{\sh}
+\@mathcmd{\small}
+\@mathcmd{\smallfrown}
+\@mathcmd{\smallint}
+\@mathcmd{\smallsetminus}
+\@mathcmd{\smallsmile}
+\@mathcmd{\smash}
+\@mathcmd{\smile}
+\@mathcmd{\sout}
+\@mathcmd{\space}
+\@mathcmd{\spades}
+\@mathcmd{\spadesuit}
+\@mathcmd{\sphericalangle}
+\@mathcmd{\sqcap}
+\@mathcmd{\sqcup}
+\@mathcmd{\square}
+\@mathcmd{\sqrt}
+\@mathcmd{\sqsubset}
+\@mathcmd{\sqsubseteq}
+\@mathcmd{\sqsupset}
+\@mathcmd{\sqsupseteq}
+\@mathcmd{\stackrel}
+\@mathcmd{\star}
+\@mathcmd{\sub}
+\@mathcmd{\sube}
+\@mathcmd{\Subset}
+\@mathcmd{\subset}
+\@mathcmd{\subseteq}
+\@mathcmd{\subseteqq}
+\@mathcmd{\subsetneq}
+\@mathcmd{\subsetneqq}
+\@mathcmd{\substack}
+\@mathcmd{\succ}
+\@mathcmd{\succapprox}
+\@mathcmd{\succcurlyeq}
+\@mathcmd{\succeq}
+\@mathcmd{\succnapprox}
+\@mathcmd{\succneqq}
+\@mathcmd{\succnsim}
+\@mathcmd{\succsim}
+\@mathcmd{\sum}
+\@mathcmd{\sup}
+\@mathcmd{\supe}
+\@mathcmd{\Supset}
+\@mathcmd{\supset}
+\@mathcmd{\supseteq}
+\@mathcmd{\supseteqq}
+\@mathcmd{\supsetneq}
+\@mathcmd{\supsetneqq}
+\@mathcmd{\surd}
+\@mathcmd{\swarrow}
+\@mathcmd{\tag}
+\@mathcmd{\tan}
+\@mathcmd{\tanh}
+\@mathcmd{\Tau}
+\@mathcmd{\tau}
+\@mathcmd{\tbinom}
+\@mathcmd{\TeX}
+\@mathcmd{\text}
+\@mathcmd{\tfrac}
+\@mathcmd{\tg}
+\@mathcmd{\th}
+\@mathcmd{\therefore}
+\@mathcmd{\Theta}
+\@mathcmd{\theta}
+\@mathcmd{\thetasym}
+\@mathcmd{\thickapprox}
+\@mathcmd{\thicksim}
+\@mathcmd{\thickspace}
+\@mathcmd{\thinspace}
+\@mathcmd{\tilde}
+\@mathcmd{\times}
+\@mathcmd{\tiny}
+\@mathcmd{\to}
+\@mathcmd{\top}
+\@mathcmd{\triangle}
+\@mathcmd{\triangledown}
+\@mathcmd{\triangleleft}
+\@mathcmd{\trianglelefteq}
+\@mathcmd{\triangleq}
+\@mathcmd{\triangleright}
+\@mathcmd{\trianglerighteq}
+\@mathcmd{\tt}
+\@mathcmd{\twoheadleftarrow}
+\@mathcmd{\twoheadrightarrow}
+\@mathcmd{\Uarr}
+\@mathcmd{\uArr}
+\@mathcmd{\uarr}
+\@mathcmd{\ulcorner}
+\@mathcmd{\underbrace}
+\@mathcmd{\undergroup}
+\@mathcmd{\underleftarrow}
+\@mathcmd{\underleftrightarrow}
+\@mathcmd{\underline}
+\@mathcmd{\underlinesegment}
+\@mathcmd{\underrightarrow}
+\@mathcmd{\underset}
+\@mathcmd{\unlhd}
+\@mathcmd{\unrhd}
+\@mathcmd{\Uparrow}
+\@mathcmd{\uparrow}
+\@mathcmd{\Updownarrow}
+\@mathcmd{\updownarrow}
+\@mathcmd{\upharpoonleft}
+\@mathcmd{\upharpoonright}
+\@mathcmd{\uplus}
+\@mathcmd{\Upsilon}
+\@mathcmd{\upsilon}
+\@mathcmd{\upuparrows}
+\@mathcmd{\urcorner}
+\@mathcmd{\utilde}
+\@mathcmd{\varDelta}
+\@mathcmd{\varepsilon}
+\@mathcmd{\varGamma}
+\@mathcmd{\varkappa}
+\@mathcmd{\varLambda}
+\@mathcmd{\varnothing}
+\@mathcmd{\varOmega}
+\@mathcmd{\varPhi}
+\@mathcmd{\varphi}
+\@mathcmd{\varPi}
+\@mathcmd{\varpi}
+\@mathcmd{\varpropto}
+\@mathcmd{\varPsi}
+\@mathcmd{\varrho}
+\@mathcmd{\varSigma}
+\@mathcmd{\varsigma}
+\@mathcmd{\varsubsetneq}
+\@mathcmd{\varsubsetneqq}
+\@mathcmd{\varsupsetneq}
+\@mathcmd{\varsupsetneqq}
+\@mathcmd{\varTheta}
+\@mathcmd{\vartheta}
+\@mathcmd{\vartriangle}
+\@mathcmd{\vartriangleleft}
+\@mathcmd{\vartriangleright}
+\@mathcmd{\varUpsilon}
+\@mathcmd{\varXi}
+\@mathcmd{\vcentcolon}
+\@mathcmd{\Vdash}
+\@mathcmd{\vDash}
+\@mathcmd{\vdash}
+\@mathcmd{\vdots}
+\@mathcmd{\vec}
+\@mathcmd{\vee}
+\@mathcmd{\veebar}
+\@mathcmd{\verb}
+\@mathcmd{\Vert}
+\@mathcmd{\vert}
+\@mathcmd{\vphantom}
+\@mathcmd{\Vvdash}
+\@mathcmd{\wedge}
+\@mathcmd{\weierp}
+\@mathcmd{\widecheck}
+\@mathcmd{\widehat}
+\@mathcmd{\widetilde}
+\@mathcmd{\wp}
+\@mathcmd{\wr}
+\@mathcmd{\xcancel}
+\@mathcmd{\xdef}
+\@mathcmd{\Xi}
+\@mathcmd{\xi}
+\@mathcmd{\xhookleftarrow}
+\@mathcmd{\xhookrightarrow}
+\@mathcmd{\xLeftarrow}
+\@mathcmd{\xleftarrow}
+\@mathcmd{\xleftharpoondown}
+\@mathcmd{\xleftharpoonup}
+\@mathcmd{\xLeftrightarrow}
+\@mathcmd{\xleftrightarrow}
+\@mathcmd{\xleftrightharpoons}
+\@mathcmd{\xlongequal}
+\@mathcmd{\xmapsto}
+\@mathcmd{\xRightarrow}
+\@mathcmd{\xrightarrow}
+\@mathcmd{\xrightharpoondown}
+\@mathcmd{\xrightharpoonup}
+\@mathcmd{\xrightleftharpoons}
+\@mathcmd{\xtofrom}
+\@mathcmd{\xtwoheadleftarrow}
+\@mathcmd{\xtwoheadrightarrow}
+\@mathcmd{\yen}
+\@mathcmd{\Z}
+\@mathcmd{\Zeta}
+\@mathcmd{\zeta}
+
+\envdef{align}{}{\[\begin{aligned}}{\end{aligned}\]}
+\envdef{align*}{}{\[\begin{aligned}}{\end{aligned}\]}
+\envdef{alignat}{#1}{\[\begin{alignedat}{#1}}{\end{alignedat}\]}
+\envdef{alignat*}{#1}{\[\begin{alignedat}{#1}}{\end{alignedat}\]}
+\envdef{gather}{}{\[\begin{gathered}}{\end{gathered}\]}
+\envdef{gather*}{}{\[\begin{gathered}}{\end{gathered}\]}
