@@ -35,6 +35,7 @@ var MathElement = /** @class */ (function () {
     MathElement.prototype.enter = function (context) {
         this.style.colour = context.get('text-colour');
         this.style.fontSize = context.getFloat('text-size', 0) || undefined;
+        this.style.bold = context.getBoolean('text-bold', false);
         this.style.classes = '';
         if (context.getBoolean('text-class-header', false))
             this.style.classes += ' item-header';
@@ -132,7 +133,11 @@ var MathElement = /** @class */ (function () {
             span.classList.add('tikz-in-math');
         }
         else {
-            katex_1.default.render(this.getText(), span, {
+            var tex = this.getText();
+            if (this.isInline && this.style.bold) {
+                tex = '\\bm{' + tex + '}';
+            }
+            katex_1.default.render(tex, span, {
                 displayMode: !this.isInline,
                 output: 'html',
                 strict: false,

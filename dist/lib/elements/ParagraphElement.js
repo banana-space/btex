@@ -47,6 +47,7 @@ var ParagraphElement = /** @class */ (function () {
         var prevType = 'space';
         var prevText = undefined;
         var first = '', last = '';
+        var spaceBeforeCjk = false, spaceAfterCjk = false;
         for (var _i = 0, _b = this.children; _i < _b.length; _i++) {
             var child = _b[_i];
             if (child instanceof SpanElement_1.SpanElement && !child.style.preservesSpaces) {
@@ -59,14 +60,30 @@ var ParagraphElement = /** @class */ (function () {
                         newText = newText.trimStart();
                     // Disallow spacing between cjk characters
                     // But preserve spaces at end as refs may follow
-                    if (prevType === 'cjk' && nextText)
-                        newText = newText.trimStart();
+                    if (prevType === 'cjk') {
+                        if (nextText && /^\s+/.test(newText)) {
+                            newText = newText.trimStart();
+                            spaceAfterCjk = true;
+                        }
+                    }
+                    else {
+                        spaceAfterCjk = false;
+                    }
+                    if ((prevText === null || prevText === void 0 ? void 0 : prevText.text) && /[\(\[\{‘“]$/u.test(prevText.text)) {
+                        if (nextText && /^\s+/.test(newText)) {
+                            newText = newText.trimStart();
+                            spaceBeforeCjk = true;
+                        }
+                    }
+                    else {
+                        spaceBeforeCjk = false;
+                    }
                     // Spacing between letters and CJK characters
                     if ((prevType === 'letter' || prevType === 'punct') &&
                         /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText))
                         newText = ' ' + newText;
                     if (prevType === 'cjk' &&
-                        /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{%'"‘“\uedae\uedaf]/u.test(newText)) {
+                        /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{#%&*§¶'"‘“\uedae\uedaf]/u.test(newText)) {
                         if (prevText)
                             prevText.text += ' ';
                         else
@@ -84,7 +101,7 @@ var ParagraphElement = /** @class */ (function () {
                         else if (/[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
                             prevType = 'cjk';
                         }
-                        else if (/[\)\]\},.!%;:?'"’”\u2026]$/.test(newText)) {
+                        else if (/[\)\]\},.!#%&*§¶;:?'"’”\u2026]$/.test(newText)) {
                             prevType = 'punct';
                         }
                         else if (/[\u3000-\u301f\uff00-\uff60\uff64]$/.test(newText)) {
@@ -92,6 +109,12 @@ var ParagraphElement = /** @class */ (function () {
                         }
                         else {
                             prevType = 'other';
+                        }
+                        if ((spaceAfterCjk &&
+                            !/^[\)\]\},.!;:?’”\u2026\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}\u3000-\u301f\uff00-\uff60\uff64]/u.test(newText)) ||
+                            (spaceBeforeCjk && prevType === 'cjk')) {
+                            newText = ' ' + newText;
+                            spaceBeforeCjk = spaceAfterCjk = false;
                         }
                         if (prevType !== 'space') {
                             if (!first)
