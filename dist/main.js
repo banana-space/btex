@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.render = void 0;
+exports.render = exports.runWorker = exports.rawWork = void 0;
 var fs_1 = require("fs");
 var http_1 = require("http");
 var path_1 = require("path");
@@ -45,6 +45,8 @@ var Compiler_1 = require("./lib/Compiler");
 var Context_1 = require("./lib/Context");
 var Parser_1 = require("./lib/Parser");
 var WorkerPool_1 = require("./WorkerPool");
+var worker_1 = require("./worker");
+Object.defineProperty(exports, "rawWork", { enumerable: true, get: function () { return worker_1.rawWork; } });
 var window = new jsdom_1.JSDOM().window;
 global['document'] = window.document;
 // Initialise context using lib/init.btx
@@ -60,6 +62,7 @@ function runWorker(code, preamble, options, renderOptions) {
         globalContext: globalContext,
     });
 }
+exports.runWorker = runWorker;
 function render(data, preamble) {
     return runWorker(data, preamble, Compiler_1.defaultCompilerOptions, { inverseSearch: false }).then(function (result) {
         if (result.errors.length) {
