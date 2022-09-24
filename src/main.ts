@@ -7,7 +7,7 @@ import { Context } from './lib/Context';
 import { RenderOptions } from './lib/Element';
 import { Parser } from './lib/Parser';
 import { WorkerPool, WorkerResult } from './WorkerPool';
-import { rawWork } from './worker';
+export { rawWork } from './worker';
 
 const window = new JSDOM().window;
 global['document'] = window.document;
@@ -18,7 +18,7 @@ Compiler.compile(Parser.parse(readFileSync(join(__dirname, '../src/lib/init.btx'
 
 const pool = new WorkerPool(4);
 
-function runWorker(
+export function runWorker(
   code: string,
   preamble?: string,
   options?: CompilerOptions,
