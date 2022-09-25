@@ -112,7 +112,9 @@
 
 \pdef$$#+1$${\@settrue{math-display}\@@enter{math}#1\@@exit{math}}
 
-\tdef\[#+1\]{\@settrue{math-display}\@@enter{math}#1\@@exit{math}}
+\def\[{\@settrue{math-display}\@@enter{math}}
+
+\def\]{\@@exit{math}}
 
 \def\begin#1{%
     \@iftrue{env-defined-#1}{%
