@@ -111,6 +111,7 @@ export class ParagraphElement implements RenderElement {
               prevType = 'letter';
             } else if (/[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
               prevType = 'cjk';
+              spaceAfterCjk = false;
             } else if (/[\)\]\},.!#%&*§¶;:?'"’”\u2026]$/.test(newText)) {
               prevType = 'punct';
             } else if (/[\u3000-\u301f\uff00-\uff60\uff64]$/.test(newText)) {

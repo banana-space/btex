@@ -100,6 +100,7 @@ var ParagraphElement = /** @class */ (function () {
                         }
                         else if (/[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
                             prevType = 'cjk';
+                            spaceAfterCjk = false;
                         }
                         else if (/[\)\]\},.!#%&*§¶;:?'"’”\u2026]$/.test(newText)) {
                             prevType = 'punct';
