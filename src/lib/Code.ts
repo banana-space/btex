@@ -48,7 +48,7 @@ export class Code {
     return -1;
   }
 
-  matchGroup(start?: number): number {
+  matchGroup(start?: number): number | undefined {
     start ??= this.pointer;
     let nest = 0;
     for (var i = start; i < this.tokens.length; i++) {
@@ -56,7 +56,7 @@ export class Code {
       if (this.tokens[i].type === TokenType.EndGroup) nest--;
       if (nest === 0) break;
     }
-    if (nest > 0) return -1;
+    if (nest > 0) return;
     return i;
   }
 
@@ -64,7 +64,7 @@ export class Code {
     let t = this.tokens[this.pointer];
     if (t.type === TokenType.BeginGroup) {
       let end = this.matchGroup();
-      if (end === -1) return undefined;
+      if (end === undefined) return undefined;
 
       let code = this.slice(this.pointer + 1, end);
       this.pointer = end + 1;
@@ -176,7 +176,9 @@ export class Code {
           for (var i = this.pointer; i < this.tokens.length; i++) {
             let t = this.tokens[i];
             if (t.type === TokenType.BeginGroup) {
-              i = this.matchGroup(i);
+              let m = this.matchGroup(i);
+              if (m === undefined) break;
+              i = m;
               continue;
             }
             if (t.type === TokenType.EndGroup) break;

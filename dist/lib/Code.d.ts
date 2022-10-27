@@ -15,7 +15,7 @@ export declare class Code {
         type: TokenType;
         text: string;
     }): number;
-    matchGroup(start?: number): number;
+    matchGroup(start?: number): number | undefined;
     readGroup(): Code | undefined;
     readSquareBracket(): Code | undefined;
     expandMacro(command: Command, strict?: boolean): boolean;

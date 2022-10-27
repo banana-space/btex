@@ -71,14 +71,14 @@ var Code = /** @class */ (function () {
                 break;
         }
         if (nest > 0)
-            return -1;
+            return;
         return i;
     };
     Code.prototype.readGroup = function () {
         var t = this.tokens[this.pointer];
         if (t.type === Token_1.TokenType.BeginGroup) {
             var end = this.matchGroup();
-            if (end === -1)
+            if (end === undefined)
                 return undefined;
             var code = this.slice(this.pointer + 1, end);
             this.pointer = end + 1;
@@ -198,7 +198,10 @@ var Code = /** @class */ (function () {
                     for (var i = this.pointer; i < this.tokens.length; i++) {
                         var t = this.tokens[i];
                         if (t.type === Token_1.TokenType.BeginGroup) {
-                            i = this.matchGroup(i);
+                            var m = this.matchGroup(i);
+                            if (m === undefined)
+                                break;
+                            i = m;
                             continue;
                         }
                         if (t.type === Token_1.TokenType.EndGroup)
