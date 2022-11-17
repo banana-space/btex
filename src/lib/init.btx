@@ -597,6 +597,10 @@
 
 \tdef\texttilde{\@u007e}
 
+\tdef\dj{\@u0111}
+
+\tdef\Dj{\@u0110}
+
 \tdef\smallskip{\@par}
 
 \tdef\medskip{\@par}
