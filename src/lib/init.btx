@@ -597,9 +597,9 @@
 
 \tdef\texttilde{\@u007e}
 
-\tdef\dj{\@u0111}
+\pdef\dj{\@u0111}
 
-\tdef\Dj{\@u0110}
+\pdef\Dj{\@u0110}
 
 \tdef\smallskip{\@par}
 
