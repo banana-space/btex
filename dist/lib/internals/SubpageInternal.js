@@ -40,7 +40,7 @@ exports.SubpageInternal = {
                 title: fullTitle,
                 displayTitle: displayTitle,
                 level: level,
-                number: (_b = context.get('subpage-number')) !== null && _b !== void 0 ? _b : '',
+                number: (_b = context.get('subpage-number')) !== null && _b !== void 0 ? _b : '', // No resetting; subpage-number is used after this.
             });
         }
         return true;

@@ -1,10 +1,12 @@
 "use strict";
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Code = void 0;
@@ -50,7 +52,7 @@ var Code = /** @class */ (function () {
         }
         if (start >= this.pointer)
             return;
-        (_a = this.tokens).splice.apply(_a, __spreadArrays([start, this.pointer - start], tokens));
+        (_a = this.tokens).splice.apply(_a, __spreadArray([start, this.pointer - start], tokens, false));
         this.pointer = start;
     };
     Code.prototype.findNext = function (token) {
@@ -260,7 +262,7 @@ var Code = /** @class */ (function () {
             // For #N -> tokens, the source token should not be the initiator!
             replace.push.apply(replace, args[index].tokens.map(function (t) { return Token_1.Token.cloneAsChildOf(t, t); }));
         }
-        this.spliceFrom.apply(this, __spreadArrays([start], replace));
+        this.spliceFrom.apply(this, __spreadArray([start], replace, false));
         return true;
     };
     return Code;

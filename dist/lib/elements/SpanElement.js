@@ -81,14 +81,14 @@ var SpanElement = /** @class */ (function () {
         if (this.style.bold)
             styles.push('font-weight:bold');
         if (this.style.colour && SpanElement.colourRegex.test(this.style.colour))
-            styles.push("color:#" + this.style.colour);
+            styles.push("color:#".concat(this.style.colour));
         if (this.style.fontSize && isFinite(this.style.fontSize)) {
             var fontSize = this.style.fontSize;
             if (fontSize < SpanElement.minFontSize)
                 fontSize = SpanElement.minFontSize;
             if (fontSize > SpanElement.maxFontSize)
                 fontSize = SpanElement.maxFontSize;
-            styles.push("font-size:" + fontSize + "px");
+            styles.push("font-size:".concat(fontSize, "px"));
         }
         if (this.style.preservesSpaces && /\s/.test(fullText) && fullText !== '\n') {
             styles.push('white-space:pre-wrap');

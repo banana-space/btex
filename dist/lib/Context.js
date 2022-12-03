@@ -14,7 +14,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -35,12 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Context = void 0;
@@ -250,14 +252,14 @@ var Context = /** @class */ (function () {
         for (var _i = 2; _i < arguments.length; _i++) {
             args[_i - 2] = arguments[_i];
         }
-        return this.errors.push(new (CompilerError_1.CompilerError.bind.apply(CompilerError_1.CompilerError, __spreadArrays([void 0, type, initiator], args)))());
+        return this.errors.push(new (CompilerError_1.CompilerError.bind.apply(CompilerError_1.CompilerError, __spreadArray([void 0, type, initiator], args, false)))());
     };
     Context.prototype.warn = function (type, initiator) {
         var args = [];
         for (var _i = 2; _i < arguments.length; _i++) {
             args[_i - 2] = arguments[_i];
         }
-        return this.warnings.push(new (CompilerError_1.CompilerError.bind.apply(CompilerError_1.CompilerError, __spreadArrays([void 0, type, initiator], args)))());
+        return this.warnings.push(new (CompilerError_1.CompilerError.bind.apply(CompilerError_1.CompilerError, __spreadArray([void 0, type, initiator], args, false)))());
     };
     /**
      * Generates a `Context` object as a sub-scope of the current scope.
@@ -506,7 +508,8 @@ var Context = /** @class */ (function () {
             this.root.tocRendered = toc;
             var tocTitle = document.createElement('div');
             tocTitle.classList.add('toctitle');
-            tocTitle.innerHTML = (_a = this.commandToHTML('\\tocname', Token_1.Token.fromCode('\\tocname', Token_1.TokenType.Command, { line: 0, col: 0 }, { line: 0, col: 0 }))) !== null && _a !== void 0 ? _a : '??';
+            tocTitle.innerHTML =
+                (_a = this.commandToHTML('\\tocname', Token_1.Token.fromCode('\\tocname', Token_1.TokenType.Command, { line: 0, col: 0 }, { line: 0, col: 0 }))) !== null && _a !== void 0 ? _a : '??';
             toc.append(tocTitle);
             var ul = document.createElement('ul');
             toc.append(ul);

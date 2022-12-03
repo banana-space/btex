@@ -1,10 +1,12 @@
 "use strict";
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LetInternal = void 0;
@@ -66,7 +68,7 @@ exports.LetInternal = {
         var overwrite = true;
         context.getBoolean('def-expand', false, true);
         if (context.getBoolean('def-prepend', false, true)) {
-            (_a = command.definitions).splice.apply(_a, __spreadArrays([0, 0], secondCommand.definitions));
+            (_a = command.definitions).splice.apply(_a, __spreadArray([0, 0], secondCommand.definitions, false));
             overwrite = false;
         }
         if (context.getBoolean('def-append', false, true)) {
@@ -74,7 +76,7 @@ exports.LetInternal = {
             overwrite = false;
         }
         if (overwrite) {
-            command.definitions = __spreadArrays(secondCommand.definitions);
+            command.definitions = __spreadArray([], secondCommand.definitions, true);
         }
         command.isGlobal = context.getBoolean('def-global', false, true);
         command.isTextCommand = context.getBoolean('def-text', false, true);

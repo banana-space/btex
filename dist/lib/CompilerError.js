@@ -55,12 +55,13 @@ var CompilerError = /** @class */ (function () {
         var _a, _b, _c, _d, _e, _f, _g, _h;
         var message = this.type;
         if (lang && errorMessages[lang]) {
-            message = (_b = (_a = errorMessages[lang][this.type + '_' + this.args.length]) !== null && _a !== void 0 ? _a : errorMessages[lang][this.type]) !== null && _b !== void 0 ? _b : this.type;
+            message =
+                (_b = (_a = errorMessages[lang][this.type + '_' + this.args.length]) !== null && _a !== void 0 ? _a : errorMessages[lang][this.type]) !== null && _b !== void 0 ? _b : this.type;
             for (var i = 0; i < 9 && i < this.args.length; i++) {
                 message = message.replace('$' + (i + 1), this.args[i]);
             }
         }
-        return ((_d = (_c = this.initiator.start) === null || _c === void 0 ? void 0 : _c.file) !== null && _d !== void 0 ? _d : '') + ":" + (((_f = (_e = this.initiator.start) === null || _e === void 0 ? void 0 : _e.line) !== null && _f !== void 0 ? _f : -1) + 1) + ":" + (((_h = (_g = this.initiator.start) === null || _g === void 0 ? void 0 : _g.col) !== null && _h !== void 0 ? _h : -1) + 1) + " " + message;
+        return "".concat((_d = (_c = this.initiator.start) === null || _c === void 0 ? void 0 : _c.file) !== null && _d !== void 0 ? _d : '', ":").concat(((_f = (_e = this.initiator.start) === null || _e === void 0 ? void 0 : _e.line) !== null && _f !== void 0 ? _f : -1) + 1, ":").concat(((_h = (_g = this.initiator.start) === null || _g === void 0 ? void 0 : _g.col) !== null && _h !== void 0 ? _h : -1) + 1, " ").concat(message);
     };
     return CompilerError;
 }());

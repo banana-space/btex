@@ -87,7 +87,7 @@ var ListElement = /** @class */ (function () {
                 tr.classList.add(cls);
             }
             if (child.indent)
-                tr.classList.add("list-item-indent-" + child.indent);
+                tr.classList.add("list-item-indent-".concat(child.indent));
             table.append(tr);
             var td = document.createElement('td');
             td.classList.add('list-item-label');

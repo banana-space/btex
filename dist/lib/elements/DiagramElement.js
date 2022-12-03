@@ -1,10 +1,12 @@
 "use strict";
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DiagramElement = void 0;
@@ -141,7 +143,7 @@ var DiagramElement = /** @class */ (function () {
         svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         svg.style.width = width + 'em';
         svg.style.height = height + 'em';
-        svg.setAttribute('viewBox', "0 0 " + width + " " + height);
+        svg.setAttribute('viewBox', "0 0 ".concat(width, " ").concat(height));
         svg.setAttribute('version', '1.1');
         rootSpan.append(svg);
         var defs = document.createElement('defs');
@@ -171,7 +173,7 @@ var DiagramElement = /** @class */ (function () {
             // draw arrow body
             var bezier = arrow.bezier;
             var mask = document.createElement('mask');
-            mask.innerHTML = "<rect x=\"0\" y=\"0\" width=\"" + width + "\" height=\"" + height + "\" fill=\"white\" />";
+            mask.innerHTML = "<rect x=\"0\" y=\"0\" width=\"".concat(width, "\" height=\"").concat(height, "\" fill=\"white\" />");
             var path = void 0;
             switch (arrow.lineType) {
                 case 'single':
@@ -231,7 +233,7 @@ var DiagramElement = /** @class */ (function () {
             if (path && mask.children.length > 1) {
                 var maskId = this.id + '-' + this.svgId;
                 mask.id = maskId;
-                path.setAttribute('mask', "url(#" + maskId + ")");
+                path.setAttribute('mask', "url(#".concat(maskId, ")"));
                 defs.append(mask);
                 this.svgId++;
                 // Firefox bug: mask doesn't work on objects with no height or no width
@@ -729,10 +731,10 @@ var DiagramElement = /** @class */ (function () {
                 y: end.Yc - ((d.x * rotation.y + d.y * rotation.x) * looseness) / 3,
             };
             var bezier = new bezier_js_1.Bezier(start.X, start.Yc, c1.x, c1.y, c2.x, c2.y, end.X, end.Yc);
-            var startT = Math.min.apply(Math, __spreadArrays([1], bezier.lineIntersects(start.lineN), bezier.lineIntersects(start.lineS), bezier.lineIntersects(start.lineW), bezier.lineIntersects(start.lineE)));
+            var startT = Math.min.apply(Math, __spreadArray(__spreadArray(__spreadArray(__spreadArray([1], bezier.lineIntersects(start.lineN), false), bezier.lineIntersects(start.lineS), false), bezier.lineIntersects(start.lineW), false), bezier.lineIntersects(start.lineE), false));
             if (startT === 1)
                 startT = 0;
-            var endT = Math.max.apply(Math, __spreadArrays([0], bezier.lineIntersects(end.lineN), bezier.lineIntersects(end.lineS), bezier.lineIntersects(end.lineW), bezier.lineIntersects(end.lineE)));
+            var endT = Math.max.apply(Math, __spreadArray(__spreadArray(__spreadArray(__spreadArray([0], bezier.lineIntersects(end.lineN), false), bezier.lineIntersects(end.lineS), false), bezier.lineIntersects(end.lineW), false), bezier.lineIntersects(end.lineE), false));
             if (endT === 0)
                 endT = 1;
             // add extra margin (4x line width) for certain types of arrow tips
@@ -775,8 +777,8 @@ var DiagramElement = /** @class */ (function () {
             if (bbox.y.max + margin > bottom)
                 bottom = bbox.y.max + margin;
             // compute label positions
-            for (var _i = 0, _a = arrow.labels; _i < _a.length; _i++) {
-                var label = _a[_i];
+            for (var _h = 0, _j = arrow.labels; _h < _j.length; _h++) {
+                var label = _j[_h];
                 var jaxSize = this_1.getJaxSize(label.content);
                 label.html = label.content.render()[0].innerHTML;
                 var kh = this_1.getKatexHeight(label.html);
@@ -888,76 +890,76 @@ var DiagramElement = /** @class */ (function () {
                 return [];
             case 'to':
                 data =
-                    "M " + transform({ x: -5.4, y: 6.5 }) + " " +
-                        ("C " + transform({ x: -4.8, y: 3 }) + " ") +
-                        (transform({ x: -2, y: 1 }) + " ") +
-                        (transform({ x: 0, y: 0 }) + " ") +
-                        ("C " + transform({ x: -2, y: -1 }) + " ") +
-                        (transform({ x: -4.8, y: -3 }) + " ") +
-                        ("" + transform({ x: -5.4, y: -6.5 }));
+                    "M ".concat(transform({ x: -5.4, y: 6.5 }), " ") +
+                        "C ".concat(transform({ x: -4.8, y: 3 }), " ") +
+                        "".concat(transform({ x: -2, y: 1 }), " ") +
+                        "".concat(transform({ x: 0, y: 0 }), " ") +
+                        "C ".concat(transform({ x: -2, y: -1 }), " ") +
+                        "".concat(transform({ x: -4.8, y: -3 }), " ") +
+                        "".concat(transform({ x: -5.4, y: -6.5 }));
                 break;
             case 'To':
                 data =
-                    "M " + transform({ x: -4.5, y: 7.5 }) + " " +
-                        ("C " + transform({ x: -3, y: 4.5 }) + " ") +
-                        (transform({ x: 1.5, y: 1 }) + " ") +
-                        (transform({ x: 4.5, y: 0 }) + " ") +
-                        ("C " + transform({ x: 1.5, y: -1 }) + " ") +
-                        (transform({ x: -3, y: -4.5 }) + " ") +
-                        ("" + transform({ x: -4.5, y: -7.5 }));
+                    "M ".concat(transform({ x: -4.5, y: 7.5 }), " ") +
+                        "C ".concat(transform({ x: -3, y: 4.5 }), " ") +
+                        "".concat(transform({ x: 1.5, y: 1 }), " ") +
+                        "".concat(transform({ x: 4.5, y: 0 }), " ") +
+                        "C ".concat(transform({ x: 1.5, y: -1 }), " ") +
+                        "".concat(transform({ x: -3, y: -4.5 }), " ") +
+                        "".concat(transform({ x: -4.5, y: -7.5 }));
                 break;
             case 'two heads':
                 data =
-                    "M " + transform({ x: -5.4, y: 6.5 }) + " " +
-                        ("C " + transform({ x: -4.8, y: 3 }) + " ") +
-                        (transform({ x: -2, y: 1 }) + " ") +
-                        (transform({ x: 0, y: 0 }) + " ") +
-                        ("C " + transform({ x: -2, y: -1 }) + " ") +
-                        (transform({ x: -4.8, y: -3 }) + " ") +
-                        (transform({ x: -5.4, y: -6.5 }) + " ") +
-                        ("M " + transform({ x: -9.9, y: 6.5 }) + " ") +
-                        ("C " + transform({ x: -9.3, y: 3 }) + " ") +
-                        (transform({ x: -6.5, y: 1 }) + " ") +
-                        (transform({ x: -4.5, y: 0 }) + " ") +
-                        ("C " + transform({ x: -6.5, y: -1 }) + " ") +
-                        (transform({ x: -9.3, y: -3 }) + " ") +
-                        ("" + transform({ x: -9.9, y: -6.5 }));
+                    "M ".concat(transform({ x: -5.4, y: 6.5 }), " ") +
+                        "C ".concat(transform({ x: -4.8, y: 3 }), " ") +
+                        "".concat(transform({ x: -2, y: 1 }), " ") +
+                        "".concat(transform({ x: 0, y: 0 }), " ") +
+                        "C ".concat(transform({ x: -2, y: -1 }), " ") +
+                        "".concat(transform({ x: -4.8, y: -3 }), " ") +
+                        "".concat(transform({ x: -5.4, y: -6.5 }), " ") +
+                        "M ".concat(transform({ x: -9.9, y: 6.5 }), " ") +
+                        "C ".concat(transform({ x: -9.3, y: 3 }), " ") +
+                        "".concat(transform({ x: -6.5, y: 1 }), " ") +
+                        "".concat(transform({ x: -4.5, y: 0 }), " ") +
+                        "C ".concat(transform({ x: -6.5, y: -1 }), " ") +
+                        "".concat(transform({ x: -9.3, y: -3 }), " ") +
+                        "".concat(transform({ x: -9.9, y: -6.5 }));
                 break;
             case 'hook':
                 data =
-                    "M " + transform({ x: 0, y: 0 }) + " " +
-                        ("C " + transform({ x: 6, y: 0 }) + " ") +
-                        (transform({ x: 6, y: 5 }) + " ") +
-                        ("" + transform({ x: 0, y: 5 }));
+                    "M ".concat(transform({ x: 0, y: 0 }), " ") +
+                        "C ".concat(transform({ x: 6, y: 0 }), " ") +
+                        "".concat(transform({ x: 6, y: 5 }), " ") +
+                        "".concat(transform({ x: 0, y: 5 }));
                 break;
             case "hook'":
                 data =
-                    "M " + transform({ x: 0, y: 0 }) + " " +
-                        ("C " + transform({ x: 6, y: 0 }) + " ") +
-                        (transform({ x: 6, y: -5 }) + " ") +
-                        ("" + transform({ x: 0, y: -5 }));
+                    "M ".concat(transform({ x: 0, y: 0 }), " ") +
+                        "C ".concat(transform({ x: 6, y: 0 }), " ") +
+                        "".concat(transform({ x: 6, y: -5 }), " ") +
+                        "".concat(transform({ x: 0, y: -5 }));
                 break;
             case 'bar':
-                data = "M " + transform({ x: 0, y: 5 }) + " L " + transform({ x: 0, y: -5 });
+                data = "M ".concat(transform({ x: 0, y: 5 }), " L ").concat(transform({ x: 0, y: -5 }));
                 break;
             case 'Bar':
-                data = "M " + transform({ x: 0, y: 7.5 }) + " L " + transform({ x: 0, y: -7.5 });
+                data = "M ".concat(transform({ x: 0, y: 7.5 }), " L ").concat(transform({ x: 0, y: -7.5 }));
                 break;
             case 'harpoon':
                 data =
-                    "M " + transform({ x: -5.4, y: -6.5 }) + " " +
-                        ("C " + transform({ x: -4.8, y: -3 }) + " ") +
-                        (transform({ x: -2, y: -1 }) + " ") +
-                        (transform({ x: 0, y: 0 }) + " ") +
-                        ("L " + transform({ x: -1, y: 0 }));
+                    "M ".concat(transform({ x: -5.4, y: -6.5 }), " ") +
+                        "C ".concat(transform({ x: -4.8, y: -3 }), " ") +
+                        "".concat(transform({ x: -2, y: -1 }), " ") +
+                        "".concat(transform({ x: 0, y: 0 }), " ") +
+                        "L ".concat(transform({ x: -1, y: 0 }));
                 break;
             case "harpoon'":
                 data =
-                    "M " + transform({ x: -5.4, y: 6.5 }) + " " +
-                        ("C " + transform({ x: -4.8, y: 3 }) + " ") +
-                        (transform({ x: -2, y: 1 }) + " ") +
-                        (transform({ x: 0, y: 0 }) + " ") +
-                        ("L " + transform({ x: -1, y: 0 }));
+                    "M ".concat(transform({ x: -5.4, y: 6.5 }), " ") +
+                        "C ".concat(transform({ x: -4.8, y: 3 }), " ") +
+                        "".concat(transform({ x: -2, y: 1 }), " ") +
+                        "".concat(transform({ x: 0, y: 0 }), " ") +
+                        "L ".concat(transform({ x: -1, y: 0 }));
                 break;
         }
         if (!data)

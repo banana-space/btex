@@ -15,11 +15,13 @@
     "bezier-js": "^4.1.1",
     "jsdom": "^16.4.0",
     "katex": "^0.15.6",
-    "mathjax": "^3.2.0"
+    "mathjax": "^3.2.0",
+    "yargs": "^17.6.2"
   },
   "devDependencies": {
     "@types/jsdom": "^16.2.4",
     "@types/katex": "^0.14.0",
-    "typescript": "^4.0.5"
+    "@types/yargs": "^17.0.15",
+    "typescript": "^4.1.6"
   }
 }

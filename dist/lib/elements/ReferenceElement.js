@@ -66,7 +66,7 @@ var ReferenceElement = /** @class */ (function () {
                     fontSize = SpanElement_1.SpanElement.minFontSize;
                 if (fontSize > SpanElement_1.SpanElement.maxFontSize)
                     fontSize = SpanElement_1.SpanElement.maxFontSize;
-                styles.push("font-size:" + fontSize + "px");
+                styles.push("font-size:".concat(fontSize, "px"));
             }
             if (styles.length > 0)
                 span.setAttribute('style', styles.join(';'));

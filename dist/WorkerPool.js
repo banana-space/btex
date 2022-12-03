@@ -83,7 +83,7 @@ var WorkerPool = /** @class */ (function () {
                     var data = _b[_i];
                     worker.worker.postMessage(data);
                 }
-                console.log("[" + getTimestamp() + "] #" + id + " Timeout.");
+                console.log("[".concat(getTimestamp(), "] #").concat(id, " Timeout."));
             }
         }, 20000);
         function getTimestamp() {

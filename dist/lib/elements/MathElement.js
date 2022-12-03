@@ -91,14 +91,14 @@ var MathElement = /** @class */ (function () {
         span.classList.add(this.isInline ? 'inline-math' : 'display-math');
         var styles = [];
         if (this.style.colour && SpanElement_1.SpanElement.colourRegex.test(this.style.colour))
-            styles.push("color:#" + this.style.colour);
+            styles.push("color:#".concat(this.style.colour));
         if (this.style.fontSize && isFinite(this.style.fontSize)) {
             var fontSize = this.style.fontSize;
             if (fontSize < SpanElement_1.SpanElement.minFontSize)
                 fontSize = SpanElement_1.SpanElement.minFontSize;
             if (fontSize > SpanElement_1.SpanElement.maxFontSize)
                 fontSize = SpanElement_1.SpanElement.maxFontSize;
-            styles.push("font-size:" + fontSize + "px");
+            styles.push("font-size:".concat(fontSize, "px"));
         }
         if (this.style.classes)
             (_a = span.classList).add.apply(_a, this.style.classes.split(' '));
@@ -189,7 +189,7 @@ var MathElement = /** @class */ (function () {
             for (var _l = 0, diagrams_1 = diagrams; _l < diagrams_1.length; _l++) {
                 var diagram = diagrams_1[_l];
                 var diagramHTML = diagram.render(options)[0].outerHTML;
-                var regex = new RegExp("<span class=\"mord text\"><span class=\"mord\">" + diagram.id + "</span></span>", 'g');
+                var regex = new RegExp("<span class=\"mord text\"><span class=\"mord\">".concat(diagram.id, "</span></span>"), 'g');
                 html = html.replace(regex, diagramHTML);
                 regex = new RegExp('([^#"])' + diagram.id, 'g');
                 html = html.replace(regex, '$1');
