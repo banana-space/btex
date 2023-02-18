@@ -13,7 +13,7 @@ global['document'] = window.document;
 
 parentPort?.on('message', (value: WorkerData) => {
   work(value).then(
-    res => parentPort?.postMessage(res),
+    (res) => parentPort?.postMessage(res),
     () => {
       parentPort?.postMessage({
         taskId: value.taskId ?? 0,
@@ -23,7 +23,7 @@ parentPort?.on('message', (value: WorkerData) => {
         warnings: [],
       });
     }
-  )
+  );
 });
 
 export async function rawWork(data: WorkerData): Promise<WorkerResult> {
@@ -36,7 +36,10 @@ export async function rawWork(data: WorkerData): Promise<WorkerResult> {
   globalContext.newVariables = contextData.newVariables;
   for (let key in contextData.newCommands)
     globalContext.newCommands[key] = Command.reconstructFrom(contextData.newCommands[key]);
-  globalContext.set('__code__', data.code);
+
+  let codeString = data.code.replace(/\r\n/g, '\n');
+  globalContext.set('__code__', codeString);
+
   let context = new Context(globalContext);
 
   // Compile preamble
@@ -55,7 +58,7 @@ export async function rawWork(data: WorkerData): Promise<WorkerResult> {
     );
   }
 
-  let code = Parser.parse(data.code, 'code');
+  let code = Parser.parse(codeString, 'code');
 
   if (!data.options?.inline) {
     // prepend 2 line-breaks to start the first paragraph

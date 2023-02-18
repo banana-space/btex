@@ -28,7 +28,7 @@ export class CodeElement implements ContainerElement {
     if (this.isEmpty()) return [];
 
     if (this.isInline) {
-      this.text = this.text.replace(/\n/g, ' ');
+      this.text = this.text.replace(/\s*(\n\s*)+/g, ' ');
     }
 
     let element = document.createElement(this.isInline ? 'code' : 'pre');

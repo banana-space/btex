@@ -62,7 +62,7 @@ worker_threads_1.parentPort === null || worker_threads_1.parentPort === void 0 ?
 function rawWork(data) {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function () {
-        var globalContext, contextData, key, context, preamble, code, lineBreak, html;
+        var globalContext, contextData, key, codeString, context, preamble, code, lineBreak, html;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -75,7 +75,8 @@ function rawWork(data) {
                     globalContext.newVariables = contextData.newVariables;
                     for (key in contextData.newCommands)
                         globalContext.newCommands[key] = Command_1.Command.reconstructFrom(contextData.newCommands[key]);
-                    globalContext.set('__code__', data.code);
+                    codeString = data.code.replace(/\r\n/g, '\n');
+                    globalContext.set('__code__', codeString);
                     context = new Context_1.Context(globalContext);
                     // Compile preamble
                     if (data.preamble) {
@@ -88,7 +89,7 @@ function rawWork(data) {
                     if ((_b = data.options) === null || _b === void 0 ? void 0 : _b.equationMode) {
                         context.enterContainer(new MathElement_1.MathElement(), Token_1.Token.fromCode('$', Token_1.TokenType.Text, { line: 0, col: 0 }, { line: 0, col: 0 }));
                     }
-                    code = Parser_1.Parser.parse(data.code, 'code');
+                    code = Parser_1.Parser.parse(codeString, 'code');
                     if (!((_c = data.options) === null || _c === void 0 ? void 0 : _c.inline)) {
                         lineBreak = Token_1.Token.fromCode('\n', Token_1.TokenType.Whitespace, { line: 0, col: 0 }, { line: 0, col: 0 });
                         code.tokens.splice(0, 0, lineBreak, lineBreak);

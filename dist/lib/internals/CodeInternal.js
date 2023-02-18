@@ -4,7 +4,7 @@ exports.CodeInternal = void 0;
 var CodeElement_1 = require("../elements/CodeElement");
 exports.CodeInternal = {
     execute: function (code, context) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         var initiator = code.token;
         code.step();
         var group = code.readGroup();
@@ -12,7 +12,7 @@ exports.CodeInternal = {
         var text = '';
         if (!context.noOutput && source && group && group.tokens.length > 0) {
             var startPosition = group.tokens[0].source.start;
-            var endPosition = group.tokens[group.tokens.length - 1].source.end;
+            var endPosition = code.tokens[code.pointer - 1].source.start;
             var lines = source.split('\n');
             if (startPosition && endPosition) {
                 if (startPosition.line === endPosition.line) {
@@ -28,25 +28,26 @@ exports.CodeInternal = {
             else {
                 text = '??';
             }
-            // Remove leading and trailing empty line; remove indentation
+            // Remove leading and trailing empty lines; remove indentation
             var textLines = text.split('\n');
+            while (textLines.length > 1 && textLines[0].trim() === '')
+                textLines.splice(0, 1);
+            while (textLines.length > 1 && textLines[textLines.length - 1].trim() === '')
+                textLines.pop();
             if (textLines.length > 1) {
-                if (textLines[0].trim() === '')
-                    textLines.splice(0, 1);
-                if (textLines[textLines.length - 1].trim() === '')
-                    textLines.pop();
-                if (textLines.length > 0) {
-                    var indent = textLines.map(function (line) { var _a, _b; return line.trim() ? (_b = (_a = line.match(/^\s*/)) === null || _a === void 0 ? void 0 : _a[0].length) !== null && _b !== void 0 ? _b : 0 : 1000; });
-                    var leastIndent_1 = indent[0];
-                    for (var i = 1; i < indent.length; i++)
-                        if (indent[i] < leastIndent_1)
-                            leastIndent_1 = indent[i];
-                    textLines = textLines.map(function (line) { return (line.trim() ? line.substring(leastIndent_1) : ''); });
-                }
+                var indent = textLines.map(function (line) { var _a, _b; return line.trim() ? (_b = (_a = line.match(/^\s*/)) === null || _a === void 0 ? void 0 : _a[0].length) !== null && _b !== void 0 ? _b : 0 : 1000; });
+                var leastIndent_1 = indent[0];
+                for (var i = 1; i < indent.length; i++)
+                    if (indent[i] < leastIndent_1)
+                        leastIndent_1 = indent[i];
+                textLines = textLines.map(function (line) { return (line.trim() ? line.substring(leastIndent_1) : ''); });
                 text = textLines.join('\n');
             }
-            // Escape {, }, \, ~
-            text = text.replace(/#([{}\\~ ])/g, '$1');
+            else {
+                text = (_d = textLines[0]) !== null && _d !== void 0 ? _d : '';
+            }
+            // Escape {, }, %, \, ~
+            text = text.replace(/#([{}\\~% ])/g, '$1');
             // In display mode, do an equivalent of \@par <pre> ... </pre> \@par
             var isDisplay = context.getBoolean('code-display', false);
             var element = new CodeElement_1.CodeElement();

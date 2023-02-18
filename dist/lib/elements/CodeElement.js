@@ -24,7 +24,7 @@ var CodeElement = /** @class */ (function () {
         if (this.isEmpty())
             return [];
         if (this.isInline) {
-            this.text = this.text.replace(/\n/g, ' ');
+            this.text = this.text.replace(/\s*(\n\s*)+/g, ' ');
         }
         var element = document.createElement(this.isInline ? 'code' : 'pre');
         if (this.lang)
