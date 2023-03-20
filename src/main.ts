@@ -7,7 +7,7 @@ import { Context } from './lib/Context';
 import { RenderOptions } from './lib/Element';
 import { Parser } from './lib/Parser';
 import { WorkerPool, WorkerResult } from './WorkerPool';
-import yargs = require('yargs');
+import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 export { rawWork } from './worker';
 
@@ -51,16 +51,7 @@ function getTimestamp() {
   return new Date().toISOString().replace('T', ' ').substring(0, 19);
 }
 
-const argv = yargs(hideBin(process.argv))
-  .option('port', {
-    alias: 'p',
-    describe: 'Port to bind on',
-    default: 7200,
-    number: true,
-  }).parseSync();
-const port = argv.port;
-
-function serve() {
+function serve(port : number) {
   let requests = 0;
   let server = createServer((request, response) => {
     if (request.method !== 'POST') {
@@ -117,7 +108,15 @@ async function test() {
 }
 
 if (require.main === module) {
-  serve();
+  const argv = yargs(hideBin(process.argv))
+    .option('port', {
+      alias: 'p',
+      describe: 'Port to bind on',
+      default: 7200,
+      number: true,
+    }).parseSync();
+
+  serve(argv.port);
 
   // Uncomment to compile ./test/test.btx to ./test/test.html
   // test();
