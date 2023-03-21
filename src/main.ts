@@ -7,6 +7,7 @@ import { Context } from './lib/Context';
 import { RenderOptions } from './lib/Element';
 import { Parser } from './lib/Parser';
 import { WorkerPool, WorkerResult } from './WorkerPool';
+export { WorkerPool, WorkerResult } from './WorkerPool';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 export { rawWork } from './worker';
@@ -15,10 +16,10 @@ const window = new JSDOM().window;
 global['document'] = window.document;
 
 // Initialise context using lib/init.btx
-const globalContext = new Context();
+export const globalContext = new Context();
 Compiler.compile(Parser.parse(readFileSync(join(__dirname, '../src/lib/init.btx')).toString()), globalContext);
 
-const pool = new WorkerPool(4);
+var pool : WorkerPool | undefined = undefined;
 
 export function runWorker(
   code: string,
@@ -26,6 +27,9 @@ export function runWorker(
   options?: CompilerOptions,
   renderOptions?: RenderOptions
 ): Promise<WorkerResult> {
+  if (pool === undefined) {
+    pool = new WorkerPool(4);
+  }
   return pool.work({
     code,
     preamble,
@@ -114,8 +118,14 @@ if (require.main === module) {
       describe: 'Port to bind on',
       default: 7200,
       number: true,
+    }).option('worker', {
+      alias: 'w',
+      describe: 'Number of workers',
+      default: 4,
+      number: true
     }).parseSync();
 
+  pool = new WorkerPool(argv.worker);
   serve(argv.port);
 
   // Uncomment to compile ./test/test.btx to ./test/test.html
