@@ -35,8 +35,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.render = exports.runWorker = exports.rawWork = void 0;
+exports.render = exports.runWorker = exports.globalContext = exports.rawWork = exports.WorkerPool = void 0;
 var fs_1 = require("fs");
 var http_1 = require("http");
 var path_1 = require("path");
@@ -45,23 +48,28 @@ var Compiler_1 = require("./lib/Compiler");
 var Context_1 = require("./lib/Context");
 var Parser_1 = require("./lib/Parser");
 var WorkerPool_1 = require("./WorkerPool");
-var yargs = require("yargs");
+var WorkerPool_2 = require("./WorkerPool");
+Object.defineProperty(exports, "WorkerPool", { enumerable: true, get: function () { return WorkerPool_2.WorkerPool; } });
+var yargs_1 = __importDefault(require("yargs/yargs"));
 var helpers_1 = require("yargs/helpers");
 var worker_1 = require("./worker");
 Object.defineProperty(exports, "rawWork", { enumerable: true, get: function () { return worker_1.rawWork; } });
 var window = new jsdom_1.JSDOM().window;
 global['document'] = window.document;
 // Initialise context using lib/init.btx
-var globalContext = new Context_1.Context();
-Compiler_1.Compiler.compile(Parser_1.Parser.parse((0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../src/lib/init.btx')).toString()), globalContext);
-var pool = new WorkerPool_1.WorkerPool(4);
+exports.globalContext = new Context_1.Context();
+Compiler_1.Compiler.compile(Parser_1.Parser.parse((0, fs_1.readFileSync)((0, path_1.join)(__dirname, '../src/lib/init.btx')).toString()), exports.globalContext);
+var pool = undefined;
 function runWorker(code, preamble, options, renderOptions) {
+    if (pool === undefined) {
+        pool = new WorkerPool_1.WorkerPool(4);
+    }
     return pool.work({
         code: code,
         preamble: preamble,
         options: options,
         renderOptions: renderOptions,
-        globalContext: globalContext,
+        globalContext: exports.globalContext,
     });
 }
 exports.runWorker = runWorker;
@@ -79,15 +87,7 @@ exports.render = render;
 function getTimestamp() {
     return new Date().toISOString().replace('T', ' ').substring(0, 19);
 }
-var argv = yargs((0, helpers_1.hideBin)(process.argv))
-    .option('port', {
-    alias: 'p',
-    describe: 'Port to bind on',
-    default: 7200,
-    number: true,
-}).parseSync();
-var port = argv.port;
-function serve() {
+function serve(port) {
     var requests = 0;
     var server = (0, http_1.createServer)(function (request, response) {
         if (request.method !== 'POST') {
@@ -143,7 +143,20 @@ function test() {
     });
 }
 if (require.main === module) {
-    serve();
+    var argv = (0, yargs_1.default)((0, helpers_1.hideBin)(process.argv))
+        .option('port', {
+        alias: 'p',
+        describe: 'Port to bind on',
+        default: 7200,
+        number: true,
+    }).option('worker', {
+        alias: 'w',
+        describe: 'Number of workers',
+        default: 4,
+        number: true
+    }).parseSync();
+    pool = new WorkerPool_1.WorkerPool(argv.worker);
+    serve(argv.port);
     // Uncomment to compile ./test/test.btx to ./test/test.html
     // test();
 }
