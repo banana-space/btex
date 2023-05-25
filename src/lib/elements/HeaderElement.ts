@@ -8,7 +8,6 @@ export class HeaderElement implements ContainerElement {
   type?: string;
   hash?: string;
   numberHTML?: string;
-  noToc?: boolean;
   paragraph: ParagraphElement = new ParagraphElement();
   isInline: boolean = true;
 
@@ -22,7 +21,6 @@ export class HeaderElement implements ContainerElement {
 
   enter(context: Context, initiator: Token) {
     this.type = context.get('header-type', true);
-    this.noToc = context.getBoolean('header-no-toc', false, true);
 
     if (context.getBoolean('header-numbered', false)) {
       this.numberHTML = context.commandToHTML('\\@headernumber', initiator) ?? undefined;

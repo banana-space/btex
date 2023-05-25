@@ -9,6 +9,7 @@ import { LabelElement } from './elements/LabelElement';
 import { ReferenceElement } from './elements/ReferenceElement';
 import { RootElement } from './elements/RootElement';
 import { SpanElement } from './elements/SpanElement';
+import { TabelOfContentElement } from './elements/TableOfContentElement';
 import { VirtualElement } from './elements/VirtualElement';
 import { SubpageDeclaration } from './internals/SubpageInternal';
 import { Token, TokenType } from './Token';
@@ -74,6 +75,7 @@ export class Context {
   labels: LabelElement[] = [];
   references: ReferenceElement[] = [];
   headers: HeaderElement[] = [];
+  tableOfContents: TabelOfContentElement[] = [];
 
   // Subpages declared with \subpage
   subpages: SubpageDeclaration[] = [];
@@ -439,6 +441,14 @@ export class Context {
         (usedBookmarks[prefix] ??= []).push(id);
       }
     }
+    for (let toc of this.tableOfContents) {
+      let id = parseInt(toc.bookmarkId);
+      if (id >= 0 && id < this.bookmarks.length && !(id in inverseMap)) {
+        let prefix = this.bookmarks[id].prefix ?? '';
+        inverseMap[id] = { prefix, newId: -1 }; // newId to be assigned later
+        (usedBookmarks[prefix] ??= []).push(id);
+      }
+    }
 
     for (let prefix in usedBookmarks) usedBookmarks[prefix].sort((a, b) => a - b);
 
@@ -463,6 +473,14 @@ export class Context {
         if (map) label.bookmarkId = map.prefix + (map.newId + 1);
       }
     }
+    for (let toc of this.tableOfContents) {
+      toc.normalise();
+      if (toc.bookmarkId) {
+        let map = inverseMap[parseInt(toc.bookmarkId)];
+        // label.bookmarkId may also be a section header
+        if (map) toc.bookmarkId = map.prefix + (map.newId + 1);
+      }
+    }
   }
 
   private handleReferences() {
@@ -482,9 +500,7 @@ export class Context {
   private addTableOfContents() {
     if (this.getBoolean('g.toc-disabled', false)) return;
 
-    let headers = this.headers.filter((header) => !header.noToc);
-
-    if (headers.length > 0) {
+    if (this.tableOfContents.length > 0) {
       let toc = document.createElement('div');
       toc.classList.add('toc');
       this.root.tocRendered = toc;
@@ -501,27 +517,27 @@ export class Context {
       let ul = document.createElement('ul');
       toc.append(ul);
 
-      for (let header of headers) {
-        let level = header.type === 'h4' ? 3 : header.type === 'h3' ? 2 : 1;
+      for (let tocitem of this.tableOfContents) {
+        let level = tocitem.level;
 
         let li = document.createElement('li');
         li.classList.add('toclevel-' + level);
         ul.append(li);
 
         let a = document.createElement('a');
-        a.setAttribute('href', '#' + encodeURIComponent(header.hash ?? ''));
+        a.setAttribute('href', '#' + encodeURIComponent(tocitem.bookmarkId));
         li.append(a);
 
-        if (header.numberHTML) {
+        if (tocitem.numberHTML) {
           let tocNumber = document.createElement('span');
           tocNumber.classList.add('tocnumber');
-          tocNumber.innerHTML = header.numberHTML;
+          tocNumber.innerHTML = tocitem.numberHTML;
           a.append(tocNumber);
         }
 
         let tocText = document.createElement('span');
         tocText.classList.add('toctext');
-        header.paragraph.renderInner().map((node) => tocText.append(node));
+        tocitem.paragraph.renderInner().map((node) => tocText.append(node));
         a.append(tocText);
       }
     }

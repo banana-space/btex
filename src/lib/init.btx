@@ -323,30 +323,56 @@
     \@@exit{div}%
 }
 
-\tdef\@header#1#2{%
-    \@@set{header-type}{#1}%
-    \@par%
-    \@@enter{header}%
+\tdef\@toc#1#2{%
+    \@@set{toc-level}{#1}%
+    \@@enter{toc}%
         #2%
-    \@@exit{header}%
-    \@iftrue{header-numbered}{%
-        \@setfalse{header-numbered}%
-    }{%
-        \@@def\@currentlabel{#2}%
-    }%
-    \@par%
+    \@@exit{toc}%
 }
-\pdef\@header#1[#2]#3{%
+\tdef\toc#1{%
+    \@@enter{toc}%
+        #1%
+    \@@exit{toc}%
+}%
+
+\tdef\@header#1#2#3{%
     \@@set{header-type}{#1}%
-    \@@set{header-hash}{#2}%
     \@par%
     \@@enter{header}%
         #3%
     \@@exit{header}%
     \@iftrue{header-numbered}{%
         \@setfalse{header-numbered}%
+        \@settrue{toc-numbered}
+        \@@def\@tocnumber{\@headernumber}%
     }{%
         \@@def\@currentlabel{#3}%
+    }%
+    \@iftrue{header-no-toc}{%
+        \@setfalse{header-no-toc}%
+    }{%
+        \@toc{#2}{#3}
+    }%
+    \@par%
+}
+\pdef\@header#1#2[#3]#4{%
+    \@@set{header-type}{#1}%
+    \@@set{header-hash}{#3}%
+    \@par%
+    \@@enter{header}%
+        #4%
+    \@@exit{header}%
+    \@iftrue{header-numbered}{%
+        \@setfalse{header-numbered}%
+        \@settrue{toc-numbered}
+        \@@def\@tocnumber{\@headernumber}%
+    }{%
+        \@@def\@currentlabel{#4}%
+    }%
+    \@iftrue{header-no-toc}{%
+        \@setfalse{header-no-toc}%
+    }{%
+        \@toc{#2}{#3}
     }%
     \@par%
 }
@@ -366,12 +392,12 @@
     \refstepcounter{section}%
     \@@def\@headernumber{\thesection}%
     \@settrue{header-numbered}%
-    \@header{h2}%
+    \@header{h2}{1}%
 }
-\pdef\@section*{\@header{h2}}
+\pdef\@section*{\@header{h2}{1}}
 \pdef\@section**{%
     \@settrue{header-no-toc}%
-    \@header{h2}%
+    \@header{h2}{1}%
 }
 \pdef\@section***{\@section**}
 
@@ -379,12 +405,12 @@
     \refstepcounter{subsection}%
     \@@def\@headernumber{\thesubsection}%
     \@settrue{header-numbered}%
-    \@header{h3}%
+    \@header{h3}{2}%
 }
-\pdef\@subsection*{\@header{h3}}
+\pdef\@subsection*{\@header{h3}{2}}
 \pdef\@subsection**{%
     \@settrue{header-no-toc}%
-    \@header{h3}%
+    \@header{h3}{2}%
 }
 \pdef\@subsection***{\@subsection**}
 
@@ -392,12 +418,12 @@
     \refstepcounter{subsubsection}%
     \@@def\@headernumber{\thesubsubsection}%
     \@settrue{header-numbered}%
-    \@header{h4}%
+    \@header{h4}{3}%
 }
-\pdef\@subsubsection*{\@header{h4}}
+\pdef\@subsubsection*{\@header{h4}{3}}
 \pdef\@subsubsection**{%
     \@settrue{header-no-toc}%
-    \@header{h4}%
+    \@header{h4}{3}%
 }
 \pdef\@subsubsection***{\@subsubsection**}
 
