@@ -8,6 +8,7 @@ var ListElement_1 = require("./elements/ListElement");
 var MathElement_1 = require("./elements/MathElement");
 var ReferenceElement_1 = require("./elements/ReferenceElement");
 var TableElement_1 = require("./elements/TableElement");
+var TableOfContentElement_1 = require("./elements/TableOfContentElement");
 var TikzElement_1 = require("./elements/TikzElement");
 exports.Containers = {
     diagram: DiagramElement_1.DiagramElement,
@@ -16,6 +17,7 @@ exports.Containers = {
     list: ListElement_1.ListElement,
     math: MathElement_1.MathElement,
     table: TableElement_1.TableElement,
+    toc: TableOfContentElement_1.TabelOfContentElement,
     ref: ReferenceElement_1.ReferenceElement,
     tikz: TikzElement_1.TikzElement,
 };

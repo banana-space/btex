@@ -9,6 +9,7 @@ import { LabelElement } from './elements/LabelElement';
 import { ReferenceElement } from './elements/ReferenceElement';
 import { RootElement } from './elements/RootElement';
 import { SpanElement } from './elements/SpanElement';
+import { TabelOfContentElement } from './elements/TableOfContentElement';
 import { SubpageDeclaration } from './internals/SubpageInternal';
 import { Token } from './Token';
 /**
@@ -65,6 +66,7 @@ export declare class Context {
     labels: LabelElement[];
     references: ReferenceElement[];
     headers: HeaderElement[];
+    tableOfContents: TabelOfContentElement[];
     subpages: SubpageDeclaration[];
     subpageOfLevel: string[];
     promises: Promise<void>[];

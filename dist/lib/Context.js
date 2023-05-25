@@ -88,6 +88,7 @@ var Context = /** @class */ (function () {
         this.labels = [];
         this.references = [];
         this.headers = [];
+        this.tableOfContents = [];
         // Subpages declared with \subpage
         this.subpages = [];
         this.subpageOfLevel = [];
@@ -440,12 +441,12 @@ var Context = /** @class */ (function () {
         return this.codeToHTML(code, initiator);
     };
     Context.prototype.removeInaccessibleBookmarks = function () {
-        var _a, _b;
+        var _a, _b, _c, _d;
         // Remove bookmarks that are not assigned with a label
         var usedBookmarks = {};
         var inverseMap = {};
-        for (var _i = 0, _c = this.labels; _i < _c.length; _i++) {
-            var label = _c[_i];
+        for (var _i = 0, _e = this.labels; _i < _e.length; _i++) {
+            var label = _e[_i];
             var id = parseInt(label.bookmarkId);
             if (id >= 0 && id < this.bookmarks.length && !(id in inverseMap)) {
                 var prefix = (_a = this.bookmarks[id].prefix) !== null && _a !== void 0 ? _a : '';
@@ -453,11 +454,20 @@ var Context = /** @class */ (function () {
                 ((_b = usedBookmarks[prefix]) !== null && _b !== void 0 ? _b : (usedBookmarks[prefix] = [])).push(id);
             }
         }
+        for (var _f = 0, _g = this.tableOfContents; _f < _g.length; _f++) {
+            var toc = _g[_f];
+            var id = parseInt(toc.bookmarkId);
+            if (id >= 0 && id < this.bookmarks.length && !(id in inverseMap)) {
+                var prefix = (_c = this.bookmarks[id].prefix) !== null && _c !== void 0 ? _c : '';
+                inverseMap[id] = { prefix: prefix, newId: -1 }; // newId to be assigned later
+                ((_d = usedBookmarks[prefix]) !== null && _d !== void 0 ? _d : (usedBookmarks[prefix] = [])).push(id);
+            }
+        }
         for (var prefix in usedBookmarks)
             usedBookmarks[prefix].sort(function (a, b) { return a - b; });
         var newBookmarks = [];
-        for (var _d = 0, _e = this.bookmarks; _d < _e.length; _d++) {
-            var bookmark = _e[_d];
+        for (var _h = 0, _j = this.bookmarks; _h < _j.length; _h++) {
+            var bookmark = _j[_h];
             bookmark.isUnused = true;
         }
         for (var prefix in usedBookmarks) {
@@ -470,14 +480,24 @@ var Context = /** @class */ (function () {
             }
         }
         this.bookmarks = newBookmarks;
-        for (var _f = 0, _g = this.labels; _f < _g.length; _f++) {
-            var label = _g[_f];
+        for (var _k = 0, _l = this.labels; _k < _l.length; _k++) {
+            var label = _l[_k];
             label.normalise();
             if (label.bookmarkId) {
                 var map = inverseMap[parseInt(label.bookmarkId)];
                 // label.bookmarkId may also be a section header
                 if (map)
                     label.bookmarkId = map.prefix + (map.newId + 1);
+            }
+        }
+        for (var _m = 0, _o = this.tableOfContents; _m < _o.length; _m++) {
+            var toc = _o[_m];
+            toc.normalise();
+            if (toc.bookmarkId) {
+                var map = inverseMap[parseInt(toc.bookmarkId)];
+                // label.bookmarkId may also be a section header
+                if (map)
+                    toc.bookmarkId = map.prefix + (map.newId + 1);
             }
         }
     };
@@ -498,11 +518,10 @@ var Context = /** @class */ (function () {
         }
     };
     Context.prototype.addTableOfContents = function () {
-        var _a, _b;
+        var _a;
         if (this.getBoolean('g.toc-disabled', false))
             return;
-        var headers = this.headers.filter(function (header) { return !header.noToc; });
-        if (headers.length > 0) {
+        if (this.tableOfContents.length > 0) {
             var toc = document.createElement('div');
             toc.classList.add('toc');
             this.root.tocRendered = toc;
@@ -513,28 +532,28 @@ var Context = /** @class */ (function () {
             toc.append(tocTitle);
             var ul = document.createElement('ul');
             toc.append(ul);
-            var _loop_1 = function (header) {
-                var level = header.type === 'h4' ? 3 : header.type === 'h3' ? 2 : 1;
+            var _loop_1 = function (tocitem) {
+                var level = tocitem.level;
                 var li = document.createElement('li');
                 li.classList.add('toclevel-' + level);
                 ul.append(li);
                 var a = document.createElement('a');
-                a.setAttribute('href', '#' + encodeURIComponent((_b = header.hash) !== null && _b !== void 0 ? _b : ''));
+                a.setAttribute('href', '#' + encodeURIComponent(tocitem.bookmarkId));
                 li.append(a);
-                if (header.numberHTML) {
+                if (tocitem.numberHTML) {
                     var tocNumber = document.createElement('span');
                     tocNumber.classList.add('tocnumber');
-                    tocNumber.innerHTML = header.numberHTML;
+                    tocNumber.innerHTML = tocitem.numberHTML;
                     a.append(tocNumber);
                 }
                 var tocText = document.createElement('span');
                 tocText.classList.add('toctext');
-                header.paragraph.renderInner().map(function (node) { return tocText.append(node); });
+                tocitem.paragraph.renderInner().map(function (node) { return tocText.append(node); });
                 a.append(tocText);
             };
-            for (var _i = 0, headers_1 = headers; _i < headers_1.length; _i++) {
-                var header = headers_1[_i];
-                _loop_1(header);
+            for (var _i = 0, _b = this.tableOfContents; _i < _b.length; _i++) {
+                var tocitem = _b[_i];
+                _loop_1(tocitem);
             }
         }
     };

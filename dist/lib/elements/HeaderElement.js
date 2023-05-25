@@ -17,7 +17,6 @@ var HeaderElement = /** @class */ (function () {
     HeaderElement.prototype.enter = function (context, initiator) {
         var _a;
         this.type = context.get('header-type', true);
-        this.noToc = context.getBoolean('header-no-toc', false, true);
         if (context.getBoolean('header-numbered', false)) {
             this.numberHTML = (_a = context.commandToHTML('\\@headernumber', initiator)) !== null && _a !== void 0 ? _a : undefined;
         }
