@@ -50,7 +50,7 @@ export class ParagraphElement implements RenderElement {
     }
 
     // Insert spaces between CJK and letters, etc.
-    let prevType: 'space' | 'letter' | 'cjk' | 'punct' | 'cjk-punct' | 'other' = 'space';
+    let prevType: 'space' | 'letter' | 'han' | 'jk' | 'punct' | 'cjk-punct' | 'other' = 'space';
     let prevText: TextNode | undefined = undefined;
     let first = '',
       last = '';
@@ -67,9 +67,9 @@ export class ParagraphElement implements RenderElement {
           // Adjacent spaces are merged into one
           if (prevType === 'space' || prevType === 'cjk-punct') newText = newText.trimStart();
 
-          // Disallow spacing between cjk characters
+          // Disallow spacing between han characters
           // But preserve spaces at end as refs may follow
-          if (prevType === 'cjk') {
+          if (prevType === 'han') {
             if (nextText && /^\s+/.test(newText)) {
               newText = newText.trimStart();
               spaceAfterCjk = true;
@@ -87,15 +87,17 @@ export class ParagraphElement implements RenderElement {
             spaceBeforeCjk = false;
           }
 
-          // Spacing between letters and CJK characters
+          // Spacing between letters and han characters
           if (
-            (prevType === 'letter' || prevType === 'punct') &&
-            /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText)
+            (prevType === 'letter' && /^\p{sc=Hani}/u.test(newText)) ||
+            (prevType === 'punct' &&
+              /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText))
           )
             newText = ' ' + newText;
           if (
-            prevType === 'cjk' &&
-            /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{#%&*§¶'"‘“\uedae\uedaf]/u.test(newText)
+            (prevType === 'han' &&
+              /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{#%&*§¶'"‘“\uedae\uedaf]/u.test(newText)) ||
+            (prevType === 'jk' && /^[\(\[\{‘“]/u.test(newText))
           ) {
             if (prevText) prevText.text += ' ';
             else newText = ' ' + newText;
@@ -109,9 +111,11 @@ export class ParagraphElement implements RenderElement {
               prevType = 'space';
             } else if (/[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\uedae\uedaf]$/u.test(newText)) {
               prevType = 'letter';
-            } else if (/[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
-              prevType = 'cjk';
+            } else if (/\p{sc=Hani}$/u.test(newText)) {
+              prevType = 'han';
               spaceAfterCjk = false;
+            } else if (/[\p{sc=Hang}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
+              prevType = 'jk';
             } else if (/[\)\]\},.!#%&*§¶;:?'"’”\u2026]$/.test(newText)) {
               prevType = 'punct';
             } else if (/[\u3000-\u301f\uff00-\uff60\uff64]$/.test(newText)) {
@@ -125,7 +129,7 @@ export class ParagraphElement implements RenderElement {
                 !/^[\)\]\},.!;:?’”\u2026\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}\u3000-\u301f\uff00-\uff60\uff64]/u.test(
                   newText
                 )) ||
-              (spaceBeforeCjk && prevType === 'cjk')
+              (spaceBeforeCjk && prevType === 'han')
             ) {
               newText = ' ' + newText;
               spaceBeforeCjk = spaceAfterCjk = false;
@@ -149,14 +153,14 @@ export class ParagraphElement implements RenderElement {
             if (childType) {
               if (
                 prevText &&
-                ((prevType === 'letter' && childType.first === 'cjk') ||
-                  (prevType === 'cjk' && childType.first === 'letter'))
+                ((prevType === 'letter' && childType.first === 'han') ||
+                  (prevType === 'han' && childType.first === 'letter'))
               )
                 prevText.text += ' ';
 
               prevType = childType.last as typeof prevType;
             } else {
-              if (prevType === 'cjk' && prevText) prevText.text += ' ';
+              if (prevType === 'han' && prevText) prevText.text += ' ';
               prevType = 'letter';
             }
           } else {
