@@ -60,9 +60,9 @@ var ParagraphElement = /** @class */ (function () {
                     // Adjacent spaces are merged into one
                     if (prevType === 'space' || prevType === 'cjk-punct')
                         newText = newText.trimStart();
-                    // Disallow spacing between cjk characters
+                    // Disallow spacing between han characters
                     // But preserve spaces at end as refs may follow
-                    if (prevType === 'cjk') {
+                    if (prevType === 'han') {
                         if (nextText && /^\s+/.test(newText)) {
                             newText = newText.trimStart();
                             spaceAfterCjk = true;
@@ -80,12 +80,14 @@ var ParagraphElement = /** @class */ (function () {
                     else {
                         spaceBeforeCjk = false;
                     }
-                    // Spacing between letters and CJK characters
-                    if ((prevType === 'letter' || prevType === 'punct') &&
-                        /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText))
+                    // Spacing between letters and han characters
+                    if ((prevType === 'letter' && /^\p{sc=Hani}/u.test(newText)) ||
+                        (prevType === 'punct' &&
+                            /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(newText)))
                         newText = ' ' + newText;
-                    if (prevType === 'cjk' &&
-                        /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{#%&*§¶'"‘“\uedae\uedaf]/u.test(newText)) {
+                    if ((prevType === 'han' &&
+                        /^[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\(\[\{#%&*§¶'"‘“\uedae\uedaf]/u.test(newText)) ||
+                        (prevType === 'jk' && /^[\(\[\{‘“]/u.test(newText))) {
                         if (prevText)
                             prevText.text += ' ';
                         else
@@ -100,9 +102,12 @@ var ParagraphElement = /** @class */ (function () {
                         else if (/[\p{Ll}\p{Lu}\p{Nd}\p{Mn}\uedae\uedaf]$/u.test(newText)) {
                             prevType = 'letter';
                         }
-                        else if (/[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
-                            prevType = 'cjk';
+                        else if (/\p{sc=Hani}$/u.test(newText)) {
+                            prevType = 'han';
                             spaceAfterCjk = false;
+                        }
+                        else if (/[\p{sc=Hang}\p{sc=Hira}\p{sc=Kana}]$/u.test(newText)) {
+                            prevType = 'jk';
                         }
                         else if (/[\)\]\},.!#%&*§¶;:?'"’”\u2026]$/.test(newText)) {
                             prevType = 'punct';
@@ -115,7 +120,7 @@ var ParagraphElement = /** @class */ (function () {
                         }
                         if ((spaceAfterCjk &&
                             !/^[\)\]\},.!;:?’”\u2026\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}\u3000-\u301f\uff00-\uff60\uff64]/u.test(newText)) ||
-                            (spaceBeforeCjk && prevType === 'cjk')) {
+                            (spaceBeforeCjk && prevType === 'han')) {
                             newText = ' ' + newText;
                             spaceBeforeCjk = spaceAfterCjk = false;
                         }
@@ -138,13 +143,13 @@ var ParagraphElement = /** @class */ (function () {
                         var childType = child.spacingType;
                         if (childType) {
                             if (prevText &&
-                                ((prevType === 'letter' && childType.first === 'cjk') ||
-                                    (prevType === 'cjk' && childType.first === 'letter')))
+                                ((prevType === 'letter' && childType.first === 'han') ||
+                                    (prevType === 'han' && childType.first === 'letter')))
                                 prevText.text += ' ';
                             prevType = childType.last;
                         }
                         else {
-                            if (prevType === 'cjk' && prevText)
+                            if (prevType === 'han' && prevText)
                                 prevText.text += ' ';
                             prevType = 'letter';
                         }
