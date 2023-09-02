@@ -52,7 +52,7 @@ var ReferenceElement = /** @class */ (function () {
         return false;
     };
     ReferenceElement.prototype.render = function (options) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         var span = document.createElement('span');
         var styles = [];
         if (this.style) {
@@ -99,7 +99,7 @@ var ReferenceElement = /** @class */ (function () {
             // Handle [[$\mathbb{Z}$]] etc.
             var tempParagraph = this.paragraph.clone();
             if (this.pageSuffix) {
-                var noSpace = ((_a = this.spacingType) === null || _a === void 0 ? void 0 : _a.last) === 'cjk' &&
+                var noSpace = (((_a = this.spacingType) === null || _a === void 0 ? void 0 : _a.last) === 'han' || ((_b = this.spacingType) === null || _b === void 0 ? void 0 : _b.last) === 'jk') &&
                     /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(this.pageSuffix);
                 var span_1 = new SpanElement_1.SpanElement();
                 if (!noSpace)
@@ -124,7 +124,7 @@ var ReferenceElement = /** @class */ (function () {
             return [span];
         }
         else {
-            var isCategory = (((_b = this.page) === null || _b === void 0 ? void 0 : _b.startsWith('分类:')) || ((_c = this.page) === null || _c === void 0 ? void 0 : _c.startsWith('Category:'))) && this.inferPage;
+            var isCategory = (((_c = this.page) === null || _c === void 0 ? void 0 : _c.startsWith('分类:')) || ((_d = this.page) === null || _d === void 0 ? void 0 : _d.startsWith('Category:'))) && this.inferPage;
             var link = document.createElement('btex-link');
             if (this.key)
                 link.setAttribute('data-key', this.key);

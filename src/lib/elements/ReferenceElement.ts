@@ -115,7 +115,7 @@ export class ReferenceElement implements ContainerElement {
       let tempParagraph = this.paragraph.clone();
       if (this.pageSuffix) {
         let noSpace =
-          this.spacingType?.last === 'cjk' &&
+          (this.spacingType?.last === 'han' || this.spacingType?.last === 'jk') &&
           /^[\p{sc=Hang}\p{sc=Hani}\p{sc=Hira}\p{sc=Kana}]/u.test(this.pageSuffix);
 
         let span = new SpanElement();
