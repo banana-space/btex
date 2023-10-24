@@ -909,6 +909,7 @@
 
 
 % ==========           TABLES           ==========
+\newcounter{table}
 
 \envdef{@table}{#1#2}{%
     \@ifmmode{%
@@ -969,6 +970,46 @@
 }
 
 \envdef{equation*}{}{\[}{\]}
+
+
+% ==========           FIGURES          ==========
+
+\newcounter{figure}
+\envdef{figure}{}{%
+    \@par\@@enter{figure}%
+    \@settrue{caption-in-figure}
+}{%
+    \@setfalse{caption-in-figure}
+    \@@exit{figure}\@par%
+}
+
+\def\@includegraphics[#1]#2{
+    \@@set{image-options}{#1}
+    \@@set{image-source}{#2}
+    \@@enter{image}
+    \@@exit{image}
+}
+
+\def\includegraphics{
+    \@includegraphics    
+}
+
+\def\caption#1{
+    \@@enter{caption}
+    \@iftrue{caption-in-figure}{
+        \@inc{g.ctr-figure}
+        \figname\thefigure #1
+    }
+    \@iftrue{caption-in-table}{
+        \@inc{g.ctr-table}
+        \tablename\thetable #1
+    }
+    \@@exit{caption}
+}
+
+
+
+
 
 
 % ==========           TIKZ             ==========
@@ -1342,6 +1383,8 @@
 \def\proofname{证明}
 \def\refname{参考文献}
 \def\tocname{目录}
+\def\figname{图}
+\def\tablename{表}
 
 \def\@english{%
     \@@def\theoremname{Theorem}%
@@ -1355,6 +1398,8 @@
     \@@def\proofname{Proof}%
     \@@def\refname{References}%
     \@@def\tocname{Contents}%
+    \@@def\figname{Figure}
+    \@@def\tablename{Table}
 }
 
 \def\english{\setlanguage{en}\@english}
