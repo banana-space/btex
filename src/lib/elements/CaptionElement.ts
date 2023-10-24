@@ -30,8 +30,14 @@ export class CaptionElement implements ContainerElement {
     this.isInTable = context.getBoolean('caption-in-table', false);
   }
 
-  event(name: string, context: Context, initiator: Token) {
-    context.throw('UNKNOWN_EVENT', initiator, name);
+  event(arg: string, context: Context, initiator: Token) {
+    switch(arg)
+    {
+      case 'par':
+        context.throw('NO_PARAGRAPHS_IN_INLINE_MODE', initiator);
+        return false;
+    }
+    context.throw('UNKNOWN_EVENT', initiator, arg);
     return false;
   }
 

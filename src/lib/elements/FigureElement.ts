@@ -27,8 +27,12 @@ export class FigureElement implements ContainerElement {
    // do nothing
   }
 
-  event(name: string, context: Context, initiator: Token) {
-    context.throw('UNKNOWN_EVENT', initiator, name);
+  event(arg: string, context: Context, initiator: Token) {
+    switch(arg){
+      case 'par':
+        return true;
+    }
+    context.throw('UNKNOWN_EVENT', initiator, arg);
     return false;
   }
 

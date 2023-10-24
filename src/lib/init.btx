@@ -975,12 +975,15 @@
 % ==========           FIGURES          ==========
 
 \newcounter{figure}
+
 \envdef{figure}{}{%
-    \@par\@@enter{figure}%
+    \@par%
+    \@@enter{figure}%
     \@settrue{caption-in-figure}
 }{%
     \@setfalse{caption-in-figure}
-    \@@exit{figure}\@par%
+    \@@exit{figure}%
+    \@par%
 }
 
 \def\@includegraphics[#1]#2{
@@ -990,8 +993,12 @@
     \@@exit{image}
 }
 
-\def\includegraphics{
-    \@includegraphics    
+\def\includegraphics#1{
+    \@includegraphics[]{#1}   
+}
+
+\def\includegraphics[#1]#2{
+    \@includegraphics[#1]#2
 }
 
 \def\caption#1{
