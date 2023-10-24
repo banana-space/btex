@@ -7,8 +7,9 @@ import { ParagraphElement } from './ParagraphElement';
 export class CaptionElement implements ContainerElement {
   name: 'caption' = 'caption';
   paragraph: ParagraphElement = new ParagraphElement();
-  inFigure: Boolean = false;
-  inTable: Boolean = false;
+  isInline: boolean = true;
+  isInFigure: boolean = false;
+  isInTable: boolean = false;
 
   constructor() {}
 
@@ -25,9 +26,8 @@ export class CaptionElement implements ContainerElement {
   }
 
   enter(context: Context, initiator: Token): void {
-   // do nothing
-   this.inFigure = context.getBoolean('caption-in-figure', true);
-   this.inTable = context.getBoolean('caption-in-table', true);
+    this.isInFigure = context.getBoolean('caption-in-figure', false);
+    this.isInTable = context.getBoolean('caption-in-table', false);
   }
 
   event(name: string, context: Context, initiator: Token) {
@@ -36,17 +36,17 @@ export class CaptionElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): HTMLElement[] {
-    var caption: HTMLElement = new HTMLElement();
-    if(this.inFigure)
-    {
+    var caption: HTMLElement;
+    if(this.isInFigure){
       caption = document.createElement('figcaption');
     }
-    else if(this.inTable)
+    else if(this.isInTable)
     {
       caption = document.createElement('caption');
     }
-    else{
-      throw Error('Invalid envriont to use caption');
+    else
+    {
+      throw Error('unknown env');
     }
     caption.append(...this.paragraph.renderInner(options));
     return [caption]

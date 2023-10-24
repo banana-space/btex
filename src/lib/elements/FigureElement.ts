@@ -7,7 +7,7 @@ import { ParagraphElement } from './ParagraphElement';
 export class FigureElement implements ContainerElement {
   name: 'figure' = 'figure';
   paragraph: ParagraphElement = new ParagraphElement();
-  isInline: boolean = true;
+  isInline: boolean = false;
 
   constructor() {}
 

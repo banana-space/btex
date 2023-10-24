@@ -998,11 +998,11 @@
     \@@enter{caption}
     \@iftrue{caption-in-figure}{
         \@inc{g.ctr-figure}
-        \figname\thefigure #1
+        \figname\thefigure\ #1
     }
     \@iftrue{caption-in-table}{
         \@inc{g.ctr-table}
-        \tablename\thetable #1
+        \tablename\thetable\ #1
     }
     \@@exit{caption}
 }
