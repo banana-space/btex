@@ -986,20 +986,23 @@
     \@par%
 }
 
-\def\@includegraphics[#1]#2{
+\def\@includegraphics#1{
+    \@@set{image-source}{#1}
+    \@@enter{image}
+    \@@exit{image}
+}
+
+\pdef\@includegraphics[#1]#2{
     \@@set{image-options}{#1}
     \@@set{image-source}{#2}
     \@@enter{image}
     \@@exit{image}
 }
 
-\def\includegraphics#1{
-    \@includegraphics[]{#1}   
+\def\includegraphics{
+    \@includegraphics
 }
 
-\def\includegraphics[#1]#2{
-    \@includegraphics[#1]#2
-}
 
 \def\caption#1{
     \@@enter{caption}
