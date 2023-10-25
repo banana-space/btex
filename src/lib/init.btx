@@ -1007,11 +1007,11 @@
 \def\caption#1{
     \@@enter{caption}
     \@iftrue{caption-in-figure}{
-        \@inc{g.ctr-figure}
+        \refstepcounter{figure}
         \figname\thefigure\ #1
     }
     \@iftrue{caption-in-table}{
-        \@inc{g.ctr-table}
+        \refstepcounter{table}
         \tablename\thetable\ #1
     }
     \@@exit{caption}
