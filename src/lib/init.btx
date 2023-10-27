@@ -977,7 +977,7 @@
 \newcounter{figure}
 
 \envdef{figure}{}{%
-    \@par%
+    \begin{center}
     \@@enter{figure}%
     \@@def\@currentlabel{\thefigure}%
     \@@bmk% make a dummy book mark whose id will be passed to img
@@ -985,7 +985,7 @@
 }{%
     \@setfalse{caption-in-figure}
     \@@exit{figure}%
-    \@par%
+    \end{center}
 }
 
 \def\@includegraphics#1{
@@ -1010,11 +1010,11 @@
     \@@enter{caption}
     \@iftrue{caption-in-figure}{
         \@inc{g.ctr-figure}
-        \figname\thefigure\ #1
+        \@bf\@rm\figname\thefigure.\@md\ #1
     }
     \@iftrue{caption-in-table}{
-        % \refstepcounter{table}
-        \tablename\thetable\ #1
+        \@inc{g.ctr-table}
+        \@bf\@rm\tablename\thetable.\@md\ #1
     }
     \@@exit{caption}
 }
