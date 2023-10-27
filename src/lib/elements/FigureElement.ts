@@ -1,10 +1,11 @@
 import { options, string } from 'yargs';
 import { Context } from '../Context';
-import { ContainerElement, RenderOptions } from '../Element';
+import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
 import { ParagraphElement } from './ParagraphElement';
 import { BookmarkElement } from './BookmarkElement';
 import { ImageElement } from './ImageElement';
+import { CaptionElement } from './CaptionElement';
 
 export class FigureElement implements ContainerElement {
   name: 'figure' = 'figure';
@@ -41,20 +42,30 @@ export class FigureElement implements ContainerElement {
   render(options?: RenderOptions): HTMLElement[] {
     let fig = document.createElement('figure');
     let imageId = '';
+    let imageChild = new ImageElement;
+    var captionChild: CaptionElement | undefined = undefined;
     for (let child of this.paragraph.children)
     {
       if (child instanceof BookmarkElement && !child.isUnused)
       {
         imageId = (child.prefix ?? '') + (child.id + 1);
-        child.isUnused = true; // remove this explicit bookmark
       }
 
-      if(child instanceof ImageElement)
+      else if(child instanceof ImageElement)
       {
-        child.setId(imageId); // pass the bookmark id to image
+        imageChild = child;
+        imageChild.setId(imageId);
+      }
+      else if(child instanceof CaptionElement)
+      {
+        captionChild = child;
       }
     }
-
+    if(captionChild)
+      this.paragraph.children = [imageChild, captionChild];
+    else
+      this.paragraph.children = [imageChild];
+    // always reorder so that caption is placed after img
     fig.append(...this.paragraph.renderInner(options));
     return [fig]
   }
