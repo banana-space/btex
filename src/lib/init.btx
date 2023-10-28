@@ -911,6 +911,18 @@
 % ==========           TABLES           ==========
 \newcounter{table}
 
+\envdef{table}{}{%
+    \begin{center}
+    \@@enter{table_wrapper}%
+    \@@def\@currentlabel{\thetable}%
+    \@@bmk% make a dummy book mark whose id will be passed to table
+    \@settrue{caption-in-table}
+}{%
+    \@setfalse{caption-in-table}
+    \@@exit{table_wrapper}%
+    \end{center}
+}
+
 \envdef{@table}{#1#2}{%
     \@ifmmode{%
         \@@throw{TABLE_IN_MATH_MODE}%
@@ -924,7 +936,7 @@
     \@pdef\\\\{\@u000a}%
     \@tdef\hline{}%
     #2%
-    \@@enter{table}%
+    \@@enter{table}% html table element
     \@cellopt%
 }{%
     \@@exit{table}%

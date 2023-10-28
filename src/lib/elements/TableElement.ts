@@ -1,6 +1,7 @@
 import { Context } from '../Context';
 import { ContainerElement, RenderElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
+import { CaptionElement } from './CaptionElement';
 import { ParagraphElement } from './ParagraphElement';
 
 export class TableElement implements ContainerElement {
@@ -11,6 +12,8 @@ export class TableElement implements ContainerElement {
   paragraph: ParagraphElement = new ParagraphElement();
   isInline: boolean = false;
   isPlain: boolean = false;
+  caption?: CaptionElement = undefined;
+  id?: string = undefined;
 
   // current cell
   row: number = 0;
@@ -132,6 +135,16 @@ export class TableElement implements ContainerElement {
         let content = row[c].renderInner();
         td.append(...content);
       }
+    }
+
+    if(this.caption)
+    {
+      table.append(...this.caption.render(options));
+    }
+    
+    if(this.id)
+    {
+      table.setAttribute('id', this.id);
     }
 
     return [div];

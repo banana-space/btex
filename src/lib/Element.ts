@@ -10,6 +10,7 @@ import { MathElement } from './elements/MathElement';
 import { ParagraphElement } from './elements/ParagraphElement';
 import { ReferenceElement } from './elements/ReferenceElement';
 import { TableElement } from './elements/TableElement';
+import { TableWrapperElement } from './elements/TableWrapperElement';
 import { TabelOfContentElement } from './elements/TableOfContentElement';
 import { TikzElement } from './elements/TikzElement';
 import { Token } from './Token';
@@ -55,6 +56,7 @@ export const Containers: { [name: string]: ContainerConstructor } = {
   list: ListElement,
   math: MathElement,
   table: TableElement,
+  table_wrapper: TableWrapperElement,
   toc: TabelOfContentElement,
   ref: ReferenceElement,
   tikz: TikzElement,
