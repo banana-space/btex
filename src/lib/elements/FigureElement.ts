@@ -54,7 +54,8 @@ export class FigureElement implements ContainerElement {
       else if(child instanceof ImageElement)
       {
         imageChild = child;
-        imageChild.setId(imageId);
+        if(imageId)
+          imageChild.id = imageId;
       }
       else if(child instanceof CaptionElement)
       {

@@ -20,10 +20,6 @@ export class ImageElement implements ContainerElement {
     return (!this.source);
   }
 
-  setId(str_id:string){
-    this.id = str_id;
-  }
-
   normalise() {
     this.paragraph.normalise();
   }
