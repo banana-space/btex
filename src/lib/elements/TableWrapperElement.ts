@@ -39,41 +39,55 @@ export class TableWrapperElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): HTMLElement[] {
+    let div = document.createElement('div');
+    div.classList.add('table-wrapper');
 
     var captionChild: CaptionElement | undefined = undefined;
     var tableChild: TableElement | undefined = undefined;
     let tableId = '';
+    var newChildren: RenderElement[] = [];
+
     for (let child of this.paragraph.children)
     {
       if(child instanceof CaptionElement)
       {
         captionChild = child;
+        // caption is added to table
       }
-      
-      if(child instanceof TableElement)
+      else if(child instanceof TableElement)
       {
         tableChild = child;
+        newChildren.push(tableChild);
       }
-
-      if(child instanceof BookmarkElement && !child.isUnused)
+      else if(child instanceof BookmarkElement && !child.isUnused)
       {
         tableId = (child.prefix ?? '') + (child.id + 1);
+        child.isUnused = true;
+        div.setAttribute('id', tableId);
       }
-    }
-
-    if(captionChild != undefined && tableChild != undefined)
-    {
-      tableChild.caption = captionChild;
+      else
+      {
+        newChildren.push(child);
+      }
     }
 
     if(tableChild){
-      if(tableId)
+      if(captionChild)
       {
-        tableChild.id = tableId;
+        tableChild.caption = captionChild;
       }
-      return tableChild.render(options);
     }
+    else if(captionChild)
+    {
+      // when no table but with caption
+      // create an empty table child to cantain the caption
+      let table = new TableElement();
+      table.caption = captionChild;
+      newChildren.push(table);
+    }
+    this.paragraph.children = newChildren;
+    div.append(...this.paragraph.renderInner(options));
     
-    return [];
+    return [div];
   }
 }

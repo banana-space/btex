@@ -12,7 +12,6 @@ export class ImageElement implements ContainerElement {
   imageOptions?: string;
   width?:string;
   height?:string;
-  id?:string; // stores bookmark if any label refered to this image
 
   constructor() {}
 
@@ -68,10 +67,6 @@ export class ImageElement implements ContainerElement {
         img.setAttribute('width', this.width);
       if(this.height)
         img.setAttribute('height', this.height);
-    }
-    if(this.id)
-    {
-      img.setAttribute('id', this.id);
     }
     return [img];
   }

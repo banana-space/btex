@@ -41,6 +41,7 @@ export class FigureElement implements ContainerElement {
 
   render(options?: RenderOptions): HTMLElement[] {
     let fig = document.createElement('figure');
+    fig.classList.add('btex-figure');
     let imageId = '';
     let imageChild = new ImageElement;
     var captionChild: CaptionElement | undefined = undefined;
@@ -49,24 +50,10 @@ export class FigureElement implements ContainerElement {
       if (child instanceof BookmarkElement && !child.isUnused)
       {
         imageId = (child.prefix ?? '') + (child.id + 1);
-      }
-
-      else if(child instanceof ImageElement)
-      {
-        imageChild = child;
-        if(imageId)
-          imageChild.id = imageId;
-      }
-      else if(child instanceof CaptionElement)
-      {
-        captionChild = child;
+        child.isUnused = true; // pass the id to figure and remove bmk element
+        fig.setAttribute('id', imageId);
       }
     }
-    if(captionChild)
-      this.paragraph.children = [imageChild, captionChild];
-    else
-      this.paragraph.children = [imageChild];
-    // always reorder so that caption is placed after img
     fig.append(...this.paragraph.renderInner(options));
     return [fig]
   }

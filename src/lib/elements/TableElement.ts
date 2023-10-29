@@ -88,12 +88,8 @@ export class TableElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): HTMLElement[] {
-    let div = document.createElement('div');
-    div.classList.add('table-wrapper');
-
     let table = document.createElement('table');
     if (!this.isPlain) table.classList.add('wikitable');
-    div.append(table);
 
     let tbody = document.createElement('tbody');
     table.append(tbody);
@@ -147,6 +143,6 @@ export class TableElement implements ContainerElement {
       table.setAttribute('id', this.id);
     }
 
-    return [div];
+    return [table];
   }
 }
