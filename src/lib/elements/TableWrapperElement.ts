@@ -39,8 +39,9 @@ export class TableWrapperElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): HTMLElement[] {
-    let div = document.createElement('div');
-    div.classList.add('table-wrapper');
+    // we use <figure> as container of <table> 
+    let fig = document.createElement('figure');
+    fig.classList.add('table-wrapper');
 
     var captionChild: CaptionElement | undefined = undefined;
     var tableChild: TableElement | undefined = undefined;
@@ -63,7 +64,7 @@ export class TableWrapperElement implements ContainerElement {
       {
         tableId = (child.prefix ?? '') + (child.id + 1);
         child.isUnused = true;
-        div.setAttribute('id', tableId);
+        fig.setAttribute('id', tableId);
       }
       else
       {
@@ -71,23 +72,12 @@ export class TableWrapperElement implements ContainerElement {
       }
     }
 
-    if(tableChild){
-      if(captionChild)
-      {
-        tableChild.caption = captionChild;
-      }
-    }
-    else if(captionChild)
-    {
-      // when no table but with caption
-      // create an empty table child to cantain the caption
-      let table = new TableElement();
-      table.caption = captionChild;
-      newChildren.push(table);
-    }
+    // always place caption at the end if any
+    if(captionChild)
+      newChildren.push(captionChild);
     this.paragraph.children = newChildren;
-    div.append(...this.paragraph.renderInner(options));
+    fig.append(...this.paragraph.renderInner(options));
     
-    return [div];
+    return [fig];
   }
 }

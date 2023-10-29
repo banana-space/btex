@@ -45,15 +45,27 @@ export class FigureElement implements ContainerElement {
     let imageId = '';
     let imageChild = new ImageElement;
     var captionChild: CaptionElement | undefined = undefined;
+    var newChildren: RenderElement[] = [];
     for (let child of this.paragraph.children)
     {
       if (child instanceof BookmarkElement && !child.isUnused)
       {
         imageId = (child.prefix ?? '') + (child.id + 1);
-        child.isUnused = true; // pass the id to figure and remove bmk element
         fig.setAttribute('id', imageId);
       }
+      else if (child instanceof CaptionElement)
+      {
+        captionChild = child;
+      }
+      else 
+      {
+        newChildren.push(child);
+      }
     }
+    // always place caption at the end if any
+    if(captionChild)
+      newChildren.push(captionChild);
+    this.paragraph.children = newChildren;
     fig.append(...this.paragraph.renderInner(options));
     return [fig]
   }
