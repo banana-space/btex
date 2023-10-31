@@ -912,15 +912,16 @@
 \newcounter{table}
 
 \envdef{table}{}{%
-    \begin{center}
-    \@@enter{table_wrapper}%
+    \@begingroup%
+    \@@set{par-align}{center}%
+    \@@enter{figure}%
     \@@def\@currentlabel{\thetable}%
     \@@bmk% make a dummy book mark whose id will be passed to table
     \@settrue{caption-in-table}
 }{%
     \@setfalse{caption-in-table}
-    \@@exit{table_wrapper}%
-    \end{center}
+    \@@exit{figure}%
+    \@endgroup
 }
 
 \envdef{@table}{#1#2}{%
@@ -989,7 +990,8 @@
 \newcounter{figure}
 
 \envdef{figure}{}{%
-    \begin{center}
+    \@begingroup%
+    \@@set{par-align}{center}%
     \@@enter{figure}%
     \@@def\@currentlabel{\thefigure}%
     \@@bmk% make a dummy book mark whose id will be passed to img
@@ -997,7 +999,7 @@
 }{%
     \@setfalse{caption-in-figure}
     \@@exit{figure}%
-    \end{center}
+    \@endgroup
 }
 
 \def\@includegraphics#1{

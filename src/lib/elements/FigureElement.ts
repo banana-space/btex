@@ -11,6 +11,7 @@ export class FigureElement implements ContainerElement {
   name: 'figure' = 'figure';
   paragraph: ParagraphElement = new ParagraphElement();
   isInline: boolean = false;
+  textAlign: string = 'center'; 
 
   constructor() {}
 
@@ -27,7 +28,13 @@ export class FigureElement implements ContainerElement {
   }
 
   enter(context: Context, initiator: Token): void {
-   // do nothing
+    let align = context.get('par-align');
+    if (context) {
+      let textAlign = context.get('par-align');
+      if (textAlign && /^(left|center|centre|right|justify)$/.test(textAlign)) {
+        this.textAlign = textAlign.replace('centre', 'center');
+      }
+    }
   }
 
   event(arg: string, context: Context, initiator: Token) {
@@ -40,7 +47,14 @@ export class FigureElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): HTMLElement[] {
+    let div = document.createElement('div');
+    div.classList.add('p');
+    div.style.textAlign = this.textAlign;
+
+
     let fig = document.createElement('figure');
+    div.append(fig);
+
     fig.classList.add('btex-figure');
     let imageId = '';
     let imageChild = new ImageElement;
@@ -67,6 +81,6 @@ export class FigureElement implements ContainerElement {
       newChildren.push(captionChild);
     this.paragraph.children = newChildren;
     fig.append(...this.paragraph.renderInner(options));
-    return [fig]
+    return [div]
   }
 }
