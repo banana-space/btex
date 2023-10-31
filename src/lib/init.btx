@@ -923,20 +923,6 @@
 
 
 % ==========           TABLES           ==========
-\newcounter{table}
-
-\envdef{table}{}{%
-    \@begingroup%
-    \@@set{par-align}{center}%
-    \@@enter{figure}%
-    \@@def\@currentlabel{\thetable}%
-    \@@bmk% make a dummy book mark whose id will be passed to table
-    \@settrue{caption-in-table}
-}{%
-    \@setfalse{caption-in-table}
-    \@@exit{figure}%
-    \@endgroup
-}
 
 \envdef{@table}{#1#2}{%
     \@ifmmode{%
@@ -1001,21 +987,6 @@
 
 % ==========           FIGURES          ==========
 
-\newcounter{figure}
-
-\envdef{figure}{}{%
-    \@begingroup%
-    \@@set{par-align}{center}%
-    \@@enter{figure}%
-    \@@def\@currentlabel{\thefigure}%
-    \@@bmk% make a dummy book mark whose id will be passed to img
-    \@settrue{caption-in-figure}
-}{%
-    \@setfalse{caption-in-figure}
-    \@@exit{figure}%
-    \@endgroup
-}
-
 \def\@includegraphics#1{
     \@ifstatic{
         \@@set{image-source}{#1}
@@ -1043,19 +1014,56 @@
     \@includegraphics
 }
 
-
-\def\caption#1{
+\def\@caption#1#2#3{
     \@@enter{caption}
-    \@iftrue{caption-in-figure}{
-        \@inc{g.ctr-figure}
-        \@bf\@rm\figname\thefigure.\@md\ #1
-    }
-    \@iftrue{caption-in-table}{
-        \@inc{g.ctr-table}
-        \@bf\@rm\tablename\thetable.\@md\ #1
-    }
+    \@inc{g.ctr-#1}
+    \@bf\@rm#2 \@@cmd{the#1}.\@md\ #3
     \@@exit{caption}
 }
+
+\def\caption#1{
+    \@caption{\@@get{caption-counter}}{\@@get{caption-begin}}{#1}
+}
+
+\def\newfigure#1#2{
+    \newcounter{#1}
+    \@envdef{#1}{}{
+        \@begingroup%
+        \@@set{par-align}{center}%
+        \@@enter{figure}%
+        \@@def\@currentlabel{\@@cmd{the#1}}%
+        \@@bmk% make a dummy book mark whose id will be passed to img
+        \@@set{caption-counter}{#1}
+        \@@set{caption-begin}{#2}
+    }{%
+        \@@exit{figure}%
+        \@endgroup
+    }
+}
+
+\pdef\newfigure#1[#2]#3{
+    \@iftrue{env-defined-#2}{
+        \@envdef{#1}{}{
+            \@begingroup%
+            \@@set{par-align}{center}%
+            \@@enter{figure}%
+            \@@def\@currentlabel{\@@cmd{the#2}}%
+            \@@bmk% make a dummy book mark whose id will be passed to img
+            \@@set{caption-counter}{#2}
+            \@@set{caption-begin}{#3}
+        }{%
+            \@@exit{figure}%
+            \@endgroup
+        }
+    }{
+        \@@set{throw-arg-1}{#2}%
+        \@@throw{UNDEFINED_ENVIRONMENT}%
+    }
+}
+
+\newfigure{figure}{\figname}
+
+\newfigure{table}{\tablename}
 
 
 
