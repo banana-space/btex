@@ -631,6 +631,20 @@
 
 % ...
 
+% ==========          STATIC-MODE       ==========
+\@setfalse{g.static-mode}
+
+\def\@enablestatic{
+    \@settrue{g.static-mode}
+}
+
+\def\@disablestatic{
+    \@setfalse{g.static-mode}
+}
+
+\def\@ifstatic{\@iftrue{g.static-mode}}   
+
+
 
 % ==========          THEOREMS          ==========
 
@@ -1003,16 +1017,26 @@
 }
 
 \def\@includegraphics#1{
-    \@@set{image-source}{#1}
-    \@@enter{image}
-    \@@exit{image}
+    \@ifstatic{
+        \@@set{image-source}{#1}
+        \@@enter{image}
+        \@@exit{image}
+    }{
+        \@@set{throw-arg-1}{includegraphics}%
+        \@@throw{UNDEFINED_COMMAND}%
+    }
 }
 
 \pdef\@includegraphics[#1]#2{
-    \@@set{image-options}{#1}
-    \@@set{image-source}{#2}
-    \@@enter{image}
-    \@@exit{image}
+    \@ifstatic{
+        \@@set{image-options}{#1}
+        \@@set{image-source}{#2}
+        \@@enter{image}
+        \@@exit{image}
+    }{
+        \@@set{throw-arg-1}{includegraphics}%
+        \@@throw{UNDEFINED_COMMAND}%
+    }
 }
 
 \def\includegraphics{
