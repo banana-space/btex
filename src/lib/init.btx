@@ -632,6 +632,7 @@
 
 % ...
 
+
 % ==========          THEOREMS          ==========
 
 \envdef{@theorem}{#1}{%
@@ -923,7 +924,7 @@
     \@pdef\\\\{\@u000a}%
     \@tdef\hline{}%
     #2%
-    \@@enter{table}% html table element
+    \@@enter{table}%
     \@cellopt%
 }{%
     \@@exit{table}%
@@ -1045,10 +1046,6 @@
 \newfigure{figure}{\figname}
 
 \newfigure{table}{\tablename}
-
-
-
-
 
 
 % ==========           TIKZ             ==========
