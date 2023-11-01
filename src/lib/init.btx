@@ -199,6 +199,7 @@
 
 \def\@newcounter#1{%
     \@@set{g.ctr-#1}{0}%
+    \@settrue{ctr-defined-#1}
     \@defbyname{the#1}{\arabic{#1}}%
     \@defbyname{@next#1}{}%
 }
@@ -631,21 +632,6 @@
 
 % ...
 
-% ==========          STATIC-MODE       ==========
-\@setfalse{g.static-mode}
-
-\def\@enablestatic{
-    \@settrue{g.static-mode}
-}
-
-\def\@disablestatic{
-    \@setfalse{g.static-mode}
-}
-
-\def\@ifstatic{\@iftrue{g.static-mode}}   
-
-
-
 % ==========          THEOREMS          ==========
 
 \envdef{@theorem}{#1}{%
@@ -987,32 +973,27 @@
 
 % ==========           FIGURES          ==========
 
-\def\@includegraphics#1{
-    \@ifstatic{
+\def\enableincludegraphics{
+    \def\@includegraphics#1{
         \@@set{image-source}{#1}
         \@@enter{image}
         \@@exit{image}
-    }{
-        \@@set{throw-arg-1}{includegraphics}%
-        \@@throw{UNDEFINED_COMMAND}%
-    }
-}
 
-\pdef\@includegraphics[#1]#2{
-    \@ifstatic{
+    }
+
+    \pdef\@includegraphics[#1]#2{
         \@@set{image-options}{#1}
         \@@set{image-source}{#2}
         \@@enter{image}
         \@@exit{image}
-    }{
-        \@@set{throw-arg-1}{includegraphics}%
-        \@@throw{UNDEFINED_COMMAND}%
+    }
+
+    \def\includegraphics{
+        \@includegraphics
     }
 }
 
-\def\includegraphics{
-    \@includegraphics
-}
+
 
 \def\@caption#1#2#3{
     \@@enter{caption}
@@ -1042,7 +1023,7 @@
 }
 
 \pdef\newfigure#1[#2]#3{
-    \@iftrue{env-defined-#2}{
+    \@iftrue{ctr-defined-#2}{
         \@envdef{#1}{}{
             \@begingroup%
             \@@set{par-align}{center}%
@@ -1057,7 +1038,7 @@
         }
     }{
         \@@set{throw-arg-1}{#2}%
-        \@@throw{UNDEFINED_ENVIRONMENT}%
+        \@@throw{UNDEFINED_COUNTER}%
     }
 }
 
