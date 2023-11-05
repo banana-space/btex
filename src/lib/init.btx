@@ -1154,12 +1154,28 @@
         \@settrue{text-sup}%
         \@@set{ref-key}{footnote:{g.ctr-footnote}}%
         \@ref{\thefootnote}%
+    }%
+    \@dec{g.ctr-footnote}%
+}
+
+\def\@footnoteorigin{%
+    \@inc{g.ctr-footnote}%
+    {%
+        \@settrue{text-sup}%
         \@@def\@currentlabel{^}%
         \@@set{ref-prefix}{o}% 
         \@@bmk%
-        \@@label{footnote-origin:\thefootnote}%
+        \@@label{footnote-origin:{g.ctr-footnote}}%
     }%
     \@dec{g.ctr-footnote}%
+}
+
+\def\@footnoteoriginref{%
+    \@settrue{text-sup}%
+    \@@set{ref-key}{footnote-origin:{g.ctr-footnote}}%
+    \@ref{\thefootnote}%
+    \ % space
+    \@setfalse{text-sup}%
 }
 
 \def\@printfootnoteitem[#1][#2]{%
@@ -1169,8 +1185,6 @@
     \@@def\@currentlabel{#2}%
     \@@bmk%
     \@@label{footnote:#1}%
-    \@@set{ref-key}{footnote-origin:#2}%
-    \@ref{#2}%
     \@setfalse{text-sup}%
 }
 
@@ -1185,12 +1199,14 @@
 
 \let\footnotemark\@footnotemark
 
+\let\footnoteorigin\@footnoteorigin
+
 \def\footnotetext#1{%
     \@inc{g.ctr-footnote}%
     \@footnotetext{#1}%
 }
 
-\def\footnote#1{\footnotemark\footnotetext{#1}}
+\def\footnote#1{\footnotemark\@footnoteorigin\footnotetext{\@footnoteoriginref#1}}
 
 \def\printfootnotes{%
     {%
