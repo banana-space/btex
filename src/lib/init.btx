@@ -199,7 +199,7 @@
 
 \def\@newcounter#1{%
     \@@set{g.ctr-#1}{0}%
-    \@settrue{ctr-defined-#1}
+    \@settrue{g.ctr-defined-#1}
     \@defbyname{the#1}{\arabic{#1}}%
     \@defbyname{@next#1}{}%
 }
@@ -979,7 +979,6 @@
         \@@set{image-source}{#1}
         \@@enter{image}
         \@@exit{image}
-
     }
 
     \pdef\@includegraphics[#1]#2{
@@ -993,8 +992,6 @@
         \@includegraphics
     }
 }
-
-
 
 \def\@caption#1#2#3{
     \@@enter{caption}
@@ -1014,7 +1011,7 @@
         \@@set{par-align}{center}%
         \@@enter{figure}%
         \@@def\@currentlabel{\@@cmd{the#1}}%
-        \@@bmk% make a dummy book mark whose id will be passed to img
+        \@@bmk%
         \@@set{caption-counter}{#1}
         \@@set{caption-begin}{#2}
     }{%
@@ -1024,13 +1021,13 @@
 }
 
 \pdef\newfigure#1[#2]#3{
-    \@iftrue{ctr-defined-#2}{
+    \@iftrue{g.ctr-defined-#2}{
         \@envdef{#1}{}{
             \@begingroup%
             \@@set{par-align}{center}%
             \@@enter{figure}%
             \@@def\@currentlabel{\@@cmd{the#2}}%
-            \@@bmk% make a dummy book mark whose id will be passed to img
+            \@@bmk%
             \@@set{caption-counter}{#2}
             \@@set{caption-begin}{#3}
         }{%
@@ -1044,7 +1041,6 @@
 }
 
 \newfigure{figure}{\figname}
-
 \newfigure{table}{\tablename}
 
 
