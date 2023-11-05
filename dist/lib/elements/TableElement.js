@@ -10,6 +10,8 @@ var TableElement = /** @class */ (function () {
         this.paragraph = new ParagraphElement_1.ParagraphElement();
         this.isInline = false;
         this.isPlain = false;
+        this.caption = undefined;
+        this.id = undefined;
         // current cell
         this.row = 0;
         this.col = 0;
@@ -83,12 +85,9 @@ var TableElement = /** @class */ (function () {
     };
     TableElement.prototype.render = function (options) {
         var _a, _b, _c, _d, _e, _f;
-        var div = document.createElement('div');
-        div.classList.add('table-wrapper');
         var table = document.createElement('table');
         if (!this.isPlain)
             table.classList.add('wikitable');
-        div.append(table);
         var tbody = document.createElement('tbody');
         table.append(tbody);
         var colAlign = [];
@@ -135,7 +134,13 @@ var TableElement = /** @class */ (function () {
                 td.append.apply(td, content);
             }
         }
-        return [div];
+        if (this.caption) {
+            table.append.apply(table, this.caption.render(options));
+        }
+        if (this.id) {
+            table.setAttribute('id', this.id);
+        }
+        return [table];
     };
     return TableElement;
 }());

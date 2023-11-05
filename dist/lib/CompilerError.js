@@ -27,6 +27,8 @@ var errorMessages = {
         UNCLOSED_CONTAINER: '容器没有退出。',
         UNDEFINED_COMMAND: '命令没有定义。',
         UNDEFINED_COMMAND_1: "命令 '$1' 没有定义。",
+        UNDEFINED_COUNTER: "计数器没有定义。",
+        UNDEFINED_COUNTER_1: "计数器 '$1' 没有定义",
         UNDEFINED_ENVIRONMENT: '环境没有定义。',
         UNDEFINED_ENVIRONMENT_1: "环境 '$1' 没有定义。",
         UNEXPECTED_TOKEN_1: "'$1' 不该出现在这里。",

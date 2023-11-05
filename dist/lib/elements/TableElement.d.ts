@@ -1,6 +1,7 @@
 import { Context } from '../Context';
 import { ContainerElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
+import { CaptionElement } from './CaptionElement';
 import { ParagraphElement } from './ParagraphElement';
 export declare class TableElement implements ContainerElement {
     name: 'table';
@@ -10,6 +11,8 @@ export declare class TableElement implements ContainerElement {
     paragraph: ParagraphElement;
     isInline: boolean;
     isPlain: boolean;
+    caption?: CaptionElement;
+    id?: string;
     row: number;
     col: number;
     isEmpty(): boolean;

@@ -199,6 +199,7 @@
 
 \def\@newcounter#1{%
     \@@set{g.ctr-#1}{0}%
+    \@settrue{g.ctr-defined-#1}
     \@defbyname{the#1}{\arabic{#1}}%
     \@defbyname{@next#1}{}%
 }
@@ -971,6 +972,78 @@
 \envdef{equation*}{}{\[}{\]}
 
 
+% ==========           FIGURES          ==========
+
+\def\enableincludegraphics{
+    \def\@includegraphics#1{
+        \@@set{image-source}{#1}
+        \@@enter{image}
+        \@@exit{image}
+    }
+
+    \pdef\@includegraphics[#1]#2{
+        \@@set{image-options}{#1}
+        \@@set{image-source}{#2}
+        \@@enter{image}
+        \@@exit{image}
+    }
+
+    \def\includegraphics{
+        \@includegraphics
+    }
+}
+
+\def\@caption#1#2#3{
+    \@@enter{caption}
+    \@inc{g.ctr-#1}
+    \@bf\@rm#2 \@@cmd{the#1}.\@md\ #3
+    \@@exit{caption}
+}
+
+\def\caption#1{
+    \@caption{\@@get{caption-counter}}{\@@get{caption-begin}}{#1}
+}
+
+\def\newfigure#1#2{
+    \newcounter{#1}
+    \@envdef{#1}{}{
+        \@begingroup%
+        \@@set{par-align}{center}%
+        \@@enter{figure}%
+        \@@def\@currentlabel{\@@cmd{the#1}}%
+        \@@bmk%
+        \@@set{caption-counter}{#1}
+        \@@set{caption-begin}{#2}
+    }{%
+        \@@exit{figure}%
+        \@endgroup
+    }
+}
+
+\pdef\newfigure#1[#2]#3{
+    \@iftrue{g.ctr-defined-#2}{
+        \@envdef{#1}{}{
+            \@begingroup%
+            \@@set{par-align}{center}%
+            \@@enter{figure}%
+            \@@def\@currentlabel{\@@cmd{the#2}}%
+            \@@bmk%
+            \@@set{caption-counter}{#2}
+            \@@set{caption-begin}{#3}
+        }{%
+            \@@exit{figure}%
+            \@endgroup
+        }
+    }{
+        \@@set{throw-arg-1}{#2}%
+        \@@throw{UNDEFINED_COUNTER}%
+    }
+}
+
+\newfigure{figure}{\figname}
+\newfigure{table}{\tablename}
+
+
 % ==========           TIKZ             ==========
 
 \envdef{tikzpicture}{}{%
@@ -1342,6 +1415,8 @@
 \def\proofname{证明}
 \def\refname{参考文献}
 \def\tocname{目录}
+\def\figname{图}
+\def\tablename{表}
 
 \def\@english{%
     \@@def\theoremname{Theorem}%
@@ -1355,6 +1430,8 @@
     \@@def\proofname{Proof}%
     \@@def\refname{References}%
     \@@def\tocname{Contents}%
+    \@@def\figname{Figure}
+    \@@def\tablename{Table}
 }
 
 \def\english{\setlanguage{en}\@english}
