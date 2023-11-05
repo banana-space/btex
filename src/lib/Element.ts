@@ -1,7 +1,10 @@
 import { Context } from './Context';
+import { CaptionElement } from './elements/CaptionElement';
 import { DiagramElement } from './elements/DiagramElement';
 import { DivElement } from './elements/DivElement';
+import { FigureElement } from './elements/FigureElement';
 import { HeaderElement } from './elements/HeaderElement';
+import { ImageElement } from './elements/ImageElement';
 import { ListElement } from './elements/ListElement';
 import { MathElement } from './elements/MathElement';
 import { ParagraphElement } from './elements/ParagraphElement';
@@ -55,4 +58,7 @@ export const Containers: { [name: string]: ContainerConstructor } = {
   toc: TabelOfContentElement,
   ref: ReferenceElement,
   tikz: TikzElement,
+  image: ImageElement,
+  figure: FigureElement,
+  caption: CaptionElement,
 };
