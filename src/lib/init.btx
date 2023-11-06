@@ -678,11 +678,12 @@
 
 \def\@changethmbegin#1{%
     \@@def\newtheorem##1##2{%
+        \newcounter{##1}
         \@envdef{##1}{}{%
             #1%
             \begin{@theorem}{%
-                \refstepcounter{theorem}%
-                ##2 \thetheorem%
+                \refstepcounter{##1}%
+                ##2 \@@cmd{the##1}%
             }%
         }{\end{@theorem}}%
     }%
@@ -693,8 +694,19 @@
         }{\end{@theorem}}%
     }%
     \@pdef\newtheorem##1[##2]##3{%
-        \newtheorem{##1}{##3}%
-    }%
+        \@iftrue{g.ctr-defined-##2}{
+            \@envdef{##1}{}{%
+                #1%
+                \begin{@theorem}{%
+                    \refstepcounter{##2}%
+                    ##3 \@@cmd{the##2}%
+                }%
+            }{\end{@theorem}}%
+        }{%
+            \@@set{throw-arg-1}{##2}%
+            \@@throw{UNDEFINED_COUNTER}%  
+        }
+    }
 }
 
 \def\@thmbegina{\@@set{g.div-class}{style-a}}
