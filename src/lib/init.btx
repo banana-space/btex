@@ -1199,7 +1199,7 @@
     \@inc{g.ctr-footnoteorigin}
     \@settrue{text-sup}%
     \@@set{ref-key}{footnote-origin:{g.ctr-footnoteorigin}}%
-    \@ref{\thefootnote}%
+    \@ref{\thefootnoteorigin}%
     \ % space
     \@setfalse{text-sup}%
 }
