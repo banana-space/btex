@@ -1195,16 +1195,16 @@
     \@dec{g.ctr-footnote}
 }
 
-\def\@footnoteoriginref{%
-    \@inc{g.ctr-footnoteorigin}
-    \@settrue{text-sup}%
-    \@@set{ref-key}{footnote-origin:{g.ctr-footnoteorigin}}%
-    \@ref{\thefootnoteorigin}%
-    \ % space
-    \@setfalse{text-sup}%
+\def\@footnoteoriginref#1{%
+    {
+        \@inc{g.ctr-footnoteorigin}
+        \@@set{ref-key}{footnote-origin:{g.ctr-footnoteorigin}}%
+        \@ref{\thefootnoteorigin}%
+    }
+    #1
 }
 
-\def\footnote#1{\footnotemark\@footnoteorigin\footnotetext{\@footnoteoriginref#1}}
+\def\footnote#1{\footnotemark\@footnoteorigin\footnotetext{\@footnoteoriginref{#1}}}
 
 \def\printfootnotes{%
     {%
