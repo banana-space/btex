@@ -1146,6 +1146,8 @@
 
 \newcounter{actualfootnote}
 
+\newcounter{footnoteorigin}
+
 \def\@printfootnotes{}
 
 \def\@footnotemark{%
@@ -1185,20 +1187,18 @@
 }
 
 \def\@footnoteorigin{%
-    \@inc{g.ctr-footnote}%
-    {%
-        \@settrue{text-sup}%
-        \@@def\@currentlabel{^}%
-        \@@set{ref-prefix}{o}% 
-        \@@bmk%
-        \@@label{footnote-origin:{g.ctr-footnote}}%
-    }%
-    \@dec{g.ctr-footnote}%
+    \@inc{g.ctr-footnote}
+    \@@def\@currentlabel{^}%
+    \@@set{ref-prefix}{o}% 
+    \@@bmk%
+    \@@label{footnote-origin:{g.ctr-footnote}}%
+    \@dec{g.ctr-footnote}
 }
 
 \def\@footnoteoriginref{%
+    \@inc{g.ctr-footnoteorigin}
     \@settrue{text-sup}%
-    \@@set{ref-key}{footnote-origin:{g.ctr-footnote}}%
+    \@@set{ref-key}{footnote-origin:{g.ctr-footnoteorigin}}%
     \@ref{\thefootnote}%
     \ % space
     \@setfalse{text-sup}%
