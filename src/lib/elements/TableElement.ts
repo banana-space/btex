@@ -1,7 +1,6 @@
 import { Context } from '../Context';
-import { ContainerElement, RenderElement, RenderOptions } from '../Element';
+import { ContainerElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
-import { CaptionElement } from './CaptionElement';
 import { ParagraphElement } from './ParagraphElement';
 
 export class TableElement implements ContainerElement {
@@ -12,8 +11,6 @@ export class TableElement implements ContainerElement {
   paragraph: ParagraphElement = new ParagraphElement();
   isInline: boolean = false;
   isPlain: boolean = false;
-  caption?: CaptionElement = undefined;
-  id?: string = undefined;
 
   // current cell
   row: number = 0;
@@ -88,8 +85,12 @@ export class TableElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): HTMLElement[] {
+    let div = document.createElement('div');
+    div.classList.add('table-wrapper');
+
     let table = document.createElement('table');
     if (!this.isPlain) table.classList.add('wikitable');
+    div.append(table);
 
     let tbody = document.createElement('tbody');
     table.append(tbody);
@@ -133,16 +134,6 @@ export class TableElement implements ContainerElement {
       }
     }
 
-    if(this.caption)
-    {
-      table.append(...this.caption.render(options));
-    }
-    
-    if(this.id)
-    {
-      table.setAttribute('id', this.id);
-    }
-
-    return [table];
+    return [div];
   }
 }
