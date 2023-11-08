@@ -1141,24 +1141,6 @@
 
 
 % ==========         FOOTNOTES          ==========
-\def\@rep#1#2{
-    \@@if{#2}{1}{
-        #1
-    }{}
-    \@@if{#2}{2}{
-        #1#1
-    }{}
-    \@@if{#2}{3}{
-        #1#1#1
-    }{}
-    \@@if{#2}{4}{
-        #1#1#1#1
-    }{}
-    \@@if{#2}{5}{
-        #1#1#1#1#1
-    }{}
-}
-
 
 \newcounter{footnote}
 
@@ -1201,7 +1183,7 @@
     \@patch\@printfootnotes{][}%
     \@defexpand\@patch\@printfootnotes{\thefootnote}%
     \@patch\@printfootnotes{]}%
-    \@defexpand\@patch\@printfootnotes{\@footnoteorigincollection}
+    \@defexpand\@patch\@printfootnotes{\@footnoteorigincollection}%
     \@patch\@printfootnotes{#1}%
 }
 
