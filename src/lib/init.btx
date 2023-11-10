@@ -1152,7 +1152,7 @@
 
 \def\@printfootnotes{}
 
-\def\@footnoteorigincollection{}
+\gdef\@footnoteorigincollection{}
 
 \def\@footnotemark{%
     \@inc{g.ctr-footnote}%
@@ -1160,8 +1160,9 @@
         \@settrue{text-sup}%
         \@@set{ref-key}{footnote:{g.ctr-footnote}}%
         \@ref{\thefootnote}%
+        \@setfalse{text-sup}%
         \@footnoteorigin%
-        \@patch\@footnoteorigincollection{\@footnoteoriginref}
+        \@patch\@footnoteorigincollection{\@footnoteoriginref}%
     }%
     \@dec{g.ctr-footnote}%
 }
@@ -1192,7 +1193,7 @@
 \def\footnotetext#1{%
     \@inc{g.ctr-footnote}%
     \@footnotetext{#1}%
-    \def\@footnoteorigincollection{}
+    \gdef\@footnoteorigincollection{}%
 }
 
 \pdef\@footnoteorigin{%
