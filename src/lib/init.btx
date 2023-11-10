@@ -1197,9 +1197,9 @@
 }
 
 \pdef\@footnoteorigin{%
-    \@inc{g.ctr-footnoteorigin}
+    \@inc{g.ctr-footnoteorigin}%
     \@@def\@currentlabel{^}%
-    \@@set{ref-prefix}{o}% 
+    \@@set{ref-prefix}{o}%
     \@@bmk%
     \@@label{footnote-origin:{g.ctr-footnoteorigin}}%
 }
