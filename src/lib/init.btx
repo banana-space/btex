@@ -1219,7 +1219,13 @@
 
 \newcounter{actualfootnote}
 
+\newcounter{footnoteorigin}
+
+\newcounter{footnoteoriginref}
+
 \def\@printfootnotes{}
+
+\gdef\@footnoteorigincollection{}
 
 \def\@footnotemark{%
     \@inc{g.ctr-footnote}%
@@ -1227,6 +1233,9 @@
         \@settrue{text-sup}%
         \@@set{ref-key}{footnote:{g.ctr-footnote}}%
         \@ref{\thefootnote}%
+        \@setfalse{text-sup}%
+        \@footnoteorigin%
+        \@patch\@footnoteorigincollection{\@footnoteoriginref}%
     }%
     \@dec{g.ctr-footnote}%
 }
@@ -1247,7 +1256,9 @@
     \@defexpand\@patch\@printfootnotes{\theactualfootnote}%
     \@patch\@printfootnotes{][}%
     \@defexpand\@patch\@printfootnotes{\thefootnote}%
-    \@patch\@printfootnotes{]#1}%
+    \@patch\@printfootnotes{]}%
+    \@defexpand\@patch\@printfootnotes{\@footnoteorigincollection}%
+    \@patch\@printfootnotes{#1}%
 }
 
 \let\footnotemark\@footnotemark
@@ -1255,12 +1266,30 @@
 \def\footnotetext#1{%
     \@inc{g.ctr-footnote}%
     \@footnotetext{#1}%
+    \gdef\@footnoteorigincollection{}%
+}
+
+\pdef\@footnoteorigin{%
+    \@inc{g.ctr-footnoteorigin}%
+    \@@def\@currentlabel{^}%
+    \@@set{ref-prefix}{o}%
+    \@@bmk%
+    \@@label{footnote-origin:{g.ctr-footnoteorigin}}%
+}
+
+\def\@footnoteoriginref{%
+    {
+        \@inc{g.ctr-footnoteoriginref}
+        \@@set{ref-key}{footnote-origin:{g.ctr-footnoteoriginref}}%
+        \@ref{\thefootnoteoriginref}%
+    }
 }
 
 \def\footnote#1{\footnotemark\footnotetext{#1}}
 
 \def\printfootnotes{%
     {%
+        \@@set{g.ctr-footnoteoriginref}{0}%
         \@@set{g.list-classes}{footnotes}%
         \begin{@list}%
             \@printfootnotes%
