@@ -1,5 +1,5 @@
 import { Context } from '../Context';
-import { ContainerElement, RenderElement, RenderOptions } from '../Element';
+import { ContainerElement, RenderOptions } from '../Element';
 import { Token } from '../Token';
 import { ParagraphElement } from './ParagraphElement';
 

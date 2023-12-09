@@ -8,8 +8,7 @@ export class CaptionElement implements ContainerElement {
   name: 'caption' = 'caption';
   paragraph: ParagraphElement = new ParagraphElement();
   isInline: boolean = true;
-  isInFigure: boolean = false;
-  isInTable: boolean = false;
+
 
   constructor() {}
 
@@ -26,8 +25,7 @@ export class CaptionElement implements ContainerElement {
   }
 
   enter(context: Context, initiator: Token): void {
-    this.isInFigure = context.getBoolean('caption-in-figure', false);
-    this.isInTable = context.getBoolean('caption-in-table', false);
+    // do nothing
   }
 
   event(arg: string, context: Context, initiator: Token) {
@@ -42,18 +40,7 @@ export class CaptionElement implements ContainerElement {
   }
 
   render(options?: RenderOptions): HTMLElement[] {
-    var caption: HTMLElement;
-    if(this.isInFigure){
-      caption = document.createElement('figcaption');
-    }
-    else if(this.isInTable)
-    {
-      caption = document.createElement('caption');
-    }
-    else
-    {
-      throw Error('unknown env');
-    }
+    let caption = document.createElement('figcaption');
     caption.append(...this.paragraph.renderInner(options));
     return [caption]
   }

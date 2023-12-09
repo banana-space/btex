@@ -199,6 +199,7 @@
 
 \def\@newcounter#1{%
     \@@set{g.ctr-#1}{0}%
+    \@settrue{g.ctr-defined-#1}
     \@defbyname{the#1}{\arabic{#1}}%
     \@defbyname{@next#1}{}%
 }
@@ -921,7 +922,6 @@
 
 
 % ==========           TABLES           ==========
-\newcounter{table}
 
 \envdef{@table}{#1#2}{%
     \@ifmmode{%
@@ -986,52 +986,74 @@
 
 % ==========           FIGURES          ==========
 
-\newcounter{figure}
+\def\enableincludegraphics{
+    \def\@includegraphics#1{
+        \@@set{image-source}{#1}
+        \@@enter{image}
+        \@@exit{image}
+    }
 
-\envdef{figure}{}{%
-    \@par%
-    \@@enter{figure}%
-    \@settrue{caption-in-figure}
-}{%
-    \@setfalse{caption-in-figure}
-    \@@exit{figure}%
-    \@par%
+    \pdef\@includegraphics[#1]#2{
+        \@@set{image-options}{#1}
+        \@@set{image-source}{#2}
+        \@@enter{image}
+        \@@exit{image}
+    }
+
+    \def\includegraphics{
+        \@includegraphics
+    }
 }
 
-\def\@includegraphics#1{
-    \@@set{image-source}{#1}
-    \@@enter{image}
-    \@@exit{image}
-}
-
-\pdef\@includegraphics[#1]#2{
-    \@@set{image-options}{#1}
-    \@@set{image-source}{#2}
-    \@@enter{image}
-    \@@exit{image}
-}
-
-\def\includegraphics{
-    \@includegraphics
-}
-
-
-\def\caption#1{
+\def\@caption#1#2#3{
     \@@enter{caption}
-    \@iftrue{caption-in-figure}{
-        \refstepcounter{figure}
-        \figname\thefigure\ #1
-    }
-    \@iftrue{caption-in-table}{
-        \refstepcounter{table}
-        \tablename\thetable\ #1
-    }
+    \@inc{g.ctr-#1}
+    \@bf\@rm#2 \@@cmd{the#1}.\@md\ #3
     \@@exit{caption}
 }
 
+\def\caption#1{
+    \@caption{\@@get{caption-counter}}{\@@get{caption-begin}}{#1}
+}
 
+\def\newfigure#1#2{
+    \newcounter{#1}
+    \@envdef{#1}{}{
+        \@begingroup%
+        \@@set{par-align}{center}%
+        \@@enter{figure}%
+        \@@def\@currentlabel{\@@cmd{the#1}}%
+        \@@bmk%
+        \@@set{caption-counter}{#1}
+        \@@set{caption-begin}{#2}
+    }{%
+        \@@exit{figure}%
+        \@endgroup
+    }
+}
 
+\pdef\newfigure#1[#2]#3{
+    \@iftrue{g.ctr-defined-#2}{
+        \@envdef{#1}{}{
+            \@begingroup%
+            \@@set{par-align}{center}%
+            \@@enter{figure}%
+            \@@def\@currentlabel{\@@cmd{the#2}}%
+            \@@bmk%
+            \@@set{caption-counter}{#2}
+            \@@set{caption-begin}{#3}
+        }{%
+            \@@exit{figure}%
+            \@endgroup
+        }
+    }{
+        \@@set{throw-arg-1}{#2}%
+        \@@throw{UNDEFINED_COUNTER}%
+    }
+}
 
+\newfigure{figure}{\figname}
+\newfigure{table}{\tablename}
 
 
 % ==========           TIKZ             ==========
@@ -1209,7 +1231,13 @@
 
 \newcounter{actualfootnote}
 
+\newcounter{footnoteorigin}
+
+\newcounter{footnoteoriginref}
+
 \def\@printfootnotes{}
+
+\gdef\@footnoteorigincollection{}
 
 \def\@footnotemark{%
     \@inc{g.ctr-footnote}%
@@ -1217,6 +1245,9 @@
         \@settrue{text-sup}%
         \@@set{ref-key}{footnote:{g.ctr-footnote}}%
         \@ref{\thefootnote}%
+        \@setfalse{text-sup}%
+        \@footnoteorigin%
+        \@patch\@footnoteorigincollection{\@footnoteoriginref}%
     }%
     \@dec{g.ctr-footnote}%
 }
@@ -1237,7 +1268,9 @@
     \@defexpand\@patch\@printfootnotes{\theactualfootnote}%
     \@patch\@printfootnotes{][}%
     \@defexpand\@patch\@printfootnotes{\thefootnote}%
-    \@patch\@printfootnotes{]#1}%
+    \@patch\@printfootnotes{]}%
+    \@defexpand\@patch\@printfootnotes{\@footnoteorigincollection}%
+    \@patch\@printfootnotes{#1}%
 }
 
 \let\footnotemark\@footnotemark
@@ -1245,12 +1278,30 @@
 \def\footnotetext#1{%
     \@inc{g.ctr-footnote}%
     \@footnotetext{#1}%
+    \gdef\@footnoteorigincollection{}%
+}
+
+\pdef\@footnoteorigin{%
+    \@inc{g.ctr-footnoteorigin}%
+    \@@def\@currentlabel{^}%
+    \@@set{ref-prefix}{o}%
+    \@@bmk%
+    \@@label{footnote-origin:{g.ctr-footnoteorigin}}%
+}
+
+\def\@footnoteoriginref{%
+    {
+        \@inc{g.ctr-footnoteoriginref}
+        \@@set{ref-key}{footnote-origin:{g.ctr-footnoteoriginref}}%
+        \@ref{\thefootnoteoriginref}%
+    }
 }
 
 \def\footnote#1{\footnotemark\footnotetext{#1}}
 
 \def\printfootnotes{%
     {%
+        \@@set{g.ctr-footnoteoriginref}{0}%
         \@@set{g.list-classes}{footnotes}%
         \begin{@list}%
             \@printfootnotes%
