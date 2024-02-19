@@ -84,3 +84,41 @@ span.display-math span.equation-tag-right {
   flex-shrink: 0;
   flex-grow: 0;
 }
+
+.marginnotebody {
+    font-size: 80%;
+    position: relative;
+}
+/* Wide viewport */
+@media (min-width: 1400px) {
+    .marginnotebody {
+        display: block;
+        float: right;
+        clear: right;
+        margin-right: -23vw;
+        text-align: left;
+
+        top: -1rem;
+        width: 20vw;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 1400px) {
+  .marginnotebody {
+      display: block;
+      float: left;
+      clear: right;
+      text-align: left;
+      margin-left: 2rem;
+      margin-right: 2rem;
+      width: 100%;
+  }
+}
+
+@media (min-width: 1400px) {
+/* Highlight the sidenote when mouse hovers on the sidenote number in body. */
+.marginnote:hover .marginnotebody {
+    background-color: yellow;
+}
+} 

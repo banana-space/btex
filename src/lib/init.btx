@@ -971,6 +971,22 @@
 
 \envdef{equation*}{}{\[}{\]}
 
+% ==========         MARGINNOTES          ==========
+\newcounter{marginnote}
+
+\def\enablemarginnote{%
+    \def\@marginnote#1#2{%
+        \@inc{g.ctr-marginnote}%
+        \@@set{marginnote-mark}{\@@cmd{themarginnote}}%
+        \@@enter{marginnote}%
+        \@bf\@rm#1 \themarginnote.\@md\ #2%
+        \@@exit{marginnote}%
+    }%
+
+    \def\marginnote#1{%
+        \@marginnote{\marginnotename}{#1}%
+    }%
+}%
 
 % ==========           FIGURES          ==========
 
@@ -1446,6 +1462,7 @@
 \def\tocname{目录}
 \def\figname{图}
 \def\tablename{表}
+\def\marginnotename{注}
 
 \def\@english{%
     \@@def\theoremname{Theorem}%
@@ -1461,6 +1478,7 @@
     \@@def\tocname{Contents}%
     \@@def\figname{Figure}
     \@@def\tablename{Table}
+    \@@def\marginnotename{Note}
 }
 
 \def\english{\setlanguage{en}\@english}
